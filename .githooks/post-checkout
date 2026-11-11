@@ -1,0 +1,3 @@
+#!/bin/sh
+# Refresh skill links after the repo changes.
+"$(git rev-parse --show-toplevel)/bin/skills" link --quiet || true

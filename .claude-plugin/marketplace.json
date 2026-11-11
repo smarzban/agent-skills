@@ -1,0 +1,11 @@
+{
+  "name": "agent-skills",
+  "owner": { "name": "agent-skills" },
+  "plugins": [
+    {
+      "name": "agent-skills",
+      "source": "./",
+      "description": "Personal skills shared across Claude Code, Codex, Cursor, Pi and Grok."
+    }
+  ]
+}

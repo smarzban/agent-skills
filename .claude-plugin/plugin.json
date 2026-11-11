@@ -1,0 +1,5 @@
+{
+  "name": "agent-skills",
+  "description": "Personal skills shared across Claude Code, Codex, Cursor, Pi and Grok.",
+  "version": "0.1.0"
+}

@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+# Link this repo's skills into every agent harness on this machine.
+#
+#   bin/skills install     link + git hooks + Claude Code SessionStart hook (run once)
+#   bin/skills link        (re)create links, prune links to deleted skills
+#   bin/skills status      show what is linked and what is in the way
+#   bin/skills new <name>  scaffold skills/<name>/SKILL.md and link it
+#   bin/skills uninstall   remove every link and hook this script created
+#
+# How skills reach each harness:
+#   Codex, Pi, Grok, Cursor  one folder link  ~/.agents/skills/agent-skills -> <repo>/skills
+#                            (they scan it recursively, so new skills need no step)
+#   Claude Code              one link per skill in ~/.claude/skills (it does not scan nested
+#                            folders); refreshed by the SessionStart hook and the git hooks
+#
+# It never overwrites anything it did not create: an existing file, folder or
+# foreign link with the same name is reported and left alone.
+set -euo pipefail
+
+SELF="${BASH_SOURCE[0]}"
+while [ -L "$SELF" ]; do
+  d="$(cd -P "$(dirname "$SELF")" && pwd)"
+  SELF="$(readlink "$SELF")"
+  case "$SELF" in /*) ;; *) SELF="$d/$SELF" ;; esac
+done
+REPO="$(cd -P "$(dirname "$SELF")/.." && pwd)"
+SRC="$REPO/skills"
+
+AGENTS_DIR="${AGENT_SKILLS_AGENTS_DIR:-$HOME/.agents/skills}"
+CLAUDE_DIR="${AGENT_SKILLS_CLAUDE_DIR:-$HOME/.claude/skills}"
+CLAUDE_SETTINGS="${AGENT_SKILLS_CLAUDE_SETTINGS:-$HOME/.claude/settings.json}"
+BUNDLE="$AGENTS_DIR/agent-skills"
+# Harness-private skill folders: a same-named skill here shadows or duplicates ours.
+OTHER_DIRS="$HOME/.codex/skills $HOME/.pi/agent/skills $HOME/.grok/skills $HOME/.cursor/skills $AGENTS_DIR"
+
+QUIET=0
+say()  { [ "$QUIET" = 1 ] || printf '%s\n' "$*"; }
+warn() { printf '%s\n' "$*" >&2; }
+
+skill_names() {
+  local d
+  for d in "$SRC"/*/; do
+    [ -f "${d}SKILL.md" ] && basename "$d"
+  done
+  return 0
+}
+
+# ensure_link <link-path> <target>: 0 = linked, 1 = something else is in the way
+ensure_link() {
+  local link="$1" target="$2"
+  if [ -L "$link" ]; then
+    if [ "$(readlink "$link")" = "$target" ]; then return 0; fi
+    case "$(readlink "$link")" in
+      "$SRC"|"$SRC"/*) rm "$link" ;;   # ours, but stale
+      *) return 1 ;;
+    esac
+  elif [ -e "$link" ]; then
+    return 1
+  fi
+  mkdir -p "$(dirname "$link")"
+  ln -s "$target" "$link"
+  say "linked   $link"
+}
+
+cmd_link() {
+  local name conflicts=0
+  ensure_link "$BUNDLE" "$SRC" || { warn "skipped  $BUNDLE exists and is not ours"; conflicts=1; }
+
+  # Claude Code: one link per skill.
+  for name in $(skill_names); do
+    if ! ensure_link "$CLAUDE_DIR/$name" "$SRC/$name"; then
+      warn "skipped  $CLAUDE_DIR/$name exists and is not ours (rename or remove it to use the repo copy)"
+      conflicts=1
+    fi
+  done
+
+  # Prune our links whose skill was deleted or renamed.
+  local link
+  for link in "$CLAUDE_DIR"/*; do
+    [ -L "$link" ] || continue
+    case "$(readlink "$link")" in
+      "$SRC"/*) [ -f "$link/SKILL.md" ] || { rm "$link"; say "pruned   $link"; } ;;
+    esac
+  done
+  return 0
+}
+
+cmd_status() {
+  local name dir state
+  printf 'repo     %s\n' "$REPO"
+  if [ -L "$BUNDLE" ] && [ "$(readlink "$BUNDLE")" = "$SRC" ]; then state="linked"; else state="NOT linked"; fi
+  printf 'bundle   %s  (%s)  -> Codex, Pi, Grok, Cursor\n' "$BUNDLE" "$state"
+  printf '\n%-28s %-12s %s\n' "skill" "claude" "same name elsewhere"
+  for name in $(skill_names); do
+    if [ -L "$CLAUDE_DIR/$name" ] && [ "$(readlink "$CLAUDE_DIR/$name")" = "$SRC/$name" ]; then
+      state="linked"
+    elif [ -e "$CLAUDE_DIR/$name" ] || [ -L "$CLAUDE_DIR/$name" ]; then
+      state="CONFLICT"
+    else
+      state="missing"
+    fi
+    local dupes=""
+    for dir in $OTHER_DIRS; do
+      [ -e "$dir/$name" ] && dupes="$dupes ${dir/#$HOME/~}/$name"
+    done
+    printf '%-28s %-12s %s\n' "$name" "$state" "${dupes:--}"
+  done
+}
+
+cmd_new() {
+  local name="${1:-}"
+  case "$name" in
+    ""|*[!a-z0-9-]*|-*|*-) warn "usage: bin/skills new <name>   (lowercase letters, digits, hyphens)"; exit 2 ;;
+  esac
+  [ -e "$SRC/$name" ] && { warn "skills/$name already exists"; exit 1; }
+  mkdir -p "$SRC/$name"
+  cat > "$SRC/$name/SKILL.md" <<EOF
+---
+name: $name
+description: TODO what this skill does and when to use it, including the phrases that should trigger it.
+---
+
+# $name
+
+TODO instructions.
+EOF
+  say "created  $SRC/$name/SKILL.md"
+  cmd_link
+}
+
+# Add or remove our SessionStart hook in Claude Code's user settings.
+claude_hook() {
+  local action="$1"
+  [ -f "$CLAUDE_SETTINGS" ] || { [ "$action" = add ] && echo '{}' > "$CLAUDE_SETTINGS" || return 0; }
+  ACTION="$action" SETTINGS="$CLAUDE_SETTINGS" HOOK_CMD="'$REPO/bin/skills' link --quiet || true" python3 - <<'PY'
+import json, os, shutil
+path, action, cmd = os.environ["SETTINGS"], os.environ["ACTION"], os.environ["HOOK_CMD"]
+with open(path) as f:
+    data = json.load(f)
+groups = data.setdefault("hooks", {}).setdefault("SessionStart", [])
+mine = lambda g: any("bin/skills' link" in h.get("command", "") for h in g.get("hooks", []))
+kept = [g for g in groups if not mine(g)]
+if action == "add":
+    kept.append({"hooks": [{"type": "command", "command": cmd, "timeout": 10}]})
+if kept != groups:
+    shutil.copy2(path, path + ".bak-agent-skills")
+    data["hooks"]["SessionStart"] = kept
+    if not kept:
+        del data["hooks"]["SessionStart"]
+    if not data["hooks"]:
+        del data["hooks"]
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
+    print(("added" if action == "add" else "removed") + "    Claude Code SessionStart hook in " + path)
+PY
+}
+
+cmd_install() {
+  cmd_link
+  if git -C "$REPO" rev-parse --git-dir >/dev/null 2>&1; then
+    git -C "$REPO" config core.hooksPath .githooks
+    say "enabled  git hooks (.githooks)"
+  fi
+  claude_hook add
+  say ""
+  cmd_status
+}
+
+cmd_uninstall() {
+  local link
+  for link in "$CLAUDE_DIR"/* "$BUNDLE"; do
+    [ -L "$link" ] || continue
+    case "$(readlink "$link")" in
+      "$SRC"|"$SRC"/*) rm "$link"; say "removed  $link" ;;
+    esac
+  done
+  claude_hook remove
+  git -C "$REPO" config --unset core.hooksPath 2>/dev/null || true
+}
+
+cmd="${1:-status}"; shift || true
+for a in "$@"; do [ "$a" = "--quiet" ] && QUIET=1; done
+case "$cmd" in
+  install)   cmd_install ;;
+  link)      cmd_link ;;
+  status)    cmd_status ;;
+  new)       cmd_new "${1:-}" ;;
+  uninstall) cmd_uninstall ;;
+  *)         sed -n '2,9p' "$SELF" | sed 's/^# \{0,1\}//'; exit 2 ;;
+esac
