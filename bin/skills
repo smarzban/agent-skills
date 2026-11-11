@@ -8,10 +8,11 @@
 #   bin/skills uninstall   remove every link and hook this script created
 #
 # How skills reach each harness:
-#   Codex, Pi, Grok, Cursor  one folder link  ~/.agents/skills/agent-skills -> <repo>/skills
-#                            (they scan it recursively, so new skills need no step)
-#   Claude Code              one link per skill in ~/.claude/skills (it does not scan nested
-#                            folders); refreshed by the SessionStart hook and the git hooks
+#   Codex, Pi, Grok     one folder link  ~/.agents/skills/agent-skills -> <repo>/skills
+#                       (they scan it recursively, so new skills need no step)
+#   Claude Code, Cursor one link per skill in ~/.claude/skills and ~/.cursor/skills
+#                       (Claude Code does not scan nested folders; Cursor is not verified to),
+#                       refreshed by the git hooks and the Claude Code SessionStart hook
 #
 # It never overwrites anything it did not create: an existing file, folder or
 # foreign link with the same name is reported and left alone.
@@ -28,10 +29,12 @@ SRC="$REPO/skills"
 
 AGENTS_DIR="${AGENT_SKILLS_AGENTS_DIR:-$HOME/.agents/skills}"
 CLAUDE_DIR="${AGENT_SKILLS_CLAUDE_DIR:-$HOME/.claude/skills}"
+CURSOR_DIR="${AGENT_SKILLS_CURSOR_DIR:-$HOME/.cursor/skills}"
+PER_SKILL_DIRS="$CLAUDE_DIR $CURSOR_DIR"
 CLAUDE_SETTINGS="${AGENT_SKILLS_CLAUDE_SETTINGS:-$HOME/.claude/settings.json}"
 BUNDLE="$AGENTS_DIR/agent-skills"
 # Harness-private skill folders: a same-named skill here shadows or duplicates ours.
-OTHER_DIRS="$HOME/.codex/skills $HOME/.pi/agent/skills $HOME/.grok/skills $HOME/.cursor/skills $AGENTS_DIR"
+OTHER_DIRS="$HOME/.codex/skills $HOME/.pi/agent/skills $HOME/.grok/skills $AGENTS_DIR"
 
 QUIET=0
 say()  { [ "$QUIET" = 1 ] || printf '%s\n' "$*"; }
@@ -63,24 +66,21 @@ ensure_link() {
 }
 
 cmd_link() {
-  local name conflicts=0
-  ensure_link "$BUNDLE" "$SRC" || { warn "skipped  $BUNDLE exists and is not ours"; conflicts=1; }
+  local name dir link
+  ensure_link "$BUNDLE" "$SRC" || warn "skipped  $BUNDLE exists and is not ours"
 
-  # Claude Code: one link per skill.
-  for name in $(skill_names); do
-    if ! ensure_link "$CLAUDE_DIR/$name" "$SRC/$name"; then
-      warn "skipped  $CLAUDE_DIR/$name exists and is not ours (rename or remove it to use the repo copy)"
-      conflicts=1
-    fi
-  done
-
-  # Prune our links whose skill was deleted or renamed.
-  local link
-  for link in "$CLAUDE_DIR"/*; do
-    [ -L "$link" ] || continue
-    case "$(readlink "$link")" in
-      "$SRC"/*) [ -f "$link/SKILL.md" ] || { rm "$link"; say "pruned   $link"; } ;;
-    esac
+  for dir in $PER_SKILL_DIRS; do
+    for name in $(skill_names); do
+      ensure_link "$dir/$name" "$SRC/$name" ||
+        warn "skipped  $dir/$name exists and is not ours (rename or remove it to use the repo copy)"
+    done
+    # Prune our links whose skill was deleted or renamed.
+    for link in "$dir"/*; do
+      [ -L "$link" ] || continue
+      case "$(readlink "$link")" in
+        "$SRC"/*) [ -f "$link/SKILL.md" ] || { rm "$link"; say "pruned   $link"; } ;;
+      esac
+    done
   done
   return 0
 }
@@ -89,21 +89,24 @@ cmd_status() {
   local name dir state
   printf 'repo     %s\n' "$REPO"
   if [ -L "$BUNDLE" ] && [ "$(readlink "$BUNDLE")" = "$SRC" ]; then state="linked"; else state="NOT linked"; fi
-  printf 'bundle   %s  (%s)  -> Codex, Pi, Grok, Cursor\n' "$BUNDLE" "$state"
-  printf '\n%-28s %-12s %s\n' "skill" "claude" "same name elsewhere"
+  printf 'bundle   %s  (%s)  -> Codex, Pi, Grok\n' "$BUNDLE" "$state"
+  printf '\n%-28s %-10s %-10s %s\n' "skill" "claude" "cursor" "same name elsewhere"
   for name in $(skill_names); do
-    if [ -L "$CLAUDE_DIR/$name" ] && [ "$(readlink "$CLAUDE_DIR/$name")" = "$SRC/$name" ]; then
-      state="linked"
-    elif [ -e "$CLAUDE_DIR/$name" ] || [ -L "$CLAUDE_DIR/$name" ]; then
-      state="CONFLICT"
-    else
-      state="missing"
-    fi
-    local dupes=""
+    local cols="" dupes=""
+    for dir in $PER_SKILL_DIRS; do
+      if [ -L "$dir/$name" ] && [ "$(readlink "$dir/$name")" = "$SRC/$name" ]; then
+        state="linked"
+      elif [ -e "$dir/$name" ] || [ -L "$dir/$name" ]; then
+        state="CONFLICT"
+      else
+        state="missing"
+      fi
+      cols="$cols$(printf '%-10s ' "$state")"
+    done
     for dir in $OTHER_DIRS; do
       [ -e "$dir/$name" ] && dupes="$dupes ${dir/#$HOME/~}/$name"
     done
-    printf '%-28s %-12s %s\n' "$name" "$state" "${dupes:--}"
+    printf '%-28s %s%s\n' "$name" "$cols" "${dupes:--}"
   done
 }
 
@@ -169,7 +172,7 @@ cmd_install() {
 
 cmd_uninstall() {
   local link
-  for link in "$CLAUDE_DIR"/* "$BUNDLE"; do
+  for link in "$CLAUDE_DIR"/* "$CURSOR_DIR"/* "$BUNDLE"; do
     [ -L "$link" ] || continue
     case "$(readlink "$link")" in
       "$SRC"|"$SRC"/*) rm "$link"; say "removed  $link" ;;

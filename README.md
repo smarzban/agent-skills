@@ -15,10 +15,10 @@ git clone <this repo> ~/Workspace/agent-skills
 
 | Harness | Route | Edit a skill | Add a skill |
 |---|---|---|---|
-| Codex, Pi, Grok, Cursor | one folder link `~/.agents/skills/agent-skills` → `skills/` | live | live, no step |
-| Claude Code | one link per skill in `~/.claude/skills/` | live | linked on next commit, pull, or Claude session start |
+| Codex, Pi, Grok | one folder link `~/.agents/skills/agent-skills` → `skills/` | live | live, no step |
+| Claude Code, Cursor | one link per skill in `~/.claude/skills/` and `~/.cursor/skills/` | live | linked by `bin/skills new`, on commit, pull or checkout, and on Claude Code session start |
 
-Claude Code does not scan nested skill folders, so it needs a link per skill. `bin/skills link` makes them; the git hooks and the `SessionStart` hook run it for you.
+Claude Code does not scan nested skill folders, so it needs a link per skill. Cursor gets the same per-skill links because nested discovery there is not verified. `bin/skills link` makes them; the git hooks and the `SessionStart` hook run it for you.
 
 ## Daily use
 
@@ -37,7 +37,7 @@ The linker never overwrites a file, folder or link it did not create. `status` s
 
 Clone and run `bin/skills install`, then `git pull` to update. That is the route that stays live.
 
-Plugin installs also work, but they are cached copies that update only when the harness refreshes them:
+The repo also carries plugin manifests (`.claude-plugin/` for Claude Code and Grok, `package.json` for Pi). Plugin installs are cached copies that update only when the harness refreshes them, and these routes have not been install-tested:
 
 - Claude Code: `/plugin marketplace add <owner>/<repo>` then `/plugin install agent-skills@agent-skills`
 - Grok: `grok plugin install <owner>/<repo> --trust`
