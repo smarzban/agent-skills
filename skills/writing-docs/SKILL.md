@@ -23,7 +23,7 @@ This skill edits docs and the docs map. It never edits product code.
 - **Published site**, read mostly by people. Read `reference/site.md`. The site may be in another repo: take the source-repo path and the docs-repo path as two inputs. Setting up or hosting a site is out of scope.
 - One source: when a site exists, usage docs live on the site only. The repo keeps its README and its changing docs, and links to the site.
 
-**Mode**: write, audit, or update for a diff.
+**Mode**: write, audit, or update for a diff. An update can also run unattended.
 
 ## The docs map
 
@@ -72,6 +72,18 @@ Change nothing.
 2. Edit only the `STALE` pages, and in them only the claims the changed paths touch.
 3. For each `UNMAPPED` path decide: a new feature gets a page and a map line, other source gets added to a `page` or `exclude` line.
 4. Verify the pages you changed.
+
+## Unattended update
+
+Use this when a scheduled job or a coordinator runs the update with nobody present. Run **Update for a diff** with these changes:
+
+- If `scripts/docs-scope` prints no `STALE` page and no `UNMAPPED` path, the outcome is clean. Stop, and open nothing.
+- Put the page edits on a branch and open one pull request. If a docs pull request from an earlier run is still open, update it; do not open a second one.
+- Do not write a new page. List each `UNMAPPED` path in the pull request description with the choice it needs: a new page, an existing `page` line, or an `exclude` line.
+- When the code looks wrong and the page right, leave the page and describe the disagreement in the pull request description, with the evidence.
+- Never merge the pull request. Ask no questions; record what you could not decide in the description.
+
+The description starts with the outcome, then lists the pages edited, the items left for the owner, and what was not checked.
 
 ## Outcomes
 
