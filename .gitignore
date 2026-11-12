@@ -1,2 +1,12 @@
 .DS_Store
 *.bak-agent-skills
+
+# Private agent notes and the per-worktree handoff note
+AGENTS.local.md
+HANDOFF.md
+
+node_modules/
+dist/
+.env
+.env.local
+*.log
