@@ -190,7 +190,7 @@ def main(argv):
         seen.add(key)
         counts[cat] = counts.get(cat, 0) + 1
         print("%-7s %s  %s" % (cat, loc, what))
-    total = sum(counts.values())
+    total = sum(n for cat, n in counts.items() if cat != "author")   # authors are listed for review, not counted
     scope = "%d file(s)" % len(files) + (", %d commit(s)" % commits if history else "")
     detail = ", ".join("%s %d" % kv for kv in sorted(counts.items())) or "nothing found"
     print("scan-private: %s scanned: %s" % (scope, detail))

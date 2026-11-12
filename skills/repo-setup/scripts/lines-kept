@@ -2,7 +2,7 @@
 # Prove a migration lost nothing: every non-blank line of ORIGINAL is a whole line in one of the FILES.
 # usage: lines-kept ORIGINAL FILE...
 # Leading and trailing spaces and a change of heading level (# to ##) are ignored; any other edit is LOST.
-# Save the original first: cp CLAUDE.md "$TMPDIR/original-instructions.md"
+# Save the original first: cp CLAUDE.md "${TMPDIR:-/tmp}/original-instructions.md"
 set -euo pipefail
 [ "$#" -ge 2 ] || { echo "usage: lines-kept ORIGINAL FILE..." >&2; exit 2; }
 orig="$1"; shift
@@ -14,7 +14,7 @@ have="$(mktemp)"; trap 'rm -f "$have"' EXIT
 norm "$@" > "$have"
 
 lost=0; total=0
-while IFS= read -r line; do
+while IFS= read -r line || [ -n "$line" ]; do
   [ -n "$line" ] || continue
   total=$((total + 1))
   if ! grep -qxF -- "$line" "$have"; then

@@ -7,7 +7,7 @@ description: Write, overhaul or review a repo's front-door README.md. The first 
 
 A README is the front door. On the first screen a newcomer learns what the project is, whether it is for them, and how to start. Everything deeper lives in the docs and is linked.
 
-Work on the current repo unless you are given a path. Follow `reference/style.md` for the prose.
+Work on the current repo unless you are given a path. In a monorepo, "the README" is the root README; write a package README only when asked for it. Follow `reference/style.md` for the prose.
 
 ## Modes
 
@@ -15,6 +15,8 @@ Work on the current repo unless you are given a path. Follow `reference/style.md
 - **Review**: report only, change nothing. Use it when asked to review, check or audit a README. Run steps 1 and 4 against the existing file and list each finding with its line and the evidence.
 
 ## Steps
+
+`<skill>` in a command is this skill's folder, the one that holds this file. Run those scripts by that path, with the target repo as the working directory.
 
 1. Read the repo before the README: the package manifest, the entry points, the CI config, the docs folder, the licence file. Settle the repo type (library, CLI, service, application, framework, monorepo, skills bundle) and the reader. Then read the existing README and mark each claim true, stale or unverifiable against the code.
 2. Choose the sections from `reference/anatomy.md` for that repo type. Leave out a section that has nothing true to say.
@@ -27,7 +29,7 @@ Work on the current repo unless you are given a path. Follow `reference/style.md
 4. Verify.
    - Quickstart: give a fresh subagent only the README and a clean checkout (`git clone` into a temporary folder, or `git worktree add`), and tell it to follow the quickstart exactly and report each command, its output, and where it had to guess. A guess is a defect in the README. Without a subagent, run the quickstart yourself in a clean checkout and say that the cold run was not independent.
    - Every other command, flag, default and path: open the code that defines it.
-   - Links and paths: run `scripts/check-links README.md` from this skill's folder. It must report 0 broken.
+   - Links and paths: run `<skill>/scripts/check-links README.md`. It must report 0 broken.
    - Badges: each badge points at something that exists. The workflow file named in a CI badge is in `.github/workflows/`, the package named in a version badge is published, and the licence badge matches the `LICENSE` file. Remove a badge that fails this.
    - Images: every image path resolves. Never link an image that is not in the repo; list it as something for the owner to supply.
 5. Report: what the README now covers, what moved to which docs page, what you could not verify, and the owner decisions.

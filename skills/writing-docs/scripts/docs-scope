@@ -9,6 +9,7 @@ docs-map.txt lives at the root of a docs tree (docs/, a framework folder such as
     verified-at  <commit>             # source commit the pages were checked against
     ledger       <command>            # how the feature list is enumerated (not run here)
     page     usage/add.md        src/cli/add.rs src/store/
+    page     README.md                       # a page that covers no source, such as the index
     exclude  src/vendor/         vendored
 
 A page path is relative to the map file (the root README is ../README.md). A source path is relative to the
@@ -96,7 +97,7 @@ def main(argv):
                 continue
             if kind == "verified-at" and len(rest) == 1:
                 verified = rest[0]
-            elif kind == "page" and len(rest) >= 2:
+            elif kind == "page" and rest:
                 pages.append((rest[0], rest[1:]))
             elif kind == "exclude" and rest:
                 excludes.append(rest[0])
@@ -140,7 +141,7 @@ def main(argv):
 
     for page, pats in pages:
         hit = [c for c in changed if any(covers(p, c) for p in pats)]
-        if verified is None or hit:
+        if hit or (verified is None and pats):
             findings.append("STALE %s" % page)
             findings.extend("  %s" % c for c in hit)
         if not os.path.isfile(os.path.join(map_dir, page)):

@@ -10,7 +10,7 @@ Fill every `<...>` with a fact from the repo. Delete a line whose fact does not 
 ## Commands
 
 - Prepare a fresh worktree: `scripts/worktree-setup`
-- Verify, the same command CI runs: `scripts/verify`
+- Verify, the same command CI runs: `<scripts/verify, or the repo's own verify command>`
 - Build: `<command>`
 - Test: `<command>`
 - Run one test: `<command>`
@@ -96,7 +96,7 @@ The script copies `AGENTS.local.md` and the env files from the main checkout. It
 
 ## CI workflow
 
-For GitHub Actions, `.github/workflows/ci.yml`. For another CI system that the repo already uses, add one job there that runs `scripts/verify`.
+For GitHub Actions, `.github/workflows/ci.yml`. For another CI system that the repo already uses, add one job there that runs the verify command.
 
 ```yaml
 name: CI
@@ -114,7 +114,7 @@ jobs:
         with:
           <version key>: <version from the repo's toolchain file>
       - run: <dependency install command>
-      - run: scripts/verify
+      - run: <verify command>
 ```
 
 Look up each action's current major tag (`git ls-remote --tags https://github.com/actions/checkout`). Do not write a version from memory.
@@ -174,6 +174,6 @@ trim_trailing_whitespace = true
 
 ## Secret-scanning baseline
 
-1. Run `scripts/scan-private --history` from this skill's folder and show the owner every `secret` hit. A real secret in history is rotated by the owner; this skill does not rewrite history.
+1. Run `<skill>/scripts/scan-private --history` and show the owner every `secret` hit. A real secret in history is rotated by the owner; this skill does not rewrite history.
 2. If the repo uses a scanner (gitleaks, trufflehog, detect-secrets), add its config file and record the accepted existing findings as its baseline, so that only new findings fail. Add the scan as a `step` in `scripts/verify`.
 3. Hosted secret scanning and push protection are remote settings. Give the owner the command or the settings page; do not turn them on.

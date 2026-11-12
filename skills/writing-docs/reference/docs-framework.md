@@ -23,14 +23,14 @@ This table was written from the frameworks' documented behaviour and checked aga
 
 ## Where the framework lives
 
-In the source repo, the framework is a folder with its own config, such as `site/`. Keep `docs-map.txt` beside that config, with `source .`, and write the page paths relative to the map. Run `scripts/docs-scope --map site/docs-map.txt` from the repo root. Add an `exclude` line for the framework folder itself (`exclude  site/  docs framework`), so that its own files are not reported as source with no page.
+In the source repo, the framework is a folder with its own config, such as `site/`. Keep `docs-map.txt` beside that config, with `source .`, and write the page paths relative to the map. Run `<skill>/scripts/docs-scope --map site/docs-map.txt` from the repo root. When the repo also has a `docs/` tree with its own map, each map excludes the other tree: `exclude  docs/  maintainer docs` here, and `exclude  site/  user docs` in `docs/docs-map.txt`.
 
 In a separate docs repo, take two paths: the source repo and the docs repo.
 
 - Read and check every claim in the source repo.
 - Write only in the docs repo.
 - Keep `docs-map.txt` at the docs repo root. Its `source` line is the source repo's remote URL, its `verified-at` is a source commit, and its source paths are relative to the source repo root.
-- Run `scripts/docs-scope --source <source repo path>` from the docs repo.
+- Run `<skill>/scripts/docs-scope --source <source repo path>` from the docs repo.
 - The two repos are released separately. If the site documents the latest release and the source checkout is ahead of it, check against the release tag and say which commit you used.
 
 ## Command reference for a CLI
@@ -42,7 +42,7 @@ Generate it from the help output; do not write it by hand. Build the CLI from th
 Build the site with its own build command. Treat every warning and every broken link as a failure, and fix it or report it. Then:
 
 ```sh
-scripts/check-links --site-root <content folder> --source-root <source repo path> <content folder>
+<skill>/scripts/check-links --site-root <content folder> --source-root <source repo path> <content folder>
 ```
 
 `--site-root` checks links that start with `/` against the content folder. If the build cannot run here (missing dependencies, no network), the outcome is blocked for the build check; say so, and report what `check-links` found.

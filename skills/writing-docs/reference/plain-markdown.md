@@ -20,6 +20,7 @@ docs/
     internals/<subsystem>.md
     security-model.md
     development.md
+CONTRIBUTING.md    at the repo root, where code hosts look for it
 ```
 
 The top level holds what a user looks for; the maintainer pages sit under `maintainers/`. A repo with maintainer docs only keeps them at the top level of `docs/`, with no `maintainers/` folder.
@@ -45,13 +46,13 @@ If `docs/` already holds something else (specs, a site), put the tree in a named
 | Run the tests | [maintainers/development.md](maintainers/development.md) |
 ```
 
-`AGENTS.md` points to this index in one line. If it does not, add the line `Docs index: docs/README.md` under its pointers and report that you did. Do not copy docs content into `AGENTS.md`.
+`AGENTS.md` points to this index in one line. If it does not, add the line `Docs index: docs/README.md` under **Before you start** and report that you did. Do not copy docs content into `AGENTS.md`.
 
 ## Check
 
 ```sh
-scripts/check-links docs README.md CONTRIBUTING.md AGENTS.md
-scripts/docs-scope --coverage
+<skill>/scripts/check-links docs README.md        # plus CONTRIBUTING.md and AGENTS.md when they exist
+<skill>/scripts/docs-scope --coverage
 ```
 
-Both exit 0.
+Both exit 0. List the index in the map as `page  README.md` with no source paths.

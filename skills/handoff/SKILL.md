@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Write or pick up HANDOFF.md, the resume note that lets a new session, an agent in a different harness, or a coordinator continue a branch's work cold. Use when asked to "write a handoff", "hand off", "save state for a new session", "pick up where we left off", "resume", or "what is each worktree doing", and when starting work in a worktree that contains HANDOFF.md.
+description: Write or pick up HANDOFF.md, the resume note that lets a new session, an agent in a different harness, or a coordinator continue a branch's work cold. Use when asked to "write a handoff", "hand off", "save state for a new session", "pick up where we left off", "resume this branch", or "what is each worktree doing", and when starting work in a worktree that contains HANDOFF.md.
 ---
 
 # handoff
@@ -13,7 +13,7 @@ Keep durable facts out of it. A fact that will still be true next month (a conve
 
 1. Read the existing `HANDOFF.md`, if there is one. Carry forward every item that is still true, including items you cannot confirm from your own context. Drop only what you know is finished or wrong.
 2. Get the facts from commands, not memory: `git rev-parse --abbrev-ref HEAD`, `git rev-parse --short HEAD`, `git status --porcelain`.
-3. Run `git check-ignore -q HANDOFF.md`. If the file is neither ignored nor tracked, add `HANDOFF.md` to `.gitignore` and say that you did.
+3. Run `git ls-files --error-unmatch HANDOFF.md` and `git check-ignore -q HANDOFF.md`. If the first exits 0, the file is tracked: write it anyway and say so; untracking it is the owner's decision. If both fail, add `HANDOFF.md` to `.gitignore` and say that you did.
 4. Write the file from the template. Put an item under **Verified** only if you ran its command in this session and it passed. This includes items carried forward: run the command again, or move the item to **Unverified**. Start **Next** with one exact command or file path.
 5. Reply with the path and the first next action.
 
@@ -56,7 +56,9 @@ If there is no `HANDOFF.md`, say so. Reconstruct the state from `git log`, the t
 
 ## Coordinator
 
-Run `scripts/handoff-status` from this skill's folder, inside any worktree of the repo. It prints one block per worktree: branch, commit, the note's header, whether the branch moved after the note, and the first **Next** line.
+`<skill>` in a command is this skill's folder, the one that holds this file. Run those scripts by that path, with the target repo as the working directory.
+
+Run `<skill>/scripts/handoff-status` inside any worktree of the repo. It prints one block per worktree: branch, commit, the note's header, whether the branch moved after the note, and the first **Next** line.
 
 A coordinator keeps its own note in the main checkout: which builders are running, what each one waits on, and the merge order.
 

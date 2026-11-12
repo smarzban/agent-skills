@@ -9,7 +9,7 @@ One repo of skills, read live by Claude Code, Codex, Cursor, Pi and Grok on this
 | `handoff` | Write or pick up the per-worktree `HANDOFF.md` note, so a new session or another harness can carry on. |
 | `repo-setup` | Give a repo its baseline: `AGENTS.md`, ignore rules, one verify command that CI also runs, a worktree setup script. |
 | `writing-readmes` | Write, overhaul or review a README, with the quickstart proven by a cold run. |
-| `writing-docs` | Write, audit or update user docs and maintainer docs from the source, in the repo or on a docs site. |
+| `writing-docs` | Write, audit or update user docs and maintainer docs from the source, as plain Markdown or for a docs framework. |
 | `publishing-a-repo` | Check a private repo before it goes public. Runs only when asked by name. |
 | `shared-skills` | Add or edit a skill in this repo. |
 
@@ -44,7 +44,9 @@ bin/skills link           # relink now, prune links to deleted skills
 bin/skills uninstall      # remove every link and hook it created
 ```
 
-Use only `name` and `description` in frontmatter; both are honoured by all five harnesses.
+Use only `name` and `description` in frontmatter; both are honoured by all five harnesses. One skill also sets `disable-model-invocation: true`, which Claude Code and Pi honour (the skill runs only when asked for) and Codex ignores, as observed on 2026-11-12; Cursor and Grok are untested. Its text therefore also tells the agent when not to run it.
+
+Before you commit a change to a skill, run `skills/_shared/scripts/check-skills`. It checks frontmatter, referenced files and the links into `skills/_shared`.
 
 The linker never overwrites a file, folder or link it did not create. `status` shows same-named skills that already exist in a harness folder so you can retire the old copy.
 

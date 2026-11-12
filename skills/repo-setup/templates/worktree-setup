@@ -23,7 +23,7 @@ done
 # Dependencies. repo-setup keeps only the lines for this repo's stack.
 if   [ -f pnpm-lock.yaml ];    then pnpm install --frozen-lockfile
 elif [ -f bun.lock ] || [ -f bun.lockb ]; then bun install --frozen-lockfile
-elif [ -f yarn.lock ];         then yarn install --frozen-lockfile
+elif [ -f yarn.lock ];         then yarn install --immutable   # Yarn 1: --frozen-lockfile
 elif [ -f package-lock.json ]; then npm ci
 fi
 if   [ -f uv.lock ];           then uv sync

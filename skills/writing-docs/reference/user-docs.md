@@ -1,6 +1,6 @@
 # User docs
 
-Docs for people who run, install or call the project. They never need to open the source. This holds whether the pages are Markdown in the repo or a docs site.
+Docs for people who run, install or call the project. They never need to open the source. This holds for plain Markdown and for a docs framework.
 
 ## Writing for the reader
 

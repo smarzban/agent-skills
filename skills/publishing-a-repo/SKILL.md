@@ -1,6 +1,6 @@
 ---
 name: publishing-a-repo
-description: Check a private repo before its owner makes it public, and report what to fix. Covers secrets in git history, private names and links, licences, security policy, CI exposure to forks, discovery metadata, and a quickstart run from a clean clone. Run only when asked by name, for example "publishing-a-repo", "prepare this repo to go public", "pre-publish check".
+description: Check a private repo before its owner makes it public, and report what to fix. Covers secrets in git history, private names and links, licences, security policy, CI exposure to forks, discovery metadata, and a quickstart run from a clean clone. Run only when the user explicitly asks for a pre-publication check, for example "publishing-a-repo", "prepare this repo to go public", "pre-publish check".
 disable-model-invocation: true
 ---
 
@@ -8,21 +8,23 @@ disable-model-invocation: true
 
 Prepare a repo for publication and report. The owner changes the visibility. This skill never changes a remote setting and never rewrites history; where either is needed, it gives the exact commands for the owner to run.
 
-Run it only when the user asks for it by name. Work on the current repo unless you are given a path.
+Run it only when the user explicitly asks for a pre-publication check. Do not start it because a task mentions a public repo. Work on the current repo unless you are given a path.
 
 Fixes inside the working tree (a removed internal link, a corrected README) are proposed in the report and made only after a yes.
 
 ## Checks
+
+`<skill>` in a command is this skill's folder, the one that holds this file. Run those scripts by that path, with the target repo as the working directory.
 
 Run all seven. For each, record pass, fail or not checked, with the evidence.
 
 ### 1. Secrets in the full history
 
 ```sh
-scripts/scan-private --history
+<skill>/scripts/scan-private --history
 ```
 
-Run it from this skill's folder against the repo. Also run a dedicated scanner when one is installed (`gitleaks detect`, `trufflehog git file://.`); the script's pattern list is short. Read every `secret` hit. A hit in an old commit counts: publishing exposes every commit on every branch and tag.
+Also run a dedicated scanner when one is installed (gitleaks, trufflehog); the script's pattern list is short. Read every `secret` hit. A hit in an old commit counts: publishing exposes every commit on every branch and tag.
 
 For a real secret, the report says: rotate it first, because a secret that was ever pushed must be treated as leaked. Then, if the owner wants it out of history, propose the commands and do not run them:
 
@@ -41,7 +43,7 @@ The same scan lists `path`, `email`, `host`, `ticket` and `author` hits across c
 - Names and emails of people, in files and in commit authorship: list them. Whether each person agreed to be public is the owner's call.
 - Home-folder paths, machine names, internal codenames: fail.
 
-Also read by eye what a pattern cannot catch: `AGENTS.md` and other instruction files, code comments, test fixtures, sample data. Check that `git check-ignore -q AGENTS.local.md HANDOFF.md` exits 0 and that neither file was ever committed (`git log --all --oneline -- AGENTS.local.md HANDOFF.md` prints nothing).
+Also read by eye what a pattern cannot catch: `AGENTS.md` and other instruction files, code comments, test fixtures, sample data. Check that `git check-ignore -q AGENTS.local.md` and `git check-ignore -q HANDOFF.md` both exit 0 and that neither file was ever committed (`git log --all --oneline -- AGENTS.local.md HANDOFF.md` prints nothing).
 
 ### 3. Ownership and third-party licences
 
@@ -72,10 +74,10 @@ Read `reference/discovery.md`. Check the repo description and topics, the packag
 
 ### 7. Quickstart from a clean clone
 
-Clone the repo into a temporary folder with no credentials for anything private, and follow the README quickstart exactly, by a fresh subagent that gets only the README where one is available.
+Clone the repo into a temporary folder (remove it afterwards) with no credentials for anything private, and follow the README quickstart exactly, by a fresh subagent that gets only the README where one is available.
 
 ```sh
-git clone --no-hardlinks . "$TMPDIR/publish-check" && cd "$TMPDIR/publish-check"
+git clone --no-hardlinks . "${TMPDIR:-/tmp}/publish-check" && cd "${TMPDIR:-/tmp}/publish-check"
 ```
 
 Fail on any step that needs a private registry, a private submodule, an internal host, an unpublished package, or a file that git ignores. If the README has no quickstart, report that and point to `writing-readmes`.

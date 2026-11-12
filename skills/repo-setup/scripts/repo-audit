@@ -69,6 +69,7 @@ row 'issue template' .github/ISSUE_TEMPLATE .github/ISSUE_TEMPLATE.md
 row 'pull request template' .github/pull_request_template.md .github/PULL_REQUEST_TEMPLATE.md .github/PULL_REQUEST_TEMPLATE
 row 'CODEOWNERS' CODEOWNERS .github/CODEOWNERS docs/CODEOWNERS
 row '.editorconfig' .editorconfig
+row '.gitattributes' .gitattributes
 row 'secret-scanning config' .gitleaks.toml .gitleaksignore .secrets.baseline .trufflehog.yml
 
 printf '\nowner decisions (never created by repo-setup)\n'
@@ -81,7 +82,8 @@ for f in AGENTS.md AGENTS.local.md AGENTS.override.md CLAUDE.md CLAUDE.local.md 
          .cursorrules .cursor/rules .github/copilot-instructions.md .windsurfrules; do
   [ -e "$f" ] || continue
   any=1
-  if [ -f "$f" ]; then printf '  %-9s %-34s %s\n' "$(state "$f")" "$f" "$(size "$f")"
+  if [ -L "$f" ]; then printf '  %-9s %-34s -> %s\n' "$(state "$f")" "$f" "$(readlink "$f")"
+  elif [ -f "$f" ]; then printf '  %-9s %-34s %s\n' "$(state "$f")" "$f" "$(size "$f")"
   else printf '  %-9s %s\n' "$(state "$f")" "$f"; fi
 done
 [ "$any" = 1 ] || echo '  none'
@@ -100,8 +102,11 @@ for name, cmd in scripts.items():
     print("  package.json  %-12s %s" % (name, cmd))
 PY
 fi
+prev=""
 for f in Makefile makefile justfile Justfile Taskfile.yml; do
   [ -f "$f" ] || continue
+  if [ -n "$prev" ] && [ "$f" -ef "$prev" ]; then continue; fi   # same file on a case-insensitive disk
+  prev="$f"
   printf '  %-13s targets: %s\n' "$f" "$(grep -oE '^[A-Za-z0-9_.-]+:' "$f" | tr -d ':' | grep -v '^\.' | tr '\n' ' ')"
 done
 if [ -d .github/workflows ]; then
