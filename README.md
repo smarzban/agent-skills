@@ -1,6 +1,8 @@
 # agent-skills
 
-Agent skills for Claude Code, Codex, Cursor, Pi and Grok, kept in one repo that every harness on your machine reads live.
+Agent skills for Claude Code, Codex, Cursor, Pi and Grok, in one repo that every harness on your machine reads live.
+
+[![CI](https://github.com/smarzban/agent-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/smarzban/agent-skills/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ## Skills
 
@@ -22,16 +24,28 @@ Agent skills for Claude Code, Codex, Cursor, Pi and Grok, kept in one repo that 
 
 Skills reach `skills/_shared` through relative symlinks, for example `skills/writing-docs/reference/style.md`. The links work when a harness reads this repo in place, which is what `bin/skills install` sets up. Copying a single skill folder out of the repo breaks them: copy `skills/_shared` beside it, or replace the links with the files they point to. Whether the plugin install routes keep the links is not tested.
 
-## Install (once per machine)
+## Quickstart
 
 Needs `git`, `bash` and `python3` on the path, and a system with symlinks. Tested on macOS.
+
+Install once per machine:
 
 ```sh
 git clone https://github.com/smarzban/agent-skills.git ~/Workspace/agent-skills
 ~/Workspace/agent-skills/bin/skills install
 ```
 
-`install` creates links, turns on the repo's git hooks, and adds a Claude Code `SessionStart` hook (a backup of `~/.claude/settings.json` is written next to it).
+`install` creates links, turns on the repo's git hooks, and adds a Claude Code `SessionStart` hook (a backup of `~/.claude/settings.json` is written next to it). It prints one line per link, then the status table. Each skill shows `linked` for Claude Code and Cursor, and the bundle line shows `(linked)  -> Codex, Pi, Grok`:
+
+```text
+bundle   /Users/you/.agents/skills/agent-skills  (linked)  -> Codex, Pi, Grok
+
+skill                        claude     cursor     same name elsewhere
+coordinator                  linked     linked     -
+...
+```
+
+To try a skill, start a new agent session in a git repo and ask it to "write a handoff". The `handoff` skill writes `HANDOFF.md` for the current branch.
 
 ## How each harness gets the skills
 
@@ -56,8 +70,6 @@ bin/skills uninstall      # remove every link and hook it created
 
 Use only `name` and `description` in frontmatter; both are honoured by all five harnesses. One skill also sets `disable-model-invocation: true`, which Claude Code and Pi honoured (the skill runs only when asked for) and Codex ignored when this repo was set up in November 2026; Cursor and Grok are untested. Its text therefore also tells the agent when not to run it.
 
-Before you commit a change to a skill, run `skills/_shared/scripts/check-skills` from the repo root. It checks frontmatter, referenced files and the links into `skills/_shared`.
-
 The linker never overwrites a file, folder or link it did not create. `status` shows same-named skills that already exist in a harness folder so you can retire the old copy.
 
 ## Other machines
@@ -71,3 +83,15 @@ The repo also carries plugin manifests (`.claude-plugin/` for Claude Code and Gr
 - Pi: `pi install git:github.com/smarzban/agent-skills`
 
 Use one route per harness: links or a plugin, not both, or each skill loads twice.
+
+## Use with agents
+
+Each skill is a folder under `skills/` with a `SKILL.md`, for example `skills/deliver/SKILL.md`. Agents working on this repo follow [`AGENTS.md`](AGENTS.md).
+
+## Contributing
+
+Read [`AGENTS.md`](AGENTS.md) for the commands and the rules a change must pass. To add or edit a skill, ask your agent to use the `shared-skills` skill.
+
+## License
+
+MIT. See [`LICENSE`](LICENSE).
