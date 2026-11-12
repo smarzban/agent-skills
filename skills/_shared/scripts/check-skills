@@ -15,20 +15,41 @@ shared="$root/_shared"
 fail=0
 bad() { printf 'FAIL %s\n' "$*"; fail=$((fail + 1)); }
 
+# Frontmatter is parsed as YAML by Ruby's standard library. Prints one problem per line, then "chars N".
+command -v ruby >/dev/null 2>&1 || { echo "check-skills: needs ruby on PATH to parse frontmatter as YAML" >&2; exit 2; }
+# shellcheck disable=SC2016
+yaml_check='require "yaml"
+begin
+  h = YAML.safe_load($stdin.read)
+rescue Exception => e
+  puts "frontmatter is not valid YAML: #{e.message.lines.first.to_s.strip}"; puts "chars 0"; exit
+end
+unless h.is_a?(Hash)
+  puts "frontmatter is not a mapping of keys"; puts "chars 0"; exit
+end
+puts "frontmatter name is #{h["name"].inspect}" unless h["name"] == ARGV[0]
+d = h["description"]
+puts "no description" unless d.is_a?(String) && !d.strip.empty?
+extra = h.keys - %w[name description disable-model-invocation]
+puts "unexpected frontmatter key: #{extra.join(", ")}" unless extra.empty?
+puts "chars #{d.is_a?(String) ? d.length : 0}"'
+
 for skill in "$root"/*/; do
   skill="${skill%/}"; name="$(basename "$skill")"
   [ -f "$skill/SKILL.md" ] || continue
   md="$skill/SKILL.md"
 
-  # Frontmatter: first line ---, name matches the folder, description present, no other keys.
-  [ "$(sed -n '1p' "$md")" = "---" ] || bad "$name: SKILL.md does not start with ---"
-  front="$(awk 'NR==1{next} /^---$/{exit} {print}' "$md")"
-  fname="$(printf '%s\n' "$front" | sed -n 's/^name:[[:space:]]*//p')"
-  desc="$(printf '%s\n' "$front" | sed -n 's/^description:[[:space:]]*//p')"
-  [ "$fname" = "$name" ] || bad "$name: frontmatter name is '$fname'"
-  [ -n "$desc" ] || bad "$name: no description"
-  extra="$(printf '%s\n' "$front" | grep -E '^[A-Za-z_-]+:' | grep -vE '^(name|description|disable-model-invocation):' || true)"
-  [ -z "$extra" ] || bad "$name: unexpected frontmatter key: $extra"
+  # Frontmatter: between a first-line --- and a closing ---, valid YAML, a mapping whose name matches
+  # the folder, with a description and no other keys.
+  chars=0
+  if [ "$(sed -n '1p' "$md")" != "---" ]; then bad "$name: SKILL.md does not start with ---"
+  elif ! awk 'NR>1 && /^---$/{found=1; exit} END{exit !found}' "$md"; then bad "$name: frontmatter has no closing ---"
+  elif out="$(awk 'NR==1{next} /^---$/{exit} {print}' "$md" | ruby -e "$yaml_check" "$name")"; then
+    while IFS= read -r line; do
+      case "$line" in "chars "*) chars="${line#chars }" ;; *) bad "$name: $line" ;; esac
+    done <<< "$out"
+  else bad "$name: could not parse the frontmatter"
+  fi
 
   # Every reference/, scripts/ or templates/ path named in a Markdown file of the skill exists.
   find "$skill" -name '*.md' | while IFS= read -r doc; do
@@ -66,7 +87,7 @@ for skill in "$root"/*/; do
       esac
     done
   done
-  printf 'ok   %-20s description %s chars, SKILL.md %s bytes\n' "$name" "${#desc}" "$(wc -c < "$md" | tr -d ' ')"
+  printf 'ok   %-20s description %s chars, SKILL.md %s bytes\n' "$name" "$chars" "$(wc -c < "$md" | tr -d ' ')"
 done
 
 if [ "$fail" -gt 0 ]; then echo "check-skills: $fail problem(s)"; exit 1; fi
