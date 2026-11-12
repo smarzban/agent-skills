@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Prepare a fresh git worktree: private notes, local env files, dependencies.
+# Run it from inside the new worktree. It never overwrites a file that exists.
+set -euo pipefail
+
+# Ignored files that git does not carry into a new worktree. Edit this list for the repo.
+LOCAL="AGENTS.local.md .env .env.local"
+
+here="$(git rev-parse --show-toplevel)"
+main="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
+cd "$here"
+
+# Copied, not linked: Claude Code does not load an imported file that is a link to outside the folder.
+if [ "$here" != "$main" ]; then
+  for f in $LOCAL; do
+    if [ -f "$main/$f" ] && [ ! -e "$f" ]; then cp "$main/$f" "$f"; echo "copied  $f"; fi
+  done
+fi
+for f in $LOCAL; do
+  if [ ! -e "$f" ] && [ -f "$f.example" ]; then cp "$f.example" "$f"; echo "created $f from $f.example"; fi
+done
+
+# Dependencies. repo-setup keeps only the lines for this repo's stack.
+if   [ -f pnpm-lock.yaml ];    then pnpm install --frozen-lockfile
+elif [ -f bun.lock ] || [ -f bun.lockb ]; then bun install --frozen-lockfile
+elif [ -f yarn.lock ];         then yarn install --frozen-lockfile
+elif [ -f package-lock.json ]; then npm ci
+fi
+if   [ -f uv.lock ];           then uv sync
+elif [ -f poetry.lock ];       then poetry install
+elif [ -f requirements.txt ];  then python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+fi
+[ ! -f Cargo.toml ]   || cargo fetch
+[ ! -f go.mod ]       || go mod download
+[ ! -f Gemfile.lock ] || bundle install
+
+echo "worktree ready: $here"

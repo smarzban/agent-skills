@@ -1,0 +1,230 @@
+#!/usr/bin/env python3
+"""Check relative Markdown links, in-page anchors and referenced paths.
+
+usage: check-links [--site-root DIR] [--source-root DIR] [--no-paths] PATH...
+
+PATH is a Markdown file or a folder (searched for .md and .mdx). Pass the docs
+folder and the root files together: check-links docs README.md CONTRIBUTING.md
+
+Checked:
+  links      [text](target), ![alt](target), [ref]: target, href="" and src=""
+  anchors    #heading in the same file and file.md#heading in another file
+  paths      `code spans` that look like a path and whose first folder exists
+             in the repo (skip with --no-paths)
+Skipped: external URLs, text inside fenced code blocks, paths with placeholders.
+Links that start with / are checked only when --site-root names the folder
+they are served from. --source-root adds a second place to look for referenced
+paths, for docs kept in a different repo from the code.
+
+Exit status: 0 no broken links, 1 broken links, 2 usage error.
+"""
+import os
+import re
+import subprocess
+import sys
+import unicodedata
+
+EXTERNAL = re.compile(r"^(?:[a-zA-Z][a-zA-Z0-9+.-]*:|//)")
+INLINE = re.compile(r"!?\[(?:[^\]\\]|\\.)*\]\(\s*(<[^>]*>|(?:[^()\s]|\([^()\s]*\))+)(?:\s+(?:\"[^\"]*\"|'[^']*'))?\s*\)")
+REFDEF = re.compile(r"^\s{0,3}\[[^\]^][^\]]*\]:\s*(<[^>]*>|\S+)")   # not a [^footnote]
+HTML = re.compile(r"""(?:href|src)\s*=\s*(?:"([^"]*)"|'([^']*)')""", re.I)
+ANCHOR_HTML = re.compile(r"""<[^>]*\b(?:id|name)\s*=\s*["']([^"']+)["']""", re.I)
+CODESPAN = re.compile(r"(`+)(.+?)\1")
+FENCE = re.compile(r"^\s{0,3}(```+|~~~+)")
+HEADING = re.compile(r"^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$")
+PATHLIKE = re.compile(r"^(?:\./|\.\./)*[\w.@-]+(?:/[\w.@-]+)+/?$")
+
+
+def repo_root(start):
+    try:
+        out = subprocess.run(["git", "-C", start, "rev-parse", "--show-toplevel"],
+                             capture_output=True, text=True)
+        if out.returncode == 0:
+            return out.stdout.strip()
+    except OSError:
+        pass
+    return None
+
+
+def slug(text):
+    """GitHub-style heading anchor."""
+    text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", text)   # links keep their text
+    text = re.sub(r"<[^>]+>", "", text)
+    text = text.replace("`", "").replace("*", "").strip().lower()
+    out = []
+    for ch in text:
+        cat = unicodedata.category(ch)
+        if ch in "-_ " or cat[0] in "LN" or cat == "Mn":
+            out.append("-" if ch == " " else ch)
+    return "".join(out)
+
+
+def read_lines(path):
+    with open(path, encoding="utf-8", errors="replace") as f:
+        return f.read().splitlines()
+
+
+def prose_lines(lines):
+    """Yield (line number, text) outside fenced code blocks and front matter."""
+    fence = None
+    front = bool(lines) and lines[0].strip() == "---"
+    for no, line in enumerate(lines, 1):
+        if front:
+            if no > 1 and line.strip() in ("---", "..."):
+                front = False
+            continue
+        m = FENCE.match(line)
+        if m:
+            mark = m.group(1)
+            if fence is None:
+                fence = mark[0]
+            elif mark[0] == fence:
+                fence = None
+            continue
+        if fence is None:
+            yield no, line
+
+
+_anchor_cache = {}
+
+
+def anchors(path):
+    if path not in _anchor_cache:
+        found, seen = set(), {}
+        for _, line in prose_lines(read_lines(path)):
+            m = HEADING.match(line)
+            if m:
+                base = slug(m.group(2))
+                n = seen.get(base, 0)
+                seen[base] = n + 1
+                found.add(base if n == 0 else "%s-%d" % (base, n))
+            for a in ANCHOR_HTML.findall(line):
+                found.add(a)
+        _anchor_cache[path] = found
+    return _anchor_cache[path]
+
+
+def site_candidates(root, target):
+    t = target.strip("/")
+    base = os.path.join(root, t) if t else root
+    cands = [base, base + ".md", base + ".mdx",
+             os.path.join(base, "index.md"), os.path.join(base, "index.mdx")]
+    # Static assets are served from a public/ folder beside or above the content.
+    d = os.path.abspath(root)
+    while d != os.path.dirname(d):
+        d = os.path.dirname(d)
+        if os.path.isdir(os.path.join(d, "public")):
+            cands.append(os.path.join(d, "public", t))
+            break
+    return cands
+
+
+def main(argv):
+    site_root = source_root = None
+    check_paths = True
+    targets = []
+    args = list(argv)
+    while args:
+        a = args.pop(0)
+        if a in ("-h", "--help"):
+            print(__doc__.strip())
+            return 0
+        if a == "--no-paths":
+            check_paths = False
+        elif a in ("--site-root", "--source-root"):
+            if not args:
+                print("check-links: %s needs a folder" % a, file=sys.stderr)
+                return 2
+            v = args.pop(0)
+            if a == "--site-root":
+                site_root = v
+            else:
+                source_root = v
+        elif a.startswith("-"):
+            print("check-links: unknown option %s" % a, file=sys.stderr)
+            return 2
+        else:
+            targets.append(a)
+    if not targets:
+        print(__doc__.strip().split("\n\n")[1], file=sys.stderr)
+        return 2
+
+    files = []
+    for t in targets:
+        if os.path.isdir(t):
+            for dp, dn, fn in os.walk(t):
+                dn[:] = sorted(d for d in dn if d not in (".git", "node_modules", "dist", "build", "target", ".astro"))
+                for f in sorted(fn):
+                    if f.endswith((".md", ".mdx")):
+                        files.append(os.path.join(dp, f))
+        elif os.path.isfile(t):
+            files.append(t)
+        else:
+            print("check-links: no such file or folder: %s" % t, file=sys.stderr)
+            return 2
+
+    broken = []
+    checked = 0
+    for path in files:
+        here = os.path.dirname(os.path.abspath(path))
+        root = repo_root(here)
+        for no, line in prose_lines(read_lines(path)):
+            spans = [m.span() for m in CODESPAN.finditer(line)]
+            in_code = lambda pos: any(s <= pos < e for s, e in spans)
+            found = [(m.start(), m.group(1)) for m in INLINE.finditer(line)]
+            m = REFDEF.match(line)
+            if m:
+                found.append((m.start(1), m.group(1)))
+            found += [(m.start(), m.group(1) or m.group(2) or "") for m in HTML.finditer(line)]
+            for pos, target in found:
+                if in_code(pos):
+                    continue
+                target = target.strip().strip("<>")
+                if not target or EXTERNAL.match(target):
+                    continue
+                checked += 1
+                file_part, _, frag = target.partition("#")
+                file_part = file_part.split("?", 1)[0]
+                if file_part.startswith("/"):
+                    if site_root is None:
+                        checked -= 1
+                        continue
+                    hit = next((c for c in site_candidates(site_root, file_part) if os.path.exists(c)), None)
+                    if hit is None:
+                        broken.append((path, no, target, "no page under %s" % site_root))
+                        continue
+                    dest = hit
+                elif file_part:
+                    dest = os.path.normpath(os.path.join(here, file_part.replace("%20", " ")))
+                    if not os.path.exists(dest):
+                        broken.append((path, no, target, "file not found"))
+                        continue
+                else:
+                    dest = os.path.abspath(path)
+                if frag and os.path.isfile(dest) and dest.endswith((".md", ".mdx")):
+                    if frag.lower() not in anchors(dest) and frag not in anchors(dest):
+                        broken.append((path, no, target, "no heading for #%s" % frag))
+            if not check_paths:
+                continue
+            for m in CODESPAN.finditer(line):
+                ref = m.group(2).strip()
+                if not PATHLIKE.match(ref) or ref.startswith(("http", "~")):
+                    continue
+                first = re.sub(r"^(?:\.\.?/)+", "", ref).split("/", 1)[0]
+                bases = [b for b in (here, root, source_root) if b]
+                # Only judge a path whose first folder is real, so that
+                # example paths from other projects are not reported.
+                if not any(os.path.isdir(os.path.join(b, first)) for b in bases):
+                    continue
+                checked += 1
+                if not any(os.path.exists(os.path.join(b, ref)) for b in bases):
+                    broken.append((path, no, "`%s`" % ref, "path not found"))
+
+    for path, no, target, why in broken:
+        print("%s:%d: %s  (%s)" % (path, no, target, why))
+    print("check-links: %d file(s), %d link(s) and path(s) checked, %d broken" % (len(files), checked, len(broken)))
+    return 1 if broken else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

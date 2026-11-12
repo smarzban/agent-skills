@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Check every skill under a skills folder: frontmatter, referenced files, links into _shared, scripts.
+# usage: check-skills [SKILLS_DIR]     (default: the folder that holds _shared)
+set -uo pipefail
+
+self="${BASH_SOURCE[0]}"
+while [ -L "$self" ]; do
+  d="$(cd -P "$(dirname "$self")" && pwd)"; self="$(readlink "$self")"
+  case "$self" in /*) ;; *) self="$d/$self" ;; esac
+done
+root="${1:-$(cd -P "$(dirname "$self")/../.." && pwd)}"
+[ -d "$root" ] || { echo "check-skills: no such folder: $root" >&2; exit 2; }
+root="$(cd -P "$root" && pwd)"
+shared="$root/_shared"
+fail=0
+bad() { printf 'FAIL %s\n' "$*"; fail=$((fail + 1)); }
+
+for skill in "$root"/*/; do
+  skill="${skill%/}"; name="$(basename "$skill")"
+  [ -f "$skill/SKILL.md" ] || continue
+  md="$skill/SKILL.md"
+
+  # Frontmatter: first line ---, name matches the folder, description present, no other keys.
+  [ "$(sed -n '1p' "$md")" = "---" ] || bad "$name: SKILL.md does not start with ---"
+  front="$(awk 'NR==1{next} /^---$/{exit} {print}' "$md")"
+  fname="$(printf '%s\n' "$front" | sed -n 's/^name:[[:space:]]*//p')"
+  desc="$(printf '%s\n' "$front" | sed -n 's/^description:[[:space:]]*//p')"
+  [ "$fname" = "$name" ] || bad "$name: frontmatter name is '$fname'"
+  [ -n "$desc" ] || bad "$name: no description"
+  extra="$(printf '%s\n' "$front" | grep -E '^[A-Za-z_-]+:' | grep -vE '^(name|description|disable-model-invocation):' || true)"
+  [ -z "$extra" ] || bad "$name: unexpected frontmatter key: $extra"
+
+  # Every reference/, scripts/ or templates/ path named in a Markdown file of the skill exists.
+  find "$skill" -name '*.md' | while IFS= read -r doc; do
+    grep -oE '`(reference|scripts|templates)/[A-Za-z0-9._/-]+`' "$doc" 2>/dev/null | tr -d '`' | sort -u | while IFS= read -r ref; do
+      # scripts/<x> may name a file that the skill creates in the target repo from templates/<x>.
+      [ -e "$skill/$ref" ] || [ -e "$skill/templates/$(basename "$ref")" ] || echo "FAIL $name: ${doc#$root/} names $ref, which does not exist"
+    done
+  done > "${TMPDIR:-/tmp}/check-skills.$$"
+  if [ -s "${TMPDIR:-/tmp}/check-skills.$$" ]; then cat "${TMPDIR:-/tmp}/check-skills.$$"; fail=$((fail + $(wc -l < "${TMPDIR:-/tmp}/check-skills.$$"))); fi
+  rm -f "${TMPDIR:-/tmp}/check-skills.$$"
+
+  # Links resolve and stay inside the skills folder. A plain copy of a shared file must match it.
+  while IFS= read -r f; do
+    if [ -L "$f" ]; then
+      target="$(cd -P "$(dirname "$f")" 2>/dev/null && cd -P "$(dirname "$(readlink "$f")")" 2>/dev/null && pwd)/$(basename "$(readlink "$f")")"
+      if [ ! -e "$f" ]; then bad "$name: broken link ${f#$root/} -> $(readlink "$f")"
+      else case "$target" in "$root"/*) ;; *) bad "$name: ${f#$root/} points outside the skills folder" ;; esac; fi
+    elif [ -d "$shared" ]; then
+      twin="$(find "$shared" -type f -name "$(basename "$f")" | head -1)"
+      if [ -n "$twin" ] && ! cmp -s "$f" "$twin"; then bad "$name: ${f#$root/} is a copy that differs from ${twin#$root/}"; fi
+    fi
+  done < <(find "$skill" \( -type f -o -type l \) ! -name SKILL.md)
+
+  # Scripts are executable and parse.
+  for dir in "$skill/scripts" "$skill/templates"; do
+    [ -d "$dir" ] || continue
+    for s in "$dir"/*; do
+      [ -f "$s" ] || continue
+      [ -x "$s" ] || bad "$name: ${s#$root/} is not executable"
+      case "$(sed -n '1p' "$s")" in
+        *python*) python3 -c 'import ast,sys; ast.parse(open(sys.argv[1]).read())' "$s" 2>/dev/null || bad "$name: ${s#$root/} does not parse" ;;
+        *sh*)     bash -n "$s" 2>/dev/null || bad "$name: ${s#$root/} does not parse" ;;
+        *)        bad "$name: ${s#$root/} has no interpreter line" ;;
+      esac
+    done
+  done
+  printf 'ok   %-20s description %s chars, SKILL.md %s bytes\n' "$name" "${#desc}" "$(wc -c < "$md" | tr -d ' ')"
+done
+
+if [ "$fail" -gt 0 ]; then echo "check-skills: $fail problem(s)"; exit 1; fi
+echo "check-skills: no problems"

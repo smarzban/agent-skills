@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Print the handoff state of every worktree of the current repo.
+set -euo pipefail
+
+git rev-parse --git-dir >/dev/null 2>&1 || { echo "handoff-status: not inside a git repository" >&2; exit 1; }
+
+git worktree list --porcelain | sed -n 's/^worktree //p' | while IFS= read -r wt; do
+  [ -d "$wt" ] || { printf '%s\n  worktree folder is missing\n\n' "$wt"; continue; }
+  branch="$(git -C "$wt" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
+  head="$(git -C "$wt" rev-parse --short HEAD 2>/dev/null || echo '?')"
+  dirty="$(git -C "$wt" status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
+  printf '%s\n  now:   %s @ %s, %s uncommitted\n' "$wt" "$branch" "$head" "$dirty"
+
+  note="$wt/HANDOFF.md"
+  if [ ! -f "$note" ]; then
+    printf '  note:  none\n\n'
+    continue
+  fi
+  header="$(grep -m1 '^_.*_$' "$note" || true)"
+  note_sha="$(printf '%s' "$header" | sed -n 's/.*@ `\{0,1\}\([0-9a-f]\{4,40\}\).*/\1/p')"
+  next="$(awk '/^## Next/{f=1;next} /^## /{f=0} f&&NF{print;exit}' "$note")"
+  printf '  note:  %s\n' "${header:-no header line}"
+  if [ -n "$note_sha" ] && [ "$note_sha" != "$head" ]; then
+    moved="$(git -C "$wt" rev-list --count "$note_sha..HEAD" 2>/dev/null || echo '?')"
+    printf '  stale: branch moved %s commit(s) after the note\n' "$moved"
+  fi
+  printf '  next:  %s\n\n' "${next:-not stated}"
+done

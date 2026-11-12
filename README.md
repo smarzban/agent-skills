@@ -2,6 +2,19 @@
 
 One repo of skills, read live by Claude Code, Codex, Cursor, Pi and Grok on this machine.
 
+## Skills
+
+| Skill | Use it to |
+|---|---|
+| `handoff` | Write or pick up the per-worktree `HANDOFF.md` note, so a new session or another harness can carry on. |
+| `repo-setup` | Give a repo its baseline: `AGENTS.md`, ignore rules, one verify command that CI also runs, a worktree setup script. |
+| `writing-readmes` | Write, overhaul or review a README, with the quickstart proven by a cold run. |
+| `writing-docs` | Write, audit or update usage and maintainer docs from the source, in the repo or on a docs site. |
+| `publishing-a-repo` | Check a private repo before it goes public. Runs only when asked by name. |
+| `shared-skills` | Add or edit a skill in this repo. |
+
+`skills/_shared` holds the prose style and the scripts that several skills link to. It is not a skill.
+
 ## Install (once per machine)
 
 ```sh

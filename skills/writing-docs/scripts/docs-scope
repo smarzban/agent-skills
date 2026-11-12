@@ -1,0 +1,190 @@
+#!/usr/bin/env python3
+"""Scope docs work from docs-map.txt: which pages a source change makes stale.
+
+usage: docs-scope [--map FILE] [--source DIR] [--to REV] [--coverage]
+
+docs-map.txt lives in the docs folder (or the root of a separate docs repo):
+
+    source       .                    # "." or the source repo's remote URL
+    verified-at  <commit>             # source commit the pages were checked against
+    ledger       <command>            # how the feature list is enumerated (not run here)
+    page     usage/add.md        src/cli/add.rs src/store/
+    exclude  src/vendor/         vendored
+
+A page path is relative to the map file (the root README is ../README.md). A source path is relative to the
+source repo root: a folder ends with "/", and * and ? are wildcards.
+
+--map       default: ./docs-map.txt, then ./docs/docs-map.txt
+--source    local checkout of the source repo (default: the repo holding the map)
+--to        compare verified-at with this revision. Default: HEAD plus the
+            working tree, so uncommitted and untracked changes count too
+--coverage  also list every tracked source file that no page or exclude covers
+
+Output, one finding per line:
+  STALE <page>          a source path the page covers changed after verified-at
+  UNMAPPED <path>       a changed (or, with --coverage, any) path no line covers
+  MISSING-PAGE <page>   listed in the map, not on disk
+  UNLISTED <page>       a .md or .mdx page on disk that the map does not list
+  DEAD-SOURCE <path>    a source path in the map that no longer exists
+
+Exit status: 0 nothing to do, 1 findings, 2 usage or map error.
+"""
+import fnmatch
+import os
+import subprocess
+import sys
+
+
+def git(cwd, *args):
+    r = subprocess.run(["git", "-C", cwd] + list(args), capture_output=True, text=True)
+    return r.stdout if r.returncode == 0 else None
+
+
+def covers(pattern, path):
+    if pattern.endswith("/"):
+        return path.startswith(pattern)
+    return path == pattern or fnmatch.fnmatchcase(path, pattern)
+
+
+def die(msg):
+    print("docs-scope: " + msg, file=sys.stderr)
+    sys.exit(2)
+
+
+def main(argv):
+    map_file = source = None
+    to = None
+    coverage = False
+    args = list(argv)
+    while args:
+        a = args.pop(0)
+        if a in ("-h", "--help"):
+            print(__doc__.strip())
+            return 0
+        if a == "--coverage":
+            coverage = True
+        elif a in ("--map", "--source", "--to"):
+            if not args:
+                die("%s needs a value" % a)
+            v = args.pop(0)
+            if a == "--map":
+                map_file = v
+            elif a == "--source":
+                source = v
+            else:
+                to = v
+        else:
+            die("unknown argument %s" % a)
+
+    if map_file is None:
+        map_file = next((p for p in ("docs-map.txt", os.path.join("docs", "docs-map.txt")) if os.path.isfile(p)), None)
+        if map_file is None:
+            die("no docs-map.txt here or in docs/; pass --map FILE")
+    if not os.path.isfile(map_file):
+        die("no such map file: %s" % map_file)
+    map_dir = os.path.dirname(os.path.abspath(map_file))
+
+    verified = None
+    pages, excludes = [], []
+    with open(map_file, encoding="utf-8") as f:
+        for no, raw in enumerate(f, 1):
+            parts = raw.split("#", 1)[0].split()
+            if not parts:
+                continue
+            kind, rest = parts[0], parts[1:]
+            if kind in ("source", "ledger"):
+                continue
+            if kind == "verified-at" and len(rest) == 1:
+                verified = rest[0]
+            elif kind == "page" and len(rest) >= 2:
+                pages.append((rest[0], rest[1:]))
+            elif kind == "exclude" and rest:
+                excludes.append(rest[0])
+            else:
+                die("%s:%d: cannot read line: %s" % (map_file, no, raw.strip()))
+    if not pages:
+        die("%s lists no pages" % map_file)
+
+    src = git(source or map_dir, "rev-parse", "--show-toplevel")
+    if src is None:
+        die("%s is not inside a git repository; pass --source DIR" % (source or map_dir))
+    src = src.strip()
+    worktree = to is None
+    to = to or "HEAD"
+    head = (git(src, "rev-parse", "--short", to) or "").strip()
+    if not head:
+        die("unknown revision: %s" % to)
+
+    findings = []
+    changed = []
+    if verified is None:
+        print("verified-at: not recorded, so every page is unverified")
+    else:
+        if git(src, "cat-file", "-e", verified + "^{commit}") is None:
+            die("verified-at %s is not a commit in %s (fetch the source repo, or pass --source)" % (verified, src))
+        names = git(src, "diff", "--name-only", "%s..%s" % (verified, to))
+        changed = [p for p in (names or "").splitlines() if p]
+        local = []
+        if worktree:
+            for out in (git(src, "diff", "--name-only", "HEAD"), git(src, "ls-files", "--others", "--exclude-standard")):
+                local += [p for p in (out or "").splitlines() if p and p not in changed and p not in local]
+            changed += local
+        count = (git(src, "rev-list", "--count", "%s..%s" % (verified, to)) or "?").strip()
+        short = (git(src, "rev-parse", "--short", verified) or verified).strip()
+        print("verified-at %s, %s is %s commit(s) later, %d path(s) changed%s"
+              % (short, head, count, len(changed), " (%d of them uncommitted)" % len(local) if local else ""))
+
+    tracked = [p for p in (git(src, "ls-files") or "").splitlines() if p]
+    tracked += [p for p in changed if p not in tracked and os.path.exists(os.path.join(src, p))]
+    all_patterns = [p for _, pats in pages for p in pats] + excludes
+
+    for page, pats in pages:
+        hit = [c for c in changed if any(covers(p, c) for p in pats)]
+        if verified is None or hit:
+            findings.append("STALE %s" % page)
+            findings.extend("  %s" % c for c in hit)
+        if not os.path.isfile(os.path.join(map_dir, page)):
+            findings.append("MISSING-PAGE %s" % page)
+        for p in pats:
+            if not any(covers(p, t) for t in tracked):
+                findings.append("DEAD-SOURCE %s  (covered by %s)" % (p, page))
+
+    # Doc pages are not source, so they are never reported as unmapped.
+    listed = set(os.path.normpath(os.path.join(map_dir, pg)) for pg, _ in pages)
+    doc_rel = set(os.path.relpath(p, src) for p in listed)
+    pool = tracked if coverage else changed
+    docs_prefix = os.path.relpath(map_dir, src) + "/"
+    for c in pool:
+        if c in doc_rel or c.startswith(docs_prefix):
+            continue
+        if not any(covers(p, c) for p in all_patterns):
+            findings.append("UNMAPPED %s" % c)
+
+    roots = set()
+    for p in listed:
+        d = os.path.dirname(p)
+        rel = os.path.relpath(d, map_dir)
+        if rel.startswith(".."):
+            continue   # a page outside the map's folder, such as the root README
+        roots.add(map_dir if rel == "." else os.path.join(map_dir, rel.split(os.sep)[0]))
+    for root in sorted(roots):
+        if root == map_dir:
+            cands = [os.path.join(root, f) for f in sorted(os.listdir(root))]
+        else:
+            cands = []
+            for dp, dn, fn in os.walk(root):
+                dn[:] = sorted(d for d in dn if d not in ("node_modules", ".git", "dist"))
+                cands.extend(os.path.join(dp, f) for f in sorted(fn))
+        for c in cands:
+            if c.endswith((".md", ".mdx")) and os.path.isfile(c) and os.path.normpath(c) not in listed:
+                findings.append("UNLISTED %s" % os.path.relpath(c, map_dir))
+
+    for line in findings:
+        print(line)
+    n = sum(1 for l in findings if not l.startswith("  "))
+    print("docs-scope: %d page(s) in the map, %d finding(s)" % (len(pages), n))
+    return 1 if n else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
