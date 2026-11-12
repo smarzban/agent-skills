@@ -1,6 +1,6 @@
 # Where tasks live
 
-Use what the `Tracker:` line in `AGENTS.local.md` says. Without one:
+Use what the owner said, then what the `Tracker:` line in `AGENTS.local.md` says. Without either:
 
 | Setup | Task list | The brief goes in |
 |---|---|---|
@@ -38,4 +38,6 @@ Put the brief in the issue body. Use the tracker's own status for the completion
 
 ## A task file
 
-Keep `TASKS.md` in the main checkout, out of git, with one section per task: the brief, the state, and what it waits on. It is a separate file from your `HANDOFF.md`, because builders read it and must not read or write your note. Give each builder the path and its section's heading.
+Keep `TASKS.md` in the main checkout, out of git, with one section per task: the brief, the state, and what it waits on. It is a separate file from your `HANDOFF.md`: builders read their own section of it, and none of them writes to either file. Give each builder the path and its section's heading.
+
+To hand a task to the owner, set its section's state to "waiting on the owner" and give them the report in the conversation. Name every follow-up task you wrote in your report; a task file shows nobody anything.

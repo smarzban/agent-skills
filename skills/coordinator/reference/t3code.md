@@ -4,13 +4,16 @@ Marker: the environment variable `T3CODE_THREAD_ID` is set, and `delegate_task` 
 
 ## Starting a builder
 
-- A builder is a delegate with its own checkout. Call `orchestrator_capabilities` once, then start each builder with `delegate_task` and `isolation: "worktree"`. Never make a builder's checkout yourself in the shell, and never run a builder in your own checkout.
+- A builder is a delegate with its own checkout. Call `orchestrator_capabilities` once, then start each builder with `delegate_task` and `isolation: "worktree"`. Use the role `implementation`. Never make a builder's checkout yourself in the shell, and never run a builder in your own checkout.
+- The worktree is a checkout of this thread's project. When the repo you coordinate is another one, pass its project as `target.projectId` (`t3_project_list` shows them). With no project for it, ask the owner to add one; this case was not run when this file was written.
+- The start call answering `running` is your confirmation that the builder started.
 - The worktree starts from your current commit. The brief names the base branch; the builder branches from its tip as its first action.
-- The task text is the whole of what the builder knows. Give it where the brief is (the task id, or the path and the heading), and "Follow the `deliver` skill." Put no secret in it.
+- The task text is the whole of what the builder knows. Give it where the brief is (the task id, or the path and the heading), and the path of the `deliver` skill to follow. Put no secret in it.
 - A new top-level thread is made only when the owner asks for one. "Builder", "delegate" and "parallel" do not mean one.
 
 ## Waiting
 
+- The completion signal is the delegate ending its run. Its last message is the report, ending with the line described below; you rarely need `task_status` or `t3_thread_read`.
 - Do not poll a running delegate: no `task_status` loops, no `sleep`, no watchers. Its completion wakes you. Follow the `next` field of the call that started it, which usually means ending your turn.
 - A delegate that stalls never completes, so it never wakes you. While you are active, if one has run far longer than its task should, read its thread once with `t3_thread_read`; if it waits on a question, answer it. Once you have ended your turn, only the owner or another completion brings you back. Tell the owner this before they leave you in charge.
 - A delegate cannot watch a pull request. Its last line reports the pull request URL, the head commit and the state of checks and reviews. If the checks were still running, you wait on them.
@@ -18,18 +21,18 @@ Marker: the environment variable `T3CODE_THREAD_ID` is set, and `delegate_task` 
 ## Pull requests
 
 - Link each pull request to the thread with `link_pull_request` (or `link_pull_requests` for several), straight after it is created or pushed to, including ones your builders opened.
-- When you wait on checks or reviews yourself, call `watch_pull_request` and end your turn. No `gh --watch`, no loops. Call `unwatch_pull_request` before you hand back.
+- When you wait on checks or reviews yourself, call `watch_pull_request` and end your turn. No `gh --watch`, no loops. Call `unwatch_pull_request` before you hand back. If you are a delegate yourself you have no watch: run `pr-status` once more after the checks' usual time, and report the state you saw.
 
 ## Sending work back
 
-A delegate that has handed back is finished. To have findings fixed, a failing check worked, or a branch brought up to date, start a new builder with `delegate_task` and a worktree: give it the pull request number, the list of what to do, and "Follow the `deliver` skill for an open pull request. Started by a coordinator: your ending is stop, and you run no review."
+A delegate that has handed back is finished. To have findings fixed, a failing check worked, or a branch brought up to date, start a new builder with `delegate_task` and a worktree. Its first action is to check out the pull request's branch (`gh pr checkout <n>`). Its task holds: the pull request number and branch, the head commit you expect, the list of what to do, the task's "done when" list, the owner's limits, and "Follow the `deliver` skill at <path> for an open pull request. Started by a coordinator: your ending is stop, and you run no review. Hand back the new head commit and the proof you ran again."
 
 T3 Code may tell you to fix a small review finding yourself. A commit you write is yours: prove it again by the `deliver` skill's proof reference, and have the next review round cover it.
 
 ## Reviewing
 
-- Each review is a new `delegate_task` with the review role and a worktree. Its first action is `git fetch` and `git checkout --detach <head sha>`. Give it the diff range, the contract and the areas to look at, and none of your reasoning. Do not send a second review to an earlier reviewer's thread.
-- The independent check before a send is also a new delegate with a worktree, checked out at the head commit the same way.
+- Each review is a new `delegate_task` with the role `review` and a worktree. Its first action is `git fetch` and `git checkout --detach <head sha>`. Give it the diff range, the contract and the areas to look at, and none of your reasoning. Do not send a second review to an earlier reviewer's thread.
+- The independent check before a send is also a new delegate with a worktree and the role `test`, checked out at the head commit the same way. That worktree is the clean checkout the `deliver` skill asks for; make no other.
 
 ## Asking the owner
 
@@ -37,4 +40,4 @@ Use the question tool, so that the thread shows it is waiting. For a login, a to
 
 ## Cleaning up
 
-Stop a delegate you no longer need with `task_cancel`. A delegate's worktree belongs to T3 Code: do not remove it in the shell; list it for the owner if it is still there. With the tsk board, `tsk clean` applies only to tasks that tsk dispatched.
+Stop a delegate you no longer need with `task_cancel`. A delegate that finished needs nothing closed. A delegate's worktree belongs to T3 Code: do not remove it in the shell; list it for the owner if it is still there. With the tsk board, `tsk clean` applies only to tasks that tsk dispatched.

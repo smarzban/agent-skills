@@ -1,5 +1,7 @@
 # When the owner leaves you in charge
 
+The owner has left you in charge when they say they will be away, or that you should carry on without asking. Until then, ask.
+
 ## Before they go
 
 Walk every task through build, proof, review and merge in your head, and ask for everything that would stop you, in one batch.

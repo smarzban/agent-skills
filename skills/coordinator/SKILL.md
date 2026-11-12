@@ -17,7 +17,7 @@ How you start a builder, wait for it and open a reviewer depends on the environm
 
 | Marker | Probe | Environment | Read |
 |---|---|---|---|
-| `T3CODE_THREAD_ID` is set | `delegate_task` is in your tool list | T3 Code | `reference/t3code.md` |
+| `T3CODE_THREAD_ID` is set | `delegate_task` is among your tools, possibly with a prefix or listed as not yet loaded | T3 Code | `reference/t3code.md` |
 | `HERDR_ENV` is `1` | `herdr agent list` answers | Herdr | `reference/herdr.md` |
 | `REX_SESSION` is set | `rex whoami --json` answers | Rex | `reference/rex.md` |
 | none, or the probe fails | | a plain terminal | `reference/plain.md` |
@@ -26,7 +26,7 @@ A marker can be inherited by an agent that was started from inside one of these 
 
 ## Settings
 
-Read these from `AGENTS.local.md`. Ask once for any that is missing and that you need, and offer to record the answer there.
+Read these from `AGENTS.local.md`. What the owner told you in this conversation wins over it. Ask once for one that is missing only when a step needs it and no default below fits, and offer to record the answer there.
 
 - `Tracker:` where tasks and briefs live. `reference/trackers.md` covers the tsk board, another tracker, and a task file.
 - `Review:` how a change is reviewed here.
@@ -35,7 +35,7 @@ Read these from `AGENTS.local.md`. Ask once for any that is missing and that you
 
 ## Your note
 
-Keep `HANDOFF.md` in the main checkout, out of git, and bring it up to date after every state change. Your context will be summarised; this file will not. Builders never write to it; each keeps its own in its worktree. It holds:
+Keep `HANDOFF.md` in the main checkout, out of git (unless the repo's `.gitignore` lists it, add the name to the file that `git rev-parse --git-path info/exclude` prints), and bring it up to date after every state change. Start it with the header line the `handoff` skill gives, so that its script can read it. Your context will be summarised; this file will not. Builders never write to it; each keeps its own in its worktree. It holds:
 
 - **Sends**: for each task the owner said to send, the date and their words, and where they said it.
 - **Builders**: for each task its branch, its worktree, its pull request, its state, and what it waits on.
@@ -43,7 +43,7 @@ Keep `HANDOFF.md` in the main checkout, out of git, and bring it up to date afte
 - **Waiting on the owner**: each open question, with the task it blocks.
 - **To undo**: test-only settings and anything you started that must be stopped.
 
-Keep your scripts and logs somewhere that lasts, not a temporary folder. `handoff-status`, in the `handoff` skill's `scripts` folder, prints the state of every worktree's own note.
+Keep your scripts, logs and the reviewers' reports in a folder that lasts, inside what the owner allowed, not a system temporary folder. `handoff-status`, in the `handoff` skill's `scripts` folder, prints the state of every worktree's own note.
 
 ## The grant to merge
 
@@ -54,31 +54,32 @@ The ending of every task is stop, unless the owner told you, in this conversatio
 - Never write a merge grant anywhere: not on a task, not in a brief, not in a pull request. A builder never holds one.
 - A task you created yourself, such as a follow-up, ends in stop, even under "send them all".
 - A task that touches a path on the repo's **Needs the owner** list ends in stop.
+- A send covers the "done when" list the owner saw. If you change a task's goal or its list after they said to send it, the ending is stop until they confirm the new one.
 
 ## Workflow
 
 1. **Ask for standing grants once**: push, changes to the dev machine, where test files may go, which credentials to set up. Never infer one, and a yes in one context does not carry to another.
-2. **Plan.** One task per unit of work. Check each task's premise against the code before you brief it. Order tasks that depend on each other, and run tasks in parallel only when their files barely overlap; tell each builder what the other owns. Check the paths each task will touch against the **Needs the owner** list in `AGENTS.md`.
+2. **Plan.** One task per unit of work. Check each task's premise against the code before you brief it. When a premise is wrong (the feature exists, the cause is elsewhere), write the task that is true and show the owner the difference; with nobody to ask, build the narrower task and end it in stop. Order tasks that depend on each other, and run tasks in parallel only when they change different files, or different functions of one file; tell each builder what the other owns, and settle the merge order now. Check the paths each task will touch against the **Needs the owner** list in `AGENTS.md`.
 3. **Brief.** Write the brief into the task, following `reference/brief.md`.
-4. **Settle the endings.** Show the owner each task's "done when" list, then ask which tasks to send. Record each yes under **Sends**. Tell them which tasks will stop whatever they say, and why.
-5. **Start a builder.** One fresh session per task, in its own worktree and branch, by your environment's reference. The prompt points at the brief and nothing else. After you start it, confirm that it is working.
+4. **Settle the endings.** Show the owner each task's "done when" list, then ask which tasks to send. If they already said, do not ask again; show the lists and say that the send holds for these. Record each yes under **Sends**. Tell them which tasks will stop whatever they say, and why.
+5. **Start a builder.** One fresh session per task, in its own worktree and branch, by your environment's reference. The prompt gives where the brief is, the repo's path and the path of the `deliver` skill to follow, and nothing else. After you start it, confirm that it started, by your environment's reference.
 6. **Wait on a signal.** Every builder has a completion signal, named in your environment's reference; never assume you will notice. Judge a builder by what it produced, not by its status: when one has gone quiet for longer than its task should take, look at its commits, its pushed branch and its `HANDOFF.md` before you prompt it again.
 7. **Read the report.** A builder hands back `deliver`'s report and a pull request. Check that the pull request's head branch is the one in your note, that the contract and the evidence are in its body with a commit for each item, and that `<deliver>/scripts/pr-status <n>` agrees with what the builder said. If its checks are not green, that is still the builder's work: send it back.
-8. **Review.** You run the review, following `reference/review.md`, and you write its outcome into the pull request body under **Review**.
-9. **Test it yourself.** A builder's proof is a claim until you have seen it.
-   - If the repo has a `verify-<app>` skill, run its `features-for` script on the branch and drive what it prints.
+8. **Review.** You run the review, following `reference/review.md`, and you write its outcome into the pull request body under **Review**. The review and your own test may run at the same time.
+9. **Test it yourself.** A builder's proof is a claim until you have seen it. Test in your own clean checkout of the head commit (`git worktree add --detach ../<repo>-test <sha>`), removed afterwards.
+   - If the repo has a `verify-<app>` skill, run its `features-for` script on the branch and drive every feature it prints, including one listed only because a shared file changed. A feature you did not drive is named in the report, and the ending is stop.
    - Otherwise run the change the way its user would: click through the app, run the CLI on real input, call the API. A process that starts, or a health check that passes, is not a test.
    - Cover the main path, the failure paths that matter, and what the change must not do.
    - When a real run is not possible, say exactly what blocks it and what you tested instead. The ending is stop.
 10. **Gate.** Check every line of `deliver`'s gate on the head commit. Its "nothing was loosened" and "no thread resolved" lines cover what the builder did as well as what you did.
-    - **Stop**: hand the pull request to the owner with the report, by `reference/trackers.md`.
-    - **Send**: only when the owner said to send this task and you have read their words again. Do `deliver` steps 7.1 to 7.4, with one more check before the merge: after `git fetch`, `git merge-base --is-ancestor origin/<base> <sha>` exits 0, so the branch holds everything already merged. The independent check is done by a fresh agent, never by you and never by the builder: you wrote the contract, and the builder wrote the code. Clean up by step 11, not by `deliver` step 7.5.
+    - **Stop**: hand the pull request to the owner with the report and the merge command, by `reference/trackers.md`. Keep its worktree until it is merged or closed.
+    - **Send**: only when the owner said to send this task and you have read their words again. Do `deliver` steps 7.1 to 7.4. The independent check is done by a fresh agent, never by you and never by the builder: you wrote the contract, and the builder wrote the code. Clean up by step 11, not by `deliver` step 7.5.
 11. **After each merge**, by you or by the owner.
-    - Run the repo's verify command on the merged base.
-    - Every other open branch is now behind. Have its builder bring it up to date. On the new head, the verify command, your own test and, for a send, the independent check run again; the review stands or not by the "new commit and old proof" table in `<deliver>/reference/proof.md`. Give the owner a new merge command for any pull request already handed to them.
-    - Clean up by your environment's reference: keep the review records, close the builder's session, remove its worktree and branch. Never remove your own note or your own checkout.
+    - Bring your main checkout up to date, and run the repo's verify command on the merged base.
+    - Every other open branch that you started is now behind; `pr-status` does not show that. Have a builder bring it up to date, by "Sending work back" in your environment's reference, and read its report as in step 7. On the new head, the verify command, your own test and, for a send, the independent check run again; the review stands or not by the "new commit and old proof" table in `<deliver>/reference/proof.md`. Give the owner a new merge command for any pull request already handed to them.
+    - Clean up the merged task by your environment's reference: close the builder's session, then remove its worktree, its local branch and its remote branch. Removing a worktree deletes its ignored files, the builder's `HANDOFF.md` and `.verify/` among them; the evidence that matters is already in the pull request. While the owner is away, keep the worktree until they are back. Never remove your own note or your own main checkout.
     - Never mark a task done. That is the owner's.
-12. **Report**, and bring `HANDOFF.md` up to date.
+12. **Report**, and bring `HANDOFF.md` up to date. One row per task: the pull request, the head commit, the `pr-status` verdict, the ending and why, what you tested, what you did not. Then the follow-up tasks you wrote, what you left behind, and last the commands the owner needs.
 
 ## Rules
 

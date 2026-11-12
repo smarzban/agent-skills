@@ -11,7 +11,7 @@ None of the markers is set, or a marker is set and its probe failed.
   git worktree add -b <branch> ../<repo>-<task> <base>
   ```
 
-- Give it where the brief is and "Follow the `deliver` skill." With the tsk board, see `trackers.md` for starting a task outside Herdr and Rex.
+- Give it where the brief is and the path of the `deliver` skill to follow. With the tsk board, see `trackers.md` for starting a task outside Herdr and Rex.
 - Confirm that the agent started working before you turn to the next task.
 
 ## Waiting
@@ -22,7 +22,7 @@ None of the markers is set, or a marker is set and its probe failed.
 
 ## Sending work back
 
-A subagent or a command-line run that has handed back is finished. For findings to fix, a failing check, or a branch to bring up to date, start a new one in the same worktree: give it the pull request number, the list, and "Follow the `deliver` skill for an open pull request. Started by a coordinator: your ending is stop, and you run no review."
+A subagent or a command-line run that has handed back is finished. For findings to fix, a failing check, or a branch to bring up to date, start a new one in the same worktree. Give it: the pull request number and branch, the head commit you expect, the list of what to do, the task's "done when" list, the owner's limits, and "Follow the `deliver` skill at <path> for an open pull request. Started by a coordinator: your ending is stop, and you run no review. Hand back the new head commit and the proof you ran again."
 
 ## Reviewing
 
