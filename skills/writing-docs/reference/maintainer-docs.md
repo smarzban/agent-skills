@@ -48,16 +48,16 @@ A page that does not get its reader there is a summary. Deepen it or fold it int
 
 ## Diagrams
 
-Draw a flow or a set of states as a Mermaid block in the page when order or transitions are the point, and only then.
+Draw a Mermaid block in the page when who talks to whom, order, or transitions are the point, and only then, and only where the page's renderer shows Mermaid.
 
 | Draw | When |
 |---|---|
 | A system map (`flowchart`) | Several processes or services: what runs where, and who talks to whom. Put the fact on the arrow ("read-only", "default-deny") |
 | A sequence diagram, with `autonumber` | A flow where the order matters; refer to its steps by number in the notes below |
-| A state diagram | A status the code stores or derives |
+| A state diagram | A status whose transitions the code enforces |
 | A table instead | One decision with several outcomes, or two independent flags |
 
-Under each chart, list the files and the names it was drawn from. Draw nothing the code does not hold. Split a chart that no longer reads at a glance, and say what the page leaves undrawn and where to find it.
+Under each chart, list the files and the names it was drawn from. Draw nothing the code does not hold. Split a chart that no longer reads at a glance.
 
 ## Subsystem page
 
