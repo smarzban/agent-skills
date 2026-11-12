@@ -16,7 +16,7 @@
 
 | Rule | Enforced by |
 |---|---|
-| Each skill passes the structural checks in `check-skills`: frontmatter keys, `name` matching its folder, a description, some referenced paths, links into `_shared`, and script headers. It does not parse YAML or check every reference; read the script for the exact rules. | `skills/_shared/scripts/check-skills` |
+| Each skill passes the structural checks in `check-skills`: frontmatter that parses as YAML (needs `ruby` on PATH), its keys, `name` matching its folder, a description, some referenced paths, links into `_shared`, and script headers. It does not check every reference; read the script for the exact rules. | `skills/_shared/scripts/check-skills` |
 | `bin/skills`, `.githooks/*`, `scripts/verify` and `scripts/worktree-setup` pass shell lint (needs `shellcheck` on PATH) | `shellcheck -x`, in `scripts/verify` |
 
 ## Needs the owner
