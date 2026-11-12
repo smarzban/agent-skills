@@ -53,9 +53,10 @@ for skill in "$root"/*/; do
 
   # Every reference/, scripts/ or templates/ path named in a Markdown file of the skill exists.
   find "$skill" -name '*.md' | while IFS= read -r doc; do
+    # shellcheck disable=SC2016 # the backticks are literal Markdown, not a command
     grep -oE '`(reference|scripts|templates)/[A-Za-z0-9._/-]+`' "$doc" 2>/dev/null | tr -d '`' | sort -u | while IFS= read -r ref; do
       # scripts/<x> may name a file that the skill creates in the target repo from templates/<x>.
-      [ -e "$skill/$ref" ] || [ -e "$skill/templates/$(basename "$ref")" ] || echo "FAIL $name: ${doc#$root/} names $ref, which does not exist"
+      [ -e "$skill/$ref" ] || [ -e "$skill/templates/$(basename "$ref")" ] || echo "FAIL $name: ${doc#"$root"/} names $ref, which does not exist"
     done
   done > "${TMPDIR:-/tmp}/check-skills.$$"
   if [ -s "${TMPDIR:-/tmp}/check-skills.$$" ]; then cat "${TMPDIR:-/tmp}/check-skills.$$"; fail=$((fail + $(wc -l < "${TMPDIR:-/tmp}/check-skills.$$"))); fi
@@ -65,11 +66,11 @@ for skill in "$root"/*/; do
   while IFS= read -r f; do
     if [ -L "$f" ]; then
       target="$(cd -P "$(dirname "$f")" 2>/dev/null && cd -P "$(dirname "$(readlink "$f")")" 2>/dev/null && pwd)/$(basename "$(readlink "$f")")"
-      if [ ! -e "$f" ]; then bad "$name: broken link ${f#$root/} -> $(readlink "$f")"
-      else case "$target" in "$root"/*) ;; *) bad "$name: ${f#$root/} points outside the skills folder" ;; esac; fi
+      if [ ! -e "$f" ]; then bad "$name: broken link ${f#"$root"/} -> $(readlink "$f")"
+      else case "$target" in "$root"/*) ;; *) bad "$name: ${f#"$root"/} points outside the skills folder" ;; esac; fi
     elif [ -d "$shared" ]; then
       twin="$(find "$shared" -type f -name "$(basename "$f")" | head -1)"
-      if [ -n "$twin" ] && ! cmp -s "$f" "$twin"; then bad "$name: ${f#$root/} is a copy that differs from ${twin#$root/}"; fi
+      if [ -n "$twin" ] && ! cmp -s "$f" "$twin"; then bad "$name: ${f#"$root"/} is a copy that differs from ${twin#"$root"/}"; fi
     fi
   done < <(find "$skill" \( -type f -o -type l \) ! -name SKILL.md)
 
@@ -78,11 +79,11 @@ for skill in "$root"/*/; do
     [ -d "$dir" ] || continue
     for s in "$dir"/*; do
       [ -f "$s" ] || continue
-      [ -x "$s" ] || bad "$name: ${s#$root/} is not executable"
+      [ -x "$s" ] || bad "$name: ${s#"$root"/} is not executable"
       case "$(sed -n '1p' "$s")" in
-        *python*) python3 -c 'import ast,sys; ast.parse(open(sys.argv[1]).read())' "$s" 2>/dev/null || bad "$name: ${s#$root/} does not parse" ;;
-        *sh*)     bash -n "$s" 2>/dev/null || bad "$name: ${s#$root/} does not parse" ;;
-        *)        bad "$name: ${s#$root/} has no interpreter line" ;;
+        *python*) python3 -c 'import ast,sys; ast.parse(open(sys.argv[1]).read())' "$s" 2>/dev/null || bad "$name: ${s#"$root"/} does not parse" ;;
+        *sh*)     bash -n "$s" 2>/dev/null || bad "$name: ${s#"$root"/} does not parse" ;;
+        *)        bad "$name: ${s#"$root"/} has no interpreter line" ;;
       esac
     done
   done

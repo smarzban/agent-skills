@@ -64,12 +64,12 @@ row 'verify command' scripts/verify bin/verify
 # A repo may have its own verify entry point; list the likely ones so the agent can confirm.
 for f in Makefile makefile justfile Justfile; do
   [ -f "$f" ] || continue
-  t="$(grep -oE '^(verify|check|ci|test):' "$f" | tr -d ':' | tr '\n' ' ')"
+  t="$(grep -oE '^(verify|check|ci|test):' "$f" | tr -d ':' | tr '\n' ' ' || true)"
   [ -z "$t" ] || printf '            candidates in %s: %s\n' "$f" "$t"
   break
 done
 if [ -f package.json ]; then
-  t="$(grep -oE '"(verify|check|ci|test)"[[:space:]]*:' package.json | tr -d '": ' | tr '\n' ' ')"
+  t="$(grep -oE '"(verify|check|ci|test)"[[:space:]]*:' package.json | tr -d '": ' | tr '\n' ' ' || true)"
   [ -z "$t" ] || printf '            candidates in package.json scripts: %s\n' "$t"
 fi
 row 'worktree setup script' scripts/worktree-setup bin/worktree-setup
@@ -99,6 +99,7 @@ for f in AGENTS.md AGENTS.local.md AGENTS.override.md CLAUDE.md CLAUDE.local.md 
 done
 [ "$any" = 1 ] || echo '  none'
 nested="$(git ls-files 2>/dev/null | grep -E '(^|/)AGENTS\.md$' | grep / || true)"
+# shellcheck disable=SC2086 # split on purpose: one line per path
 [ -z "$nested" ] || printf '  nested:   %s\n' $nested
 
 printf '\ncommands found\n'
@@ -127,5 +128,6 @@ fi
 packages="$(git ls-files 2>/dev/null | grep -E '/(package\.json|Cargo\.toml|go\.mod|pyproject\.toml)$' | grep -v node_modules | sed 's|/[^/]*$||' | sort -u || true)"
 if [ -n "$packages" ]; then
   printf '\npackages (a monorepo: each may take its own AGENTS.md)\n'
+  # shellcheck disable=SC2086 # split on purpose: one line per path
   printf '  %s\n' $packages
 fi
