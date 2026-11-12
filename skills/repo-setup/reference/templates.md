@@ -60,6 +60,7 @@ Private notes for this checkout. Git ignores this file.
 
 Review: <how a change is reviewed here, such as the command or skill to run>
 Evidence: <where pictures and recordings of proof are sent, such as a chat channel>
+Outside code: <where code from an outside pull request may be run, such as a named machine; leave out to never run it>
 Tracker: <where tasks and briefs live>
 Plan: <where a plan is written down, when it is not the tracker>
 ```

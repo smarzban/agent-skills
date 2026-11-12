@@ -25,4 +25,4 @@ You do not decide whether the project wants a feature. You give the owner what t
 
 ## After the verdict
 
-Stop. When the owner says yes, write the task with a "done when" list they have seen, and take it through `deliver` with the ending they give for it.
+Stop. When the owner says yes, write the task in your own words, with a "done when" list, and show it to them. From then on it is the owner's own task: it leaves `triage`, and `deliver` takes it with the ending the owner gives for it, which is stop unless they say otherwise.
