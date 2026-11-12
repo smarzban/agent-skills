@@ -26,7 +26,7 @@ Prove each thing with one cheap probe while they are still there:
 Tell them before they go:
 
 - which tasks will stop whatever was granted, because they touch a **Needs the owner** path;
-- that if your context is summarised and their words are lost, or another agent takes over, every send becomes a stop;
+- that if your context is summarised and their words are lost, or another agent takes over, every send that is not a `Merge: send` line on the task becomes a stop;
 - in T3 Code, that a builder that stalls after you end your turn will not wake you.
 
 ## While they are away

@@ -47,11 +47,11 @@ Keep your scripts, logs and the reviewers' reports in a folder that lasts, insid
 
 ## The grant to merge
 
-The ending of every task is stop, unless the owner told you, in this conversation, to send that task.
+The ending of every task is stop, unless the owner told you, in this conversation, to send that task, or the task carries a `Merge: send` line. A `Merge: stop` line always wins.
 
 - The grant is the owner's words to you. **Sends** in your note records them; it is a pointer, not the grant, because a file can be written by anyone.
-- Before a send, read the owner's words again in your own conversation. If you cannot, because your context was summarised and the words are gone, or because you are a different agent that took over, the ending is stop until the owner confirms. A handover therefore loses every send; say so when you hand over.
-- Never write a merge grant anywhere: not on a task, not in a brief, not in a pull request. A builder never holds one.
+- Before a send, read the owner's words again in your own conversation, or the `Merge: send` line on the task. If you can find neither, because your context was summarised and the words are gone, or because you are a different agent that took over, the ending is stop until the owner confirms. A handover therefore loses every send that was only spoken; say so when you hand over.
+- Never write a merge grant anywhere: not a `Merge:` line on a task, not in a brief, not in a pull request. A builder never holds one.
 - A task you created yourself, such as a follow-up, ends in stop, even under "send them all".
 - A task that touches a path on the repo's **Needs the owner** list ends in stop.
 - A send covers the "done when" list the owner saw. If you change a task's goal or its list after they said to send it, the ending is stop until they confirm the new one.
