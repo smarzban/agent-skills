@@ -14,10 +14,10 @@ Work on the current repo unless you are given a path. `<skill>` in a command is 
 ## Choose the mode
 
 - **Create**: the repo has no verification skill.
-- **Adopt**: the repo has one in a harness-specific folder, such as `.cursor/skills/verify-<app>/`, or one without the sections this skill adds. Read `reference/adopt.md`.
-- **Maintain**: the repo has one and it may have drifted from the app. Read `reference/maintain.md`.
+- **Adopt**: the repo has one in a harness-specific folder, such as `.cursor/skills/verify-<app>/`, or one whose feature files lack a `Source` section. Read `reference/adopt.md`. Adopt comes before maintain.
+- **Maintain**: the repo has an adopted one and it may have drifted from the app. Read `reference/maintain.md`.
 
-Look before you choose: `find .agents/skills .claude/skills .cursor/skills -maxdepth 1 -name 'verify-*' 2>/dev/null`.
+Look before you choose: `find .agents/skills .claude/skills .cursor/skills -maxdepth 1 -name 'verify-*' 2>/dev/null`. A verification skill in this sense has a `features/` map. Leave any other `verify-*` skill alone (a model check, a lint). With several that have a map, ask which; with nobody to ask, handle each in turn.
 
 ## Create
 
@@ -37,6 +37,7 @@ Look before you choose: `find .agents/skills .claude/skills .cursor/skills -maxd
 ## Rules for every mode
 
 - Edit only `<verify>`, the links to it, the `AGENTS.md` line and the ignore rule. Never edit product code. Where the app does not do what the map says, decide which is wrong: a stale map is fixed, a broken app is reported.
+- A recipe must be able to fail. For each check, ask what it would print if the feature were broken; a check that also matches the failure output proves nothing.
 - Never weaken a recipe to make it pass. A feature that cannot be driven is recorded with the route you tried and the precondition that was missing.
 - Proof standards, written into the generated skill (leave out one that has nothing to apply to in this app):
   - Drive the real user path, not an internal setter or a test-only endpoint.

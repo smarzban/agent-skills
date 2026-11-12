@@ -35,7 +35,7 @@ The map is the project's maintained list of what a user can do and how to prove 
 - `README.md`, `AGENTS.md`, `.gitignore`, `docs/`, `tests/`, `.github/`
 ```
 
-**Automated** is `full`, `partly` or `none`: whether tests that run without an agent cover the feature. It tells the owner which features CI protects when an outside contributor changes them, and which only an agent run can check.
+**Automated** is `full` (a test drives every sub-feature through the user path), `partly` or `none`: whether tests that run without an agent cover the feature. It tells the owner which features CI protects when an outside contributor changes them, and which only an agent run can check.
 
 **Not mapped yet** lists each user-facing feature you found and did not write a file for, with its source path in backticks. `features-for` prints `NOT-MAPPED` when a change touches one. Remove a line when its file is written.
 
@@ -50,7 +50,7 @@ One file per feature. An H1 title, one paragraph on what the user can do, then t
 3. `Driving it with <driver>`: `<driver>` is the helper's name or the tool's. The section starts with `Preconditions:`. Each bullet pairs a user action with the exact command and the result to observe. The last bullet is the proof to capture, followed by a restore bullet when the recipe changed data.
 4. `Gotchas`: traps that waste or invalidate a run.
 5. `Source`: the paths whose change means this feature must be driven again. One per bullet, in backticks, relative to the repo root. A folder ends with `/`.
-6. `Automated coverage`: for each sub-feature, the test that covers it and the command that runs it, or `none`. A test of a layer below the user path is `partly`, with the layer named.
+6. `Automated coverage`: for each sub-feature, the test that covers it and the command that runs it, or `none`. A test of a layer below the user path is `partly`, with the layer named. Name any condition the test needs to run (a flag, Docker).
 
 Sections 1 to 4 are written from the user's point of view: name user paths, stable handles, required state, commands and observable results, and keep implementation detail out. Sections 5 and 6 are the two places where the map points into the code.
 
@@ -105,7 +105,10 @@ Preconditions:
 
 ## Rules
 
+- In `Source`, **Not mapped yet** and **Paths with no feature**, put only paths in backticks. `features-for` reads every backticked word in those sections as a path.
+- A file may appear under a feature's `Source` and under **Not mapped yet**; a change to it then prints both.
+- A feature that can be driven only where the agent may not be (production, a paid service) keeps a narrow `Source`. Put shared code under a feature that can be driven locally, or every change will ask for a drive nobody can do.
 - If the seed data lacks a precondition that a recipe needs, the recipe reports a failure and the reason goes in `Gotchas`. Do not weaken the recipe.
 - `Source` paths are wide enough to catch a change that can break the feature. Where the code allows it, keep them narrow enough not to fire on every commit: shared code that every feature uses (the app shell, the router) goes to the feature that would show the break first. Where several features live in one file, list that file under each of them.
 - Take `Automated coverage` from the test files, not from their names: open the test and confirm that it exercises the sub-feature.
-- Check the map with `<verify>/scripts/features-for --all`. It lists every feature and exits 0 when it prints no `NO-SOURCE` and no `DEAD` line.
+- Check the map with `<verify>/scripts/features-for --all`. It lists every feature, checks every path in the map, and exits 0 when it prints no `NO-SOURCE` and no `DEAD` line.

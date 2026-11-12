@@ -63,4 +63,4 @@ Launch creates the run id and prints it. Every later command takes the run id as
 - A helper is executable, and the skill body shows how to call it. A helper the reader has to read to use is not finished.
 - Use a language the repo already depends on, or POSIX shell or Python 3. Do not add a dependency to the product for the sake of a helper; if the helper needs a package, keep it in a virtual environment under `.verify/` and show the one command that creates it.
 - A helper refuses to run against anything it did not create: it checks that the data folder is its own before it writes.
-- Keep run state (ids, ports, process ids) under `.verify/<run-id>/`, not in the skill folder.
+- Keep run state (ids, ports, process ids) out of the skill folder: under `.verify/<run-id>/`, or in a temporary folder outside the repo with owner-only permissions when it holds a secret (a cookie jar, a token).

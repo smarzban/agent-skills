@@ -14,7 +14,7 @@ A project skill is read from a different folder by each harness. Put the skill i
 
 3. If the repo already has a `.cursor/` folder, add the same link under `.cursor/skills/`. Do not create `.cursor/` for this.
 4. Commit the links. Git stores them as links. A checkout on Windows without link support gets a text file instead; note that in the report.
-5. Add one line to the repo's `AGENTS.md`, in the section that says what to read before starting or at the end of the file, so that a harness that finds no skill folder still finds the skill:
+5. Add one line to the repo's `AGENTS.md`, next to the build and test commands, in the section that says what to read before starting, or at the end of the file, so that a harness that finds no skill folder still finds the skill:
 
    ```markdown
    - To prove a change in the running app, follow `.agents/skills/verify-<app>/SKILL.md`. `.agents/skills/verify-<app>/scripts/features-for` lists the features a diff touches.
@@ -23,7 +23,7 @@ A project skill is read from a different folder by each harness. Put the skill i
    If the repo has no `AGENTS.md`, report that and do not create one here; `repo-setup` does that.
 6. Add `.verify/` to `.gitignore`. Run output and evidence go there.
 
-Never overwrite an existing file or link with one of these names. Report it and stop.
+A link that already points at the skill is left as it is. Never overwrite any other existing file or link with one of these names; report it and stop.
 
 ## What each harness was observed to read
 
