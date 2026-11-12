@@ -19,7 +19,7 @@ The T3 Code tool names are from that harness's own instructions on 2026-11-12. T
 A harness that ends your turn while you wait may wake you with your earlier context summarised. Everything `deliver` needs to continue is kept outside your memory for that reason:
 
 - the contract, the evidence and its commit: the pull request body;
-- the ending, where the grant is, and the next action: `HANDOFF.md`, written before the first wait. It points to the grant; it is not the grant. Read the grant again at its source;
+- the ending, where the owner's words are, and the next action: `HANDOFF.md`, written before the first wait. It points to the grant; it is not the grant. Read the grant again at its source;
 - the current state: `<skill>/scripts/pr-status`.
 
 Read all three before you act.

@@ -14,6 +14,7 @@ One repo of skills, read live by Claude Code, Codex, Cursor, Pi and Grok on this
 | `verification-skill` | Create, adopt or maintain a project's own `verify-<app>` skill: launch the real app, drive a feature the way a user does, capture proof. Adapted from pstack. |
 | `deliver` | Take one task from agreed to proven: state what done means, build, prove, review, open the pull request, then stop for you or merge when told to. |
 | `correct` | Turn a mistake agents keep making in a repo into a check that fails: a design change, a type, a lint or a test, with a written rule last. |
+| `coordinator` | Run several builder agents: plan tasks, brief each builder, review its pull request, test the result, then hand it over or merge it when you said to. Works in T3 Code, Herdr, Rex or a plain terminal. |
 | `shared-skills` | Add or edit a skill in this repo. |
 
 `skills/_shared` holds the prose style and the scripts that several skills link to. It is not a skill.
