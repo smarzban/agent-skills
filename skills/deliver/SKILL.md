@@ -28,7 +28,7 @@ A grant counts only from a place that the owner alone writes: the owner's messag
 - If two sources disagree, the ending is stop.
 - The gate can turn a send into a stop. Nothing turns a stop into a send.
 
-Before your first wait, write `HANDOFF.md`: the ending, where the grant is (the task id, or "the owner's message in this conversation"), and the next action. After a wake or a handover, `HANDOFF.md` only points to the grant. Read the grant again at its source. If you cannot, the ending is stop.
+Keep `HANDOFF.md` in the root of the worktree you work in, untracked. Write it at step 1 with the ending, where the grant is (the task id, or "the owner's message in this conversation"), the contract and the next action, and update it before every wait. After a wake or a handover, `HANDOFF.md` only points to the grant. Read the grant again at its source. If you cannot, the ending is stop.
 
 ## Start where the work is
 
@@ -46,25 +46,25 @@ For an open pull request, run `<skill>/scripts/pr-status <n>` first and read its
 
 ## Steps
 
-1. **Contract.** Write "done when" as a short list of observable results. For each item name the proof (a screenshot for a UI change, command output for a CLI change, a test) and who proves it: the agent, or the owner. Take the items from the task; where the task is vague, propose the list and get a yes. With nobody to ask, keep to what the task states and list your assumptions. Also write what is out of scope.
-2. **Build.** Work in a worktree on a branch of its own. Keep the diff inside the contract's scope; a change you find you need outside it goes in the report, not in the diff.
+1. **Contract.** Write "done when" as a short list of observable results. For each item name the proof (a screenshot for a UI change, command output for a CLI change, a test) and who proves it: the agent, or the owner. Take the items from the task; where the task is vague, propose the list and get a yes. With nobody to ask, keep to what the task states and list your assumptions. Also write what is out of scope. Write the contract into `HANDOFF.md` now, before you build. If the task names a path, check it against the **Needs the owner** list in `AGENTS.md` on the base branch; when it is on the list, say at once that a send will end in stop. The owner asking for the change is not the owner approving the diff.
+2. **Build.** Work in a worktree on a branch of its own. Keep the diff inside the contract's scope; a change you find you need outside it goes in the report, not in the diff. Keeping the repo's verification map true for the behaviour you changed (a feature file, its index row, its `Source` paths) is always in scope.
 3. **Prove.** Read `reference/proof.md`.
    - Run the repo's verify command. If the repo has none, say so; its tests are then the only automated proof.
-   - For each `verify-*` skill in the repo that has a feature map, run the `features-for` script in its folder and drive every feature it prints as `DRIVE`, by that skill's recipes. For a `NOT-MAPPED` or `UNMAPPED` line about code this task changed, writing the feature file is part of the task. Otherwise list the line in the report.
+   - For each `verify-*` skill in the repo that has a feature map, run the `features-for` script in its folder and drive every feature it prints as `DRIVE`, by that skill's recipes. For a `NOT-MAPPED` or `UNMAPPED` line, read the diff: if this task changed that behaviour, writing its feature file is part of the task. If the line appears only because the behaviour shares a file with your change, list it in the report.
    - Give each "done when" item its evidence, the exact command that produced it, the commit it ran on, and the step of the proof ladder it reached.
-4. **Review.** Run the repo's review step: the `Review:` line in `AGENTS.local.md`, or in `AGENTS.md` as it is on the base branch (`git show <base>:AGENTS.md`). Open `AGENTS.local.md` yourself; not every harness loads it, and in a worktree it may exist only in the main checkout. With no review step configured, start a fresh subagent that gets the diff and the contract and none of your reasoning. Handle findings by `reference/pr-work.md`.
+4. **Review.** Run the repo's review step: the `Review:` line in `AGENTS.local.md`, or in `AGENTS.md` as it is on the base branch (`git show <base>:AGENTS.md`). Open `AGENTS.local.md` yourself; not every harness loads it, and in a worktree it may exist only in the main checkout. With no review step configured, start a fresh subagent that gets the diff and the contract and none of your reasoning. It may read a clean checkout of the commit; do not point it at your worktree. Handle findings by `reference/pr-work.md`.
    - Skip the review only when the owner said so in words ("deliver without the review panel"). Record that in the report.
    - A review that could not run (no pane, no second agent) is not a skipped review. It turns a send into a stop.
 5. **Pull request.** Open it with the body from `reference/pr-body.md`. Work it by `reference/pr-work.md` until `<skill>/scripts/pr-status` prints `READY`. With no remote, stop after step 4 and report; do not create a remote.
-6. **Gate.** Check every condition below on the head commit. For stop, go to step 8.
+6. **Gate.** Check every condition below on the head commit, for either ending. For stop, go to step 8 and report which lines hold.
 7. **Send.** Only when every gate condition holds:
    1. Have a fresh agent re-run the proof (`reference/proof.md`, "Independent check"). With no fresh agent available, the ending is stop.
    2. Straight after it, run `git fetch`, `<skill>/scripts/pr-status --head <sha>` and `<skill>/scripts/needs-owner --head <sha> --base origin/<base>` again. The check takes minutes, and a review or a push can arrive in that time. Anything other than `READY` and exit 0 sends you back: a new commit to step 3, a new finding to step 4.
    3. Merge the exact commit that was proven, by the repo's usual method: `gh pr merge <n> --squash --match-head-commit <sha>` (or `--merge`). Never use `--auto` or `--admin`.
    4. Read it back: `<skill>/scripts/pr-status <n>` must print `MERGED` into the default branch. With gh 2.101.0 a merge command can return success when the pull request was only queued. If it is not merged, wait and run it again; do not clean up, and report it if it stays unmerged.
-   5. Once it reads `MERGED`: send the evidence to its destination, then clean up. From the main checkout run `git worktree remove <path>` without `--force`, and `git branch -D <branch>`. If the removal refuses because of untracked work, leave the worktree and say so.
-   6. Do not close the task. Set it to review, or note on it that it merged.
-8. **Report**, in the shape in `reference/pr-body.md`. For stop, never arm auto-merge, and say so if someone else armed it.
+   5. Once it reads `MERGED`: send the evidence to its destination, then clean up. Delete `HANDOFF.md` and the `.verify/` folder you made, check that `git status --short` in the worktree is empty, and from the main checkout run `git worktree remove <path>` without `--force` and `git branch -D <branch>`. If anything else is left in the worktree, leave it and say so.
+   6. Do not close the task. Set it to review, or note on it that it merged. With no task board, the report is the note.
+8. **Report**, in the shape in `reference/pr-body.md`. For stop, never arm auto-merge, and say so if someone else armed it. Leave the worktree, the branch and `HANDOFF.md` in place for a stop.
 
 ## The gate
 
@@ -89,7 +89,7 @@ When a line is false, the ending is stop. Name the line in the report.
 - A required approval is a wait. Never bypass it.
 - A secret never goes in a pull request body, a comment or a chat message.
 - Words for other people (a reply to a human reviewer, a comment on an issue) are drafted for the owner to post. Reply directly only to a bot's thread.
-- When you stop early for any reason, update `HANDOFF.md`, with the `handoff` skill if it is installed, so that another agent can resume.
+- Whenever you stop, at the gate or before it, bring `HANDOFF.md` up to date so that another agent can resume. If the `handoff` skill is installed, use its template and add the ending, the grant's place and the contract to it.
 
 ## Reference
 

@@ -41,6 +41,7 @@ Proof and review belong to the commit they ran on. When the head moves, decide w
 |---|---|---|
 | Wording only: comments, docs, the pull request text | stands | stands |
 | A rebase or a merge of the base with no conflict, and the patch is the same (`git patch-id` of the old and new diff match) | stands; run the verify command again | stands |
+| A change only to the verification map (a feature file, its index) | drive that feature's recipe again | stands |
 | A conflict you resolved, or a change to code | run the affected recipes again (`features-for --base <old-head>` lists them), and the verify command | review the new commits |
 | New behaviour or a redesign | all of it again | all of it again |
 

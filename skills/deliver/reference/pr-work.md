@@ -1,6 +1,6 @@
 # Working a pull request to ready
 
-Run `<skill>/scripts/pr-status`. It prints one verdict and exits; it does not wait. Act on the verdict, then wait for the next state the way your harness provides (`harness.md`).
+Run `<skill>/scripts/pr-status <n>`. It prints one verdict and exits; it does not wait. Without a number it uses the current branch's pull request, so run it from the worktree. Act on the verdict, then wait for the next state the way your harness provides (`harness.md`).
 
 Work in this order: conflicts, then review findings, then failing checks. Collect every fix you know of into one push, because each push restarts the checks.
 
@@ -37,7 +37,8 @@ They come from the repo's review step, from review bots and from people.
 - A real finding about code the diff did not touch: note it for the report as a follow-up. Do not widen the diff.
 - A finding you cannot show to be real: say why in one or two lines, and list it in the pull request body under **Review**. Opinions about style that the repo's rules do not back go the same way.
 - Block only on a problem you can show: a bug a user would hit, a failed check, a doc line the change made wrong.
-- Stop after three rounds of review on the same pull request. If findings keep coming, report what is still open and let the owner decide.
+- Each round uses a fresh reviewer on the whole diff. A review counts from the first one you run, before or after the pull request exists. An objection that you fixed, followed by a round that passes, is a pass. A fix that changes only wording or the verification map needs no further round.
+- Stop after three rounds. If findings keep coming, report what is still open and let the owner decide.
 
 Threads and replies:
 

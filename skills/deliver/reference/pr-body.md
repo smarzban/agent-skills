@@ -24,7 +24,7 @@ Use these headings in this order. Drop one that has nothing to say, except **Don
 | 2 | <observable result> | owner | <the exact steps for the owner> | |
 
 ## Verification
-Commit: <full sha the evidence ran on>
+Commit: <full sha the evidence ran on. When items ran on different commits, name the commit beside each.>
 
 1. `<exact command or recipe>`
    ```
@@ -68,4 +68,6 @@ Send it at the end, for either ending. Lead with the result; the owner should be
 <What could still be wrong, and how the owner would notice.>
 ```
 
-For a send that turned into a stop, the first line says which gate condition was false.
+Use **Ready for you** when the pull request is proven, reviewed and green and waits for the owner, including a send that the gate turned into a stop; the first line then says which gate condition was false. Use **Stopped** when the work ended before that.
+
+For a stop, **Your steps** ends with the merge command pinned to the proven commit, `gh pr merge <n> --squash --match-head-commit <sha>`, using the method of the repo's earlier merges, or squash when there are none.
