@@ -28,7 +28,7 @@ A grant counts only from a place that the owner alone writes: the owner's messag
 - If two sources disagree, the ending is stop.
 - The gate can turn a send into a stop. Nothing turns a stop into a send.
 
-Keep `HANDOFF.md` in the root of the worktree you work in, out of git: if `git check-ignore -q HANDOFF.md` fails, add the name to `.git/info/exclude`, which is local and not part of the diff. If the repo tracks a `HANDOFF.md` of its own, use `HANDOFF.local.md` the same way. Write it at step 1 with the ending, where the grant is (the task id, or "the owner's message in this conversation"), the contract and the next action. Update it before anything that ends your turn or takes more than a minute: a subagent, a check run, a question. After a wake or a handover, `HANDOFF.md` only points to the grant. Read the grant again at its source. If you cannot, the ending is stop.
+Keep `HANDOFF.md` in the root of the worktree you work in, out of git: if `git check-ignore -q HANDOFF.md` fails, add the name to the file that `git rev-parse --git-path info/exclude` prints, which is local and not part of the diff. If the repo tracks a `HANDOFF.md` of its own, use `HANDOFF.local.md` the same way. Write it at step 1 with the ending, where the grant is (the task id, or "the owner's message in this conversation"), the contract and the next action. Update it before anything that ends your turn or takes more than a minute: a subagent, a check run, a question. After a wake or a handover, `HANDOFF.md` only points to the grant. Read the grant again at its source. If you cannot, the ending is stop.
 
 ## Start where the work is
 
@@ -55,7 +55,7 @@ For an open pull request, run `<skill>/scripts/pr-status <n>` first and read its
 4. **Review.** Run the repo's review step: the `Review:` line in `AGENTS.local.md`, or in `AGENTS.md` as it is on the base branch (`git show <base>:AGENTS.md`). Open `AGENTS.local.md` yourself; not every harness loads it, and in a worktree it may exist only in the main checkout. With no review step configured, start a fresh subagent that gets the diff and the contract and none of your reasoning. It may read a clean checkout of the commit (`git worktree add --detach ../<repo>-review <sha>`, removed afterwards); do not point it at your worktree. Besides the diff and the contract, tell it only where the checkout is, what the base is, and the repo's rule for running the app without touching real data. Handle findings by `reference/pr-work.md`.
    - Skip the review only when the owner said so in words ("deliver without the review panel"). Record that in the report.
    - A review that could not run (no pane, no second agent) is not a skipped review. It turns a send into a stop.
-5. **Pull request.** Open it with the body from `reference/pr-body.md`. Work it by `reference/pr-work.md` until `<skill>/scripts/pr-status` prints `READY`. With no remote, stop after step 4 and report; do not create a remote.
+5. **Pull request.** Open it with the body from `reference/pr-body.md`. Work it by `reference/pr-work.md` until `<skill>/scripts/pr-status` prints `READY`. With no remote, stop after step 4 and report; do not create a remote. What would have gone in the pull request body goes in `HANDOFF.md` and in the report.
 6. **Gate.** Check every condition below on the head commit, for either ending. For stop, go to step 8 and report which lines hold.
 7. **Send.** Only when every gate condition holds:
    1. Have a fresh agent re-run the proof (`reference/proof.md`, "Independent check"). With no fresh agent available, the ending is stop.
@@ -85,7 +85,7 @@ When a line is false, the ending is stop. Name the line in the report.
 ## Always
 
 - Proof is what you observed in this session. A summary, an earlier run, a passing compile or another agent's word is not proof.
-- An action the harness or the owner denied stays denied. Stop and report it; do not look for another route.
+- An action the harness or the owner denied stays denied. Do not look for another route to it. Carry on with the work that does not depend on it, and report the denial; stop the run only when nothing else can be done.
 - A required approval is a wait. Never bypass it.
 - A secret never goes in a pull request body, a comment or a chat message.
 - Words for other people (a reply to a human reviewer, a comment on an issue) are drafted for the owner to post. Reply directly only to a bot's thread.

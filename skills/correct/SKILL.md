@@ -15,7 +15,7 @@ Work on the current repo unless you are given a path.
 
 - The ending is stop: this skill never merges, whatever was said. It changes the checks that guard the repo, and the owner merges those.
 - Before the first commit, start a branch in a worktree of its own. Never commit on the default branch. With no remote, leave the branch and report.
-- If the `deliver` skill is installed, follow all of it, with the ending fixed at stop: write "Ending: stop (fixed by `correct`)" in `HANDOFF.md`, so that a later "send it" is not read as a grant. The contract has one group of items per class: the check fails on the mistake, it passes on the fix, and behaviour the class does not concern is unchanged.
+- If the `deliver` skill is installed, follow all of it, with the ending fixed at stop: write "Ending: stop (fixed by `correct`)" in `HANDOFF.md`, so that a later "send it" is not read as a grant. The contract has one group of items per class: the check fails on the mistake, it passes on the fix, and behaviour the class does not concern is unchanged. Use `deliver`'s report, with the per-class account from **Report** below as its "Done when". A baseline makes `deliver`'s "nothing was loosened" line false; say so, and it costs nothing because the ending is stop.
 - What the owner must decide goes in one place: under `## For the owner to decide` in the pull request body, and again in the report.
 - If a pull request from an earlier run of this skill is still open (branch `correct/<name>`), add to it; do not open a second one.
 
@@ -39,13 +39,13 @@ Otherwise look for repeats:
 
 Group what you find into classes. A class counts when it has happened twice, or when the owner says it matters. For each class write one line: what goes wrong, and the commits, comments or files that show it.
 
-With more than three classes, take the three most frequent and list the rest in the report.
+With more than three classes, take the three most frequent and list the rest in the report. If one class stalls, ship the ones that are finished and proven, and leave the stalled one out of the branch and in the report.
 
 ## 2. Choose the fix, highest level first
 
 For each class, take the first level that works and say why the ones above it did not.
 
-1. **Design.** Make the wrong thing impossible to express. Give each piece of state one owner and each task one supported way. Hide internals so that the wrong import fails. Replace a list that is kept in step by hand with one source. Delete the old way and any dead code an agent would copy.
+1. **Design.** Make the wrong thing impossible to express, or refuse it at the moment it is attempted. Give each piece of state one owner and each task one supported way. Hide internals so that the wrong import fails. Replace a list that is kept in step by hand with one source. Delete the old way and any dead code an agent would copy.
 2. **Type.** Make the bad state fail to compile or to load.
 3. **Lint or check.** A check whose error message names the file, the function or the command to use instead. An agent reads that message and fixes itself.
 4. **Test.** A test of the behaviour, which fails when the behaviour breaks and survives a refactor.
@@ -54,7 +54,7 @@ For each class, take the first level that works and say why the ones above it di
 Limits on the choice:
 
 - Prefer a fix that stops the mistake where the harm happens over one that reports it afterwards. A check in the verify command is too late for a mistake that deletes or overwrites something when it runs.
-- Anything a user, a script or another repo can observe is the owner's to change: output, exit codes, defaults, public API, file formats. Take the strongest fix that leaves those as they are, say plainly what it still lets through, and put the stronger fix forward for the owner to decide. When nobody is present, make no design-level change that alters any of them.
+- Anything a user, a script or another repo can observe is the owner's to change: output, exit codes, defaults, public API, file formats. A new check in the verify command is the one exception; that is what this skill is for. Take the strongest fix that leaves those as they are, say plainly what it still lets through, and put the stronger fix forward for the owner to decide. When nobody is present, make no design-level change that alters any of them.
 - A higher level that covers only part of the class can be joined with a lower one that covers the rest.
 - If the fix is a check, do not also write a rule for it. The rule table row is enough.
 - A test that still passes when what it checks is broken may be fixed, after you show it passing with the behaviour broken. Deleting a test is the owner's decision.
@@ -64,9 +64,10 @@ Limits on the choice:
 - One class per commit. Fixes that come out of review are further commits.
 - Prove each check against the mistake as it was made. Do it in a throwaway worktree (`git worktree add --detach ../<repo>-mistake <sha>`), removed afterwards; the branch you ship never holds the mistake. Check out the old code there, or write the mistake back in the way it was described. Show that the check fails with the message you intended, then show that it passes on the fixed code. Paste both outputs in the pull request, and say what tree each ran on. For `deliver`, this pair is the evidence for the class, at ladder step 4. For a design fix, prove the design (the wrong thing is refused) and the test that guards it.
 - If making the mistake is itself harmful, make it in isolation as well: a temporary home folder, a copy of the data, a container. Check afterwards that nothing real was touched.
+- A check that watches or blocks file writes, processes or the network can do damage while it is half built. Develop it with the home and temporary folders pointed at a scratch folder you will delete.
 - The check runs in the repo's verify command, so that it runs the same way locally and in CI. A repo with no verify command gets the check in its test command. A repo with neither gets the check as a script, and wiring it in is for the owner to decide.
 - Use the linter and the test framework the repo already has, or a small script in the repo. Adding a new tool or dependency needs the owner's yes.
-- If the code already breaks the new check in more places than you can fix in this change, the check fails only on new occurrences. Record the existing ones in a baseline file, keyed by file and by the offending text or symbol, never by line number, and report the count. A baseline is an allowlist; name it as one in the pull request.
+- If the code already breaks the new check in places you cannot fix in this change, or may not (the fix would change what users see), the check fails only on new occurrences. Record the existing ones in a baseline file, keyed by file and by the offending text or symbol, never by line number, and report the count. A baseline is an allowlist; name it as one in the pull request.
 - An exception goes on the offending line, with the reason, an expiry date and the name of the person who approved it. The owner asking for the correction is not that approval. With nobody to approve, add no exception and list the case for the owner.
 
 ## 4. Keep the rule table
