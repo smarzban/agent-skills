@@ -30,7 +30,7 @@ gh repo edit <owner>/<repo> --description "<the first sentence>"
 gh repo edit <owner>/<repo> --add-topic <topic> --add-topic <topic>
 ```
 
-Topics are lowercase with hyphens, at most 20. Pick them from the category, the stack, the protocols and integrations, and the domain. Use terms that appear in the code or the docs, not aspirations.
+Topics are lowercase with hyphens. Keep to the ten or so that a searcher would type; the host caps the number. Pick them from the category, the stack, the protocols and integrations, and the domain. Use terms that appear in the code or the docs, not aspirations.
 
 **Package manifest.** `description`, `keywords`, `repository`, `homepage` and `license` in `package.json`, `pyproject.toml`, `Cargo.toml` or the equivalent. This is an in-repo edit: propose it with the other fixes. The `license` field waits for the owner's licence choice.
 

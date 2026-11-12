@@ -1,6 +1,6 @@
 ---
 name: writing-docs
-description: Write, audit or update a project's docs from its source code. User docs (quickstart, install, configuration, a page per feature) and maintainer docs (architecture, data model, invariants), as plain Markdown or for a docs framework such as Starlight or MkDocs. Use for "write the docs", "document this repo", "user docs", "user guide", "docs site", "website docs", "architecture docs", "audit the docs", "update the docs", "the docs are out of date".
+description: Write, audit or update a project's docs from its source code. User docs (quickstart, install, configuration, a page per feature) and maintainer docs (architecture, data model, invariants), as plain Markdown or for a docs framework such as Starlight or MkDocs. Use for "write the docs", "document this repo", "user docs", "user guide", "docs site", "website docs", "architecture docs", "audit the docs", "update the docs", "the docs are out of date". Not for creating or hosting a docs site.
 ---
 
 # writing-docs

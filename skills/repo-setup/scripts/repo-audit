@@ -61,6 +61,17 @@ ignored 'ignore rule for AGENTS.local.md' AGENTS.local.md
 ignored 'ignore rule for HANDOFF.md' HANDOFF.md
 row '.gitignore' .gitignore
 row 'verify command' scripts/verify bin/verify
+# A repo may have its own verify entry point; list the likely ones so the agent can confirm.
+for f in Makefile makefile justfile Justfile; do
+  [ -f "$f" ] || continue
+  t="$(grep -oE '^(verify|check|ci|test):' "$f" | tr -d ':' | tr '\n' ' ')"
+  [ -z "$t" ] || printf '            candidates in %s: %s\n' "$f" "$t"
+  break
+done
+if [ -f package.json ]; then
+  t="$(grep -oE '"(verify|check|ci|test)"[[:space:]]*:' package.json | tr -d '": ' | tr '\n' ' ')"
+  [ -z "$t" ] || printf '            candidates in package.json scripts: %s\n' "$t"
+fi
 row 'worktree setup script' scripts/worktree-setup bin/worktree-setup
 row 'CI workflow' .github/workflows .gitlab-ci.yml .circleci/config.yml .buildkite azure-pipelines.yml
 

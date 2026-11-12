@@ -1,6 +1,6 @@
 ---
 name: repo-setup
-description: Set up or audit a repo's working baseline for people and agents. Public AGENTS.md plus a gitignored AGENTS.local.md, ignore rules, one verify command that CI also runs, and a worktree setup script. Migrates an existing CLAUDE.md without losing a line. Use for "set up this repo", "repo setup", "bootstrap the repo", "add AGENTS.md", "migrate CLAUDE.md to AGENTS.md".
+description: Set up or audit a repo's working baseline for people and agents. Public AGENTS.md plus a gitignored AGENTS.local.md, ignore rules, one verify command that CI also runs, and a worktree setup script. Migrates an existing CLAUDE.md without losing a line. Use for "set up this repo for agents", "repo setup", "bootstrap the repo", "add AGENTS.md", "migrate CLAUDE.md to AGENTS.md". Not for installing dependencies or getting a project to run locally.
 ---
 
 # repo-setup
@@ -44,7 +44,7 @@ Work on the current repo unless you are given a path.
 
 - Never replace an existing file. Add the missing lines, keep the rest, and show the diff first.
 - Write a fact or leave the line out. Take build, test and lint commands from the CI config and the package scripts that the audit prints, and run each one before you write it down. A repo with no checks yet gets no verify command and no CI file. Report them as waiting for a stack; do not write a placeholder.
-- Use the repo's existing verify entry point if it has one (`make check`, `npm run verify`). Otherwise create `scripts/verify`. In both cases CI calls the same command a person runs.
+- Use the repo's existing verify entry point if it has one (`make check`, `npm run verify`); the audit lists candidates under its verify row. Otherwise create `scripts/verify`. In both cases CI calls the same command a person runs.
 - Owner decisions are flagged and never invented: the licence, the security policy and its reporting channel, the code of conduct, `CODEOWNERS` entries, and remote settings (visibility, branch protection, hosted secret scanning). For a remote setting, give the exact command and let the owner run it. One exception: when the repo has a single author, propose `* @<that-owner>` for `CODEOWNERS` and ask for confirmation.
 - Never create `AGENTS.override.md`. Codex reads it in place of `AGENTS.md`.
 

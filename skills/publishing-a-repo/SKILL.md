@@ -87,7 +87,7 @@ Fail on any step that needs a private registry, a private submodule, an internal
 1. A table: each check, its result, and the evidence.
 2. Blockers, in the order to fix them: secrets, then private references, then licence and ownership.
 3. Proposed in-repo fixes, for a yes.
-4. Commands for the owner to run, including the last one, which this skill never runs:
+4. Commands for the owner to run, including the last one, which this skill never runs. The flags are those of `gh` 2.101.0 (2026-09); check `gh repo edit --help` if it differs:
 
    ```sh
    gh repo edit <owner>/<repo> --visibility public --accept-visibility-change-consequences
