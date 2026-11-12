@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""Print one verdict for a pull request and exit. It never waits or polls.
+
+usage: pr-status [PR] [--head SHA] [--json FILE]
+
+  PR       number, URL or branch. Default: the pull request of the current branch.
+  --head   also require that the pull request's head commit is SHA
+  --json   read `gh pr view --json ...` output from FILE instead of calling gh (for tests)
+
+Verdicts, first match wins:
+  MERGED             the pull request is merged (the base branch is printed)
+  CLOSED             closed without a merge
+  HEAD-MOVED         --head was given and the head commit is a different one
+  DRAFT              still a draft
+  CONFLICT           it cannot merge cleanly into its base
+  CHECKS-FAILING     at least one check failed (each is listed)
+  CHECKS-PENDING     checks are still running (each is listed)
+  CHANGES-REQUESTED  a reviewer asked for changes
+  THREADS-OPEN       unresolved review threads (the count is printed)
+  REVIEW-REQUIRED    a required approval is missing
+  BLOCKED            the host reports another blocker (its state is printed)
+  READY              nothing above applies
+
+Exit status: 0 READY or MERGED, 1 any other verdict, 2 usage or gh error.
+"""
+import json
+import subprocess
+import sys
+
+FIELDS = ("number,url,state,isDraft,mergeable,mergeStateStatus,reviewDecision,"
+          "statusCheckRollup,headRefOid,baseRefName,autoMergeRequest")
+FAIL = {"FAILURE", "ERROR", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED", "STARTUP_FAILURE"}
+PEND = {"PENDING", "QUEUED", "IN_PROGRESS", "EXPECTED", "WAITING", "REQUESTED"}
+
+
+def run(cmd):
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0:
+        print("pr-status: %s" % (r.stderr.strip() or "command failed: " + " ".join(cmd)), file=sys.stderr)
+        sys.exit(2)
+    return r.stdout
+
+
+def open_threads(pr):
+    try:
+        owner, repo = pr["url"].split("/")[3:5]
+    except (KeyError, ValueError):
+        return None
+    q = ("query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n)"
+         "{reviewThreads(first:100){nodes{isResolved}}}}}")
+    r = subprocess.run(["gh", "api", "graphql", "-f", "query=" + q, "-f", "o=" + owner, "-f", "r=" + repo,
+                        "-F", "n=%d" % pr["number"]], capture_output=True, text=True)
+    if r.returncode != 0:
+        return None
+    try:
+        nodes = json.loads(r.stdout)["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"]
+    except (KeyError, TypeError, ValueError):
+        return None
+    return sum(1 for n in nodes if not n.get("isResolved"))
+
+
+def main(argv):
+    target, head, src = None, None, None
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a in ("-h", "--help"):
+            print(__doc__.strip())
+            return 0
+        if a in ("--head", "--json"):
+            i += 1
+            if i >= len(argv):
+                print("pr-status: %s needs a value" % a, file=sys.stderr)
+                return 2
+            if a == "--head":
+                head = argv[i]
+            else:
+                src = argv[i]
+        elif a.startswith("-"):
+            print("pr-status: unknown option %s" % a, file=sys.stderr)
+            return 2
+        else:
+            target = a
+        i += 1
+
+    if src:
+        with open(src, encoding="utf-8") as f:
+            pr = json.load(f)
+        threads = pr.get("openThreads")
+    else:
+        pr = json.loads(run(["gh", "pr", "view"] + ([target] if target else []) + ["--json", FIELDS]))
+        threads = open_threads(pr)
+
+    sha = pr.get("headRefOid") or ""
+    lines = []
+
+    def out(verdict, detail=""):
+        print("%s%s" % (verdict, "  " + detail if detail else ""))
+        for l in lines:
+            print("  " + l)
+        print("pr-status: #%s head %s base %s%s" % (pr.get("number"), sha[:9], pr.get("baseRefName"),
+              "  (auto-merge is armed)" if pr.get("autoMergeRequest") else ""))
+        return 0 if verdict in ("READY", "MERGED") else 1
+
+    state = pr.get("state")
+    if state == "MERGED":
+        return out("MERGED", "into %s" % pr.get("baseRefName"))
+    if state == "CLOSED":
+        return out("CLOSED")
+    if head and not (sha.startswith(head) or head.startswith(sha)):
+        return out("HEAD-MOVED", "expected %s" % head[:9])
+    if pr.get("isDraft"):
+        return out("DRAFT")
+    if pr.get("mergeable") == "CONFLICTING" or pr.get("mergeStateStatus") == "DIRTY":
+        return out("CONFLICT")
+
+    failing, pending = [], []
+    for c in pr.get("statusCheckRollup") or []:
+        name = c.get("name") or c.get("context") or "?"
+        res = (c.get("conclusion") or c.get("state") or c.get("status") or "").upper()
+        if res in FAIL:
+            failing.append("%s: %s" % (name, res.lower()))
+        elif res in PEND or (c.get("status") and c.get("status") != "COMPLETED"):
+            pending.append("%s: %s" % (name, res.lower() or "pending"))
+    if failing:
+        lines.extend(failing)
+        return out("CHECKS-FAILING", "%d check(s)" % len(failing))
+    if pending:
+        lines.extend(pending)
+        return out("CHECKS-PENDING", "%d check(s)" % len(pending))
+    if pr.get("reviewDecision") == "CHANGES_REQUESTED":
+        return out("CHANGES-REQUESTED")
+    if threads:
+        return out("THREADS-OPEN", "%d unresolved" % threads)
+    if pr.get("reviewDecision") == "REVIEW_REQUIRED":
+        return out("REVIEW-REQUIRED")
+    if pr.get("mergeStateStatus") in ("BLOCKED", "BEHIND", "UNKNOWN") or pr.get("mergeable") == "UNKNOWN":
+        return out("BLOCKED", "host reports %s / %s" % (pr.get("mergeStateStatus"), pr.get("mergeable")))
+    if threads is None and not src:
+        lines.append("review threads could not be read; check them by hand")
+    return out("READY")
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

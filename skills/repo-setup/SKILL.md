@@ -55,6 +55,7 @@ Work on the current repo unless you are given a path.
 - The commands, including how to prepare a fresh worktree.
 - The pointers: read `HANDOFF.md` first if it exists, where the docs index is, and "a change to a user-facing surface updates its docs page in the same change", naming the `writing-docs` update mode.
 - A rule table that pairs each rule with what enforces it: a lint, a test, a type, or "nothing yet". A rule with "nothing yet" is a candidate for a check, and the table makes that visible.
+- A **Needs the owner** list: the paths an agent never merges alone.
 - The split: a note a stranger who cloned the repo could use goes in `AGENTS.md`; local paths, personal workflow and private context go in `AGENTS.local.md`.
 
 Budget: keep the root `AGENTS.md` under 150 lines and 8 KB. The three harnesses probed load the whole file at the start of every session (`reference/harness-loading.md`), so each line is paid for on every task. When an existing file is over budget, report it and propose moves; do not cut content yourself.

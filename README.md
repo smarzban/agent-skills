@@ -12,6 +12,7 @@ One repo of skills, read live by Claude Code, Codex, Cursor, Pi and Grok on this
 | `writing-docs` | Write, audit or update user docs and maintainer docs from the source, as plain Markdown or for a docs framework. |
 | `publishing-a-repo` | Check a private repo before it goes public. Runs only when asked by name. |
 | `verification-skill` | Create, adopt or maintain a project's own `verify-<app>` skill: launch the real app, drive a feature the way a user does, capture proof. Adapted from pstack. |
+| `deliver` | Take one task from agreed to proven: state what done means, build, prove, review, open the pull request, then stop for you or merge when told to. |
 | `shared-skills` | Add or edit a skill in this repo. |
 
 `skills/_shared` holds the prose style and the scripts that several skills link to. It is not a skill.
