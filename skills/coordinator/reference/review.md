@@ -4,7 +4,7 @@ You run the review on each builder's pull request. The builder's brief told it n
 
 ## Running it
 
-- Use the repo's review step: the `Review:` line in `AGENTS.local.md`, or in `AGENTS.md` as it is on the base branch. With none, start a fresh agent that gets the diff and the contract and none of your reasoning, as `deliver` step 4 describes.
+- Use the repo's review step: the `Review:` line in `AGENTS.local.md`, or in `AGENTS.md` as it is on the base branch. With none, use what the owner answered when you asked (see Settings in the skill). With nobody to ask, start a fresh agent that gets the diff and the contract and none of your reasoning, as `deliver` step 4 describes.
 - The reviewer works in its own fresh session, in a clean checkout of the head commit, not in the builder's worktree. Your environment's reference says where to open it.
 - Give it the pull request's base and head commits, the "done when" list, the owner's limits, and the repo's rule for running the app without touching real data. Name the areas that matter for this change: security boundaries, writes that other people see, compatibility with what is deployed. Ask for findings with a file and line and a failing case, and separately for remarks. It edits nothing and posts nothing.
 - Fresh-agent reviews can run side by side. A review step that uses one named session reviews one pull request at a time.
