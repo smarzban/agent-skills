@@ -15,6 +15,8 @@ One repo of skills, read live by Claude Code, Codex, Cursor, Pi and Grok on this
 
 `skills/_shared` holds the prose style and the scripts that several skills link to. It is not a skill.
 
+Skills reach `skills/_shared` through relative symlinks, for example `skills/writing-docs/reference/style.md`. The links work when a harness reads this repo in place, which is what `bin/skills install` sets up. Copying a single skill folder out of the repo breaks them: copy `skills/_shared` beside it, or replace the links with the files they point to. Whether the plugin install routes keep the links is not tested.
+
 ## Install (once per machine)
 
 ```sh
