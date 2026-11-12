@@ -1,0 +1,187 @@
+#!/usr/bin/env python3
+"""Print one verdict for a GitHub pull request and exit. It never waits or polls.
+
+usage: pr-status [PR] [--head SHA] [--json FILE]
+
+  PR       number, URL or branch. Default: the pull request of the current branch.
+  --head   also require that the pull request's head commit is SHA (7 or more hex characters)
+  --json   read `gh pr view --json ...` output from FILE instead of calling gh (for tests)
+
+Verdicts, first match wins:
+  MERGED             the pull request is merged (the base branch is printed)
+  CLOSED             closed without a merge
+  HEAD-MOVED         --head was given and the head commit is a different one
+  DRAFT              still a draft
+  CONFLICT           it cannot merge cleanly into its base
+  COMPUTING          the host has not finished working out whether it can merge
+  CHECKS-FAILING     a check finished with anything other than success, neutral or skipped
+  CHECKS-PENDING     checks are still running
+  NO-CHECKS          no check has reported on the head commit
+  CHANGES-REQUESTED  a reviewer asked for changes
+  THREADS-OPEN       unresolved review threads (the count is printed)
+  THREADS-UNKNOWN    the review threads could not be read, or there are more than 100
+  REVIEW-REQUIRED    a required approval is missing
+  BLOCKED            the host reports another blocker (its state is printed)
+  READY              nothing above applies
+
+The last line always names the head commit, the base branch, the author and whether
+the pull request comes from another repository.
+
+Exit status: 0 READY or MERGED, 1 any other verdict, 2 usage, gh or input error.
+"""
+import json
+import re
+import subprocess
+import sys
+
+FIELDS = ("number,url,state,isDraft,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup,"
+          "headRefOid,baseRefName,autoMergeRequest,author,isCrossRepository")
+PASS = {"SUCCESS", "NEUTRAL", "SKIPPED"}
+PEND = {"PENDING", "QUEUED", "IN_PROGRESS", "EXPECTED", "WAITING", "REQUESTED"}
+
+
+def die(msg):
+    print("pr-status: %s" % msg, file=sys.stderr)
+    sys.exit(2)
+
+
+def run(cmd):
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True)
+    except OSError as e:
+        die("cannot run %s: %s" % (cmd[0], e))
+    if r.returncode != 0:
+        die(r.stderr.strip() or "command failed: " + " ".join(cmd))
+    return r.stdout
+
+
+def open_threads(pr):
+    """Number of unresolved review threads, or None when it cannot be known."""
+    try:
+        owner, repo = pr["url"].split("/")[3:5]
+        q = ("query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n)"
+             "{reviewThreads(first:100){pageInfo{hasNextPage} nodes{isResolved}}}}}")
+        r = subprocess.run(["gh", "api", "graphql", "-f", "query=" + q, "-f", "o=" + owner, "-f", "r=" + repo,
+                            "-F", "n=%d" % pr["number"]], capture_output=True, text=True)
+        if r.returncode != 0:
+            return None
+        t = json.loads(r.stdout)["data"]["repository"]["pullRequest"]["reviewThreads"]
+        if t["pageInfo"]["hasNextPage"]:
+            return None
+        return sum(1 for n in t["nodes"] if not n.get("isResolved"))
+    except (KeyError, TypeError, ValueError, OSError):
+        return None
+
+
+def main(argv):
+    target, head, src = None, None, None
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a in ("-h", "--help"):
+            print(__doc__.strip())
+            return 0
+        if a in ("--head", "--json"):
+            i += 1
+            if i >= len(argv):
+                die("%s needs a value" % a)
+            if a == "--head":
+                head = argv[i]
+            else:
+                src = argv[i]
+        elif a.startswith("-"):
+            die("unknown option %s" % a)
+        else:
+            target = a
+        i += 1
+    if head is not None:
+        head = head.strip().lower()
+        if not re.fullmatch(r"[0-9a-f]{7,40}", head):
+            die("--head needs a commit id of 7 to 40 hex characters, got %r" % head)
+
+    default_branch = None
+    try:
+        if src:
+            with open(src, encoding="utf-8") as f:
+                pr = json.load(f)
+            threads = pr.get("openThreads")
+            default_branch = pr.get("defaultBranch")
+        else:
+            pr = json.loads(run(["gh", "pr", "view"] + ([target] if target else []) + ["--json", FIELDS]))
+            threads = open_threads(pr)
+            if pr.get("state") == "MERGED":
+                owner, repo = pr["url"].split("/")[3:5]
+                default_branch = json.loads(run(["gh", "repo", "view", "%s/%s" % (owner, repo), "--json",
+                                                 "defaultBranchRef"]))["defaultBranchRef"]["name"]
+    except (OSError, ValueError, KeyError, TypeError) as e:
+        die("cannot read the pull request: %s" % e)
+
+    sha = (pr.get("headRefOid") or "").lower()
+    if not re.fullmatch(r"[0-9a-f]{40}", sha):
+        die("the pull request data has no head commit")
+    lines = []
+
+    def out(verdict, detail=""):
+        print("%s%s" % (verdict, "  " + detail if detail else ""))
+        for l in lines:
+            print("  " + l)
+        author = (pr.get("author") or {}).get("login") or "unknown"
+        print("pr-status: #%s head %s base %s author %s cross-repository %s%s"
+              % (pr.get("number"), sha[:9], pr.get("baseRefName"), author,
+                 "yes" if pr.get("isCrossRepository") else "no",
+                 "  (auto-merge is armed)" if pr.get("autoMergeRequest") else ""))
+        return 0 if verdict in ("READY", "MERGED") else 1
+
+    state = pr.get("state")
+    if state == "MERGED":
+        base = pr.get("baseRefName")
+        note = ""
+        if default_branch:
+            note = " (the default branch)" if base == default_branch else " (NOT the default branch, which is %s)" % default_branch
+        return out("MERGED", "into %s%s" % (base, note))
+    if state == "CLOSED":
+        return out("CLOSED")
+    if head and not sha.startswith(head):
+        return out("HEAD-MOVED", "expected %s" % head[:9])
+    if pr.get("isDraft"):
+        return out("DRAFT")
+    if pr.get("mergeable") == "CONFLICTING" or pr.get("mergeStateStatus") == "DIRTY":
+        return out("CONFLICT")
+    if pr.get("mergeable") == "UNKNOWN" or pr.get("mergeStateStatus") == "UNKNOWN":
+        return out("COMPUTING")
+
+    rollup = pr.get("statusCheckRollup") or []
+    failing, pending = [], []
+    for c in rollup:
+        name = c.get("name") or c.get("context") or "?"
+        status = (c.get("status") or "").upper()
+        res = (c.get("conclusion") or c.get("state") or "").upper()
+        if res in PASS:
+            continue
+        if res in PEND or (not res and status != "COMPLETED") or (status and status != "COMPLETED"):
+            pending.append("%s: %s" % (name, (res or status or "pending").lower()))
+        else:
+            failing.append("%s: %s" % (name, (res or "no result").lower()))
+    if failing:
+        lines.extend(failing)
+        return out("CHECKS-FAILING", "%d check(s)" % len(failing))
+    if pending:
+        lines.extend(pending)
+        return out("CHECKS-PENDING", "%d check(s)" % len(pending))
+    if not rollup:
+        return out("NO-CHECKS")
+    if pr.get("reviewDecision") == "CHANGES_REQUESTED":
+        return out("CHANGES-REQUESTED")
+    if threads is None:
+        return out("THREADS-UNKNOWN")
+    if threads:
+        return out("THREADS-OPEN", "%d unresolved" % threads)
+    if pr.get("reviewDecision") == "REVIEW_REQUIRED":
+        return out("REVIEW-REQUIRED")
+    if pr.get("mergeStateStatus") in ("BLOCKED", "BEHIND"):
+        return out("BLOCKED", "host reports %s" % pr.get("mergeStateStatus"))
+    return out("READY")
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

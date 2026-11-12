@@ -83,7 +83,7 @@ Preconditions:
 - **Confirm it was stored.** Run `control-notes cli -- notes list --format json`. The output holds one note titled `Release checklist`.
 - **Cancel a draft.** Open a new note, fill `Title` with `Discard me`, and run `control-notes browser click --role button --name "Cancel"`. The list has no `Discard me`.
 - **CLI entry.** Run `control-notes cli -- notes create --title "CLI note" --body "From the terminal" --format json`. Exit code 0, and the output holds the new id.
-- **Proof.** Run `control-notes browser screenshot --path .verify/$RUN_ID/create-note/list.png` and save the `notes list` output beside it. Both show `Release checklist` and `CLI note`.
+- **Proof.** Run `control-notes browser screenshot --run <run-id> --path create-note/list.png`, which writes under `.verify/<run-id>/`, and save the `notes list` output beside it. Both show `Release checklist` and `CLI note`.
 
 ## Gotchas
 

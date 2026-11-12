@@ -1,0 +1,152 @@
+#!/usr/bin/env python3
+"""List the changed paths that the repo's owner must approve before a merge.
+
+usage: needs-owner [--base REF] [--head SHA]
+
+The list is read from the "## Needs the owner" section of AGENTS.md as it is on the
+base branch, never from the change itself, so that a change cannot take itself off
+the list. One path per bullet, in backticks; a folder ends with "/" (a listed name
+with no "/" also covers everything under a folder of that name); * and ? are wildcards.
+
+Always on the list, whatever AGENTS.md says:
+  CI configuration    .github/workflows/, .github/actions/, .gitlab-ci.yml, .circleci/,
+                      .buildkite/, azure-pipelines.yml, Jenkinsfile
+  the verify command  scripts/verify, bin/verify, Makefile, makefile, justfile, Justfile
+  ownership           CODEOWNERS, .github/CODEOWNERS, docs/CODEOWNERS
+  AGENTS.md           a change to its "Needs the owner" section or to a "Review:" line
+
+  --base   the branch the change will merge into. Default: origin/HEAD, origin/main,
+           main or master, whichever exists first. Fetch before you run this.
+  --head   the commit to check, such as a pull request's head. Default: HEAD plus the
+           working tree. With --head the working tree is not looked at.
+
+A file that was renamed counts under both its old and its new path.
+
+Output: NEEDS-OWNER <path>  (<rule>) for each match, then a summary line.
+Exit status: 0 nothing needs the owner, 1 at least one path does, 2 usage or repo error.
+"""
+import fnmatch
+import re
+import subprocess
+import sys
+
+BUILTIN = [".github/workflows/", ".github/actions/", ".gitlab-ci.yml", ".circleci/", ".buildkite/",
+           "azure-pipelines.yml", "Jenkinsfile", "scripts/verify", "bin/verify", "Makefile", "makefile",
+           "justfile", "Justfile", "CODEOWNERS", ".github/CODEOWNERS", "docs/CODEOWNERS"]
+
+
+def die(msg):
+    print("needs-owner: %s" % msg, file=sys.stderr)
+    sys.exit(2)
+
+
+def git(*args):
+    try:
+        r = subprocess.run(["git", "-c", "core.quotepath=false"] + list(args), capture_output=True, text=True)
+    except OSError as e:
+        die("cannot run git: %s" % e)
+    return r.stdout if r.returncode == 0 else None
+
+
+def covers(pattern, path):
+    if pattern.endswith("/"):
+        return path.startswith(pattern)
+    return path == pattern or path.startswith(pattern + "/") or fnmatch.fnmatchcase(path, pattern)
+
+
+def section(text):
+    out, inside = [], False
+    for line in (text or "").splitlines():
+        if line.startswith("## "):
+            inside = line[3:].strip().lower() == "needs the owner"
+            continue
+        if inside and line.strip():
+            out.append(line.strip())
+    return out
+
+
+def review_lines(text):
+    return [l.strip() for l in (text or "").splitlines() if l.strip().lower().startswith("review:")]
+
+
+def main(argv):
+    base, head = None, None
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a in ("-h", "--help"):
+            print(__doc__.strip())
+            return 0
+        if a in ("--base", "--head"):
+            i += 1
+            if i >= len(argv) or not argv[i].strip():
+                die("%s needs a value" % a)
+            if a == "--base":
+                base = argv[i]
+            else:
+                head = argv[i].strip()
+        else:
+            die("unknown argument %s" % a)
+        i += 1
+
+    if git("rev-parse", "--git-dir") is None:
+        die("not inside a git repository")
+    if base is None:
+        for cand in ("origin/HEAD", "origin/main", "main", "master"):
+            if git("rev-parse", "-q", "--verify", cand + "^{commit}"):
+                base = cand
+                break
+    if base is None or not git("rev-parse", "-q", "--verify", base + "^{commit}"):
+        die("no base branch found; pass --base")
+    tip = head or "HEAD"
+    if not git("rev-parse", "-q", "--verify", tip + "^{commit}"):
+        die("commit %s is not in this checkout; fetch it first" % tip)
+    mb = (git("merge-base", base, tip) or "").strip()
+    if not mb:
+        die("no merge base between %s and %s" % (base, tip))
+
+    changed = []
+    outs = [git("diff", "--no-renames", "--name-only", mb, tip)]
+    if head is None:
+        outs += [git("diff", "--no-renames", "--name-only", "HEAD"), git("ls-files", "--others", "--exclude-standard")]
+    for out in outs:
+        for p in (out or "").splitlines():
+            if p and p not in changed:
+                changed.append(p)
+
+    base_text = git("show", "%s:AGENTS.md" % base)
+    base_list = section(base_text)
+    listed = [p for line in base_list for p in re.findall(r"`([^`\s]+)`", line)]
+
+    hits = []
+    for c in changed:
+        rule = next((p for p in listed if covers(p, c)), None)
+        if rule:
+            hits.append((c, "AGENTS.md on %s lists %s" % (base, rule)))
+            continue
+        rule = next((p for p in BUILTIN if covers(p, c)), None)
+        if rule:
+            hits.append((c, "always: %s" % rule))
+    if "AGENTS.md" in changed:
+        if head is None:
+            try:
+                with open(git("rev-parse", "--show-toplevel").strip() + "/AGENTS.md", encoding="utf-8") as f:
+                    now_text = f.read()
+            except OSError:
+                now_text = ""
+        else:
+            now_text = git("show", "%s:AGENTS.md" % tip) or ""
+        if section(now_text) != base_list:
+            hits.append(("AGENTS.md", "always: the Needs the owner list changed"))
+        if review_lines(now_text) != review_lines(base_text):
+            hits.append(("AGENTS.md", "always: the Review line changed"))
+
+    for path, rule in hits:
+        print("NEEDS-OWNER %s  (%s)" % (path, rule))
+    print("needs-owner: %s against %s: %d changed path(s), %d need the owner; the list has %d path(s)"
+          % (tip if head else "HEAD and the working tree", base, len(changed), len(hits), len(listed)))
+    return 1 if hits else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

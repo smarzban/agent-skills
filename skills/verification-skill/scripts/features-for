@@ -7,8 +7,8 @@ Run it from anywhere inside the repo. It reads ../features/*.md beside this scri
 
   PATH...   treat these repo-relative paths as the change (no git diff)
   --base    compare with this revision. Default: the merge base with origin/HEAD,
-            origin/main, main or master, whichever exists first. Uncommitted and
-            untracked files always count.
+            origin/main, main or master, whichever exists first; with none of them,
+            it stops and asks for --base. Uncommitted and untracked files always count.
   --all     list every feature and check the map itself, as a maintenance pass needs
 
 A feature file names its source under a "## Source" heading, one path per bullet,
@@ -23,7 +23,10 @@ Output, one finding per line, with paths relative to the repo root:
   NOT-MAPPED <feature>      a changed path belongs to a feature listed as not mapped yet
   UNMAPPED <path>           a changed path that nothing in the map names
   NO-SOURCE <feature file>  the feature file has no "## Source" paths
-  DEAD <pattern>            a source path that matches no tracked file
+  DEAD <pattern>            a source path that matches no tracked file (printed in every mode)
+
+A renamed file counts under both its old and its new path. A feature is also printed
+when its own file changed, or when a changed path matched the Source it had at the base.
 
 Exit status: 0 nothing to drive, 1 at least one DRIVE or NOT-MAPPED line, 2 usage or repo error.
 With --all: 0 the map is sound, 1 a NO-SOURCE or DEAD line was printed.
@@ -36,7 +39,7 @@ import sys
 
 
 def git(cwd, *args):
-    r = subprocess.run(["git", "-C", cwd] + list(args), capture_output=True, text=True)
+    r = subprocess.run(["git", "-C", cwd, "-c", "core.quotepath=false"] + list(args), capture_output=True, text=True)
     return r.stdout if r.returncode == 0 else None
 
 
@@ -134,14 +137,15 @@ def main(argv):
                 if git(top, "rev-parse", "-q", "--verify", cand + "^{commit}"):
                     base = cand
                     break
-        outs = []
-        if base is not None:
-            mb = (git(top, "merge-base", base, "HEAD") or "").strip()
-            if not mb:
-                print("features-for: no merge base with %s" % base, file=sys.stderr)
-                return 2
-            outs.append(git(top, "diff", "--name-only", mb, "HEAD"))
-        outs.append(git(top, "diff", "--name-only", "HEAD"))
+        if base is None or not git(top, "rev-parse", "-q", "--verify", base + "^{commit}"):
+            print("features-for: no base branch found; pass --base REV", file=sys.stderr)
+            return 2
+        mb = (git(top, "merge-base", base, "HEAD") or "").strip()
+        if not mb:
+            print("features-for: no merge base with %s" % base, file=sys.stderr)
+            return 2
+        outs = [git(top, "diff", "--no-renames", "--name-only", mb, "HEAD")]
+        outs.append(git(top, "diff", "--no-renames", "--name-only", "HEAD"))
         outs.append(git(top, "ls-files", "--others", "--exclude-standard"))
         for out in outs:
             for p in (out or "").splitlines():
@@ -150,20 +154,31 @@ def main(argv):
         def own(p):   # the skill itself, or a link to it from another harness's folder
             full = os.path.join(top, p)
             return p.startswith(skill_rel) or (os.path.islink(full) and os.path.realpath(full) == os.path.realpath(skill))
+        touched = [p for p in changed if p.startswith(skill_rel + "features/")]
         changed = [p for p in changed if not own(p)]
+        # A change cannot take itself off the map: also match the Source paths each feature had at the base.
+        for n, (fname, pats) in enumerate(features):
+            old = git(top, "show", "%s:%s" % (mb, fname))
+            if old:
+                features[n] = (fname, pats, [q for q in source_paths(old) if q not in pats])
 
     findings, drive, broken = [], 0, 0
     covered = set()
-    for fname, pats in features:
+    touched = locals().get("touched", [])
+    for feature in features:
+        fname, pats = feature[0], feature[1]
+        before = feature[2] if len(feature) > 2 else []
         if not pats:
             findings.append("NO-SOURCE %s" % fname)
             broken += 1
-        hits = [c for c in changed if any(covers(p, c) for p in pats)]
+        hits = [c for c in changed if any(covers(p, c) for p in pats + before)]
         covered.update(hits)
-        if every or hits:
+        if every or hits or fname in touched:
             drive += 1
             findings.append("DRIVE %s" % fname)
             findings.extend("  %s" % h for h in hits)
+            if fname in touched:
+                findings.append("  (this feature file changed)")
         for p in pats:
             if not any(covers(p, t) for t in tracked):
                 findings.append("DEAD %s  (in %s)" % (p, fname))

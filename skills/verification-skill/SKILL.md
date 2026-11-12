@@ -1,6 +1,6 @@
 ---
 name: verification-skill
-description: Create, adopt or maintain a project's own verify-<app> skill, the scripted way for any agent to launch the real app, drive a feature the way a user does, and capture proof. Use for "create a verification skill", "make a control skill for this repo", "set up verification for this app", "move the verify skill", "maintain the verification skill", "audit the verify skill".
+description: Create, adopt or maintain a project's own verify-<app> skill, the scripted way for any agent to launch the real app, drive a feature the way a user does, and capture proof. Use for "create a verification skill", "make a control skill for this repo", "set up verification for this app", "move the verify skill", "maintain the verification skill", "audit the verify skill". Not for running a verification; the generated skill does that.
 ---
 
 # verification-skill
@@ -31,7 +31,7 @@ Look before you choose: `find .agents/skills .claude/skills .cursor/skills -maxd
 3. Write `<verify>/SKILL.md` and its helpers, following `reference/generated-skill.md`.
 4. Seed the feature map in `<verify>/features/`, following `reference/feature-map.md`. With five or fewer user-facing features, map them all. With more, map the three to five that the README and the docs lead with, and list every other one in the index as not mapped yet, so that the gap is visible.
 5. Make it findable, following `reference/placement.md`: the links for other harnesses, one line in `AGENTS.md`, and the ignore rule for run output.
-6. Prove it. Run the generated skill's own instructions end to end: launch, doctor, drive every feature you mapped, capture evidence, clean up. Then check that the evidence is still at the path the skill names. Fix what fails and run the cleanup after every failed attempt. A generated skill that was never run is a draft; say so if you could not run it.
+6. Prove it. Run the generated skill's own instructions end to end: launch, doctor, drive every feature you mapped, capture evidence, clean up. Then check that the evidence is still at the path the skill names, and that `<verify>/scripts/features-for --all` exits 0. Fix what fails and run the cleanup after every failed attempt. A generated skill that was never run is a draft; say so if you could not run it.
 7. Report: the surface and the driver chosen, the features mapped and not mapped, which features have automated coverage, what the proof run covered, and anything that a stand-in hid (a container in place of a real machine, a local stack in place of a remote one).
 
 ## Rules for every mode

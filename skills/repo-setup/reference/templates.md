@@ -28,6 +28,12 @@ Fill every `<...>` with a fact from the repo. Delete a line whose fact does not 
 |---|---|
 | <rule> | <lint, test or type that fails when it is broken, or "nothing yet"> |
 
+## Needs the owner
+
+A change to one of these paths is never merged by an agent alone.
+
+- `<path or folder/>`
+
 ## Where notes go
 
 A note that a stranger who cloned this repo could use goes in this file. Local paths, personal workflow and private context go in `AGENTS.local.md`. Never put content in `AGENTS.override.md`.
@@ -36,6 +42,7 @@ A note that a stranger who cloned this repo could use goes in this file. Local p
 ````
 
 - Leave out the docs-index line until a docs index exists.
+- **Needs the owner** lists the paths the owner names: migrations, billing, auth, release scripts. Ask for them; do not guess. With none, leave the heading and write `- none yet`. The `deliver` skill reads this list from the base branch before it merges anything, and treats CI configuration and the list itself as always on it.
 - Start the rule table with rules the repo already enforces (the formatter, the linter, the type checker, the test suite). Add a "nothing yet" row only for a rule the owner states.
 - The last line is an import. Claude Code expands it and skips it when the file is absent. Codex and Pi show it as plain text and rely on the "read it" line above. See `harness-loading.md`.
 - In a monorepo, add under **Before you start**: `- Before you change files under <packages/app/>, read <packages/app/AGENTS.md>.`
@@ -50,6 +57,9 @@ Create it only when there is private content to put in it. The ignore rule is en
 # AGENTS.local.md
 
 Private notes for this checkout. Git ignores this file.
+
+Review: <how a change is reviewed here, such as the command or skill to run>
+Evidence: <where pictures and recordings of proof are sent, such as a chat channel>
 ```
 
 ## CLAUDE.md
