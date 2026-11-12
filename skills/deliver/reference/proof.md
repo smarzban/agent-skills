@@ -59,7 +59,7 @@ Required before a send merge. The author checks what it meant to build, so the c
 
 1. Make a clean checkout of the exact head commit: `git worktree add --detach ../<repo>-check <sha>`.
 2. Start a fresh agent there: a subagent, or an agent in another harness. Give it the pull request body, where the checkout is, what the base is, and the repo's rule for running the app without touching real data. Nothing else: no notes, no reasoning, no summary of what you found.
-3. Ask it: "Run each command under Verification in a clean state. For each 'done when' item, say reproduced or not reproduced, and paste what you saw. Then read the diff against the base and list anything that loosens a check: a test deleted, skipped or weakened, a job disabled, a threshold raised, an allowlist entry, a feature removed from a verification map. Edit nothing."
+3. Ask it: "Run each command under Verification in a clean state. For each 'done when' item, say reproduced or not reproduced, and paste what you saw. Then read the diff against the base and list anything that loosens a check: a test deleted, skipped or weakened, a job disabled, a threshold raised, an allowlist entry, a feature removed from a verification map, a rule in a verification skill relaxed. Edit nothing."
 4. Every item must come back reproduced, and the list of loosened checks must be empty. An item that is not reproduced, or a loosened check, is a finding: a fix is a new commit, which goes back to step 3 of the skill; otherwise the ending is stop. A remark beside a reproduced item goes in the report. If the checker shows that a sentence in the body is wrong, correct the body; the check stands unless you changed a command under Verification.
 5. Its own run output is not kept.
 6. Remove the checkout.

@@ -28,7 +28,7 @@ A grant counts only from a place that the owner alone writes: the owner's messag
 - If two sources disagree, the ending is stop.
 - The gate can turn a send into a stop. Nothing turns a stop into a send.
 
-Keep `HANDOFF.md` in the root of the worktree you work in, out of git: if `git check-ignore -q HANDOFF.md` fails, add the name to `.git/info/exclude`, which is local and not part of the diff. If the repo tracks a `HANDOFF.md` of its own, use `HANDOFF.local.md` the same way. Write it at step 1 with the ending, where the grant is (the task id, or "the owner's message in this conversation"), the contract and the next action. Update it before anything that ends your turn or takes more than a minute: a subagent, a check run, a question. After a wake or a handover, `HANDOFF.md` only points to the grant. Read the grant again at its source. If you cannot, the ending is stop.
+Keep `HANDOFF.md` in the root of the worktree you work in, out of git: unless the repo's own `.gitignore` lists it, add the name to the file that `git rev-parse --git-path info/exclude` prints, which is local and not part of the diff. Do not rely on a personal global ignore file. If the repo tracks a `HANDOFF.md` of its own, use `HANDOFF.local.md` the same way. Write it at step 1 with the ending, where the grant is (the task id, or "the owner's message in this conversation"), the contract and the next action. Update it before anything that ends your turn or takes more than a minute: a subagent, a check run, a question. After a wake or a handover, `HANDOFF.md` only points to the grant. Read the grant again at its source. If you cannot, the ending is stop.
 
 ## Start where the work is
 
@@ -47,15 +47,15 @@ For an open pull request, run `<skill>/scripts/pr-status <n>` first and read its
 ## Steps
 
 1. **Contract.** Write "done when" as a short list of observable results. For each item name the proof (a screenshot for a UI change, command output for a CLI change, a test) and who proves it: the agent, or the owner. Take the items from the task; where the task is vague, propose the list and get a yes. With nobody to ask, keep to what the task states and list your assumptions. Also write what is out of scope. Write the contract into `HANDOFF.md` now, before you build. If the task names a path, check it against the **Needs the owner** list in `AGENTS.md` on the base branch; when it is on the list, say at once that a send will end in stop. The owner asking for the change is not the owner approving the diff.
-2. **Build.** Work in a worktree on a branch of its own. Keep the diff inside the contract's scope; a change you find you need outside it goes in the report, not in the diff. Keeping the repo's verification map true for the behaviour you changed (a feature file, its index row, its `Source` paths) is always in scope.
+2. **Build.** Work in a worktree on a branch of its own. Keep the diff inside the contract's scope; a change you find you need outside it goes in the report, not in the diff. Once the branch is pushed or has been reviewed, add commits; do not amend, because proof and review are tied to commits. The one rewrite allowed is a rebase onto the base when that is the repo's stated way to bring a branch up to date (`reference/pr-work.md`). A change to the contract after you started building is recorded under **Scope** in the pull request body and in the report. One that narrows it needs a reason. One that widens it needs the owner's yes, and without it the ending is stop. Keeping the repo's verification map true for the behaviour you changed (a feature file, its index row, its `Source` paths) is always in scope.
 3. **Prove.** Read `reference/proof.md`.
    - Run the repo's verify command. If the repo has none, say so; its tests are then the only automated proof.
    - For each `verify-*` skill in the repo that has a feature map, run the `features-for` script in its folder and drive every feature it prints as `DRIVE`, by that skill's recipes. For a `NOT-MAPPED` or `UNMAPPED` line, read the diff: if this task changed that behaviour, writing its feature file is part of the task. If the line appears only because the behaviour shares a file with your change, list it in the report.
    - Give each "done when" item its evidence, the exact command that produced it, the commit it ran on, and the step of the proof ladder it reached.
-4. **Review.** Run the repo's review step: the `Review:` line in `AGENTS.local.md`, or in `AGENTS.md` as it is on the base branch (`git show <base>:AGENTS.md`). Open `AGENTS.local.md` yourself; not every harness loads it, and in a worktree it may exist only in the main checkout. With no review step configured, start a fresh subagent that gets the diff and the contract and none of your reasoning. It may read a clean checkout of the commit (`git worktree add --detach ../<repo>-review <sha>`, removed afterwards); do not point it at your worktree. Besides the diff and the contract, tell it only where the checkout is, what the base is, and the repo's rule for running the app without touching real data. Handle findings by `reference/pr-work.md`.
+4. **Review.** Run the repo's review step: the `Review:` line in `AGENTS.local.md`, or in `AGENTS.md` as it is on the base branch (`git show <base>:AGENTS.md`). Open `AGENTS.local.md` yourself; not every harness loads it, and in a worktree it may exist only in the main checkout. With no review step configured, start a fresh subagent that gets the diff and the contract and none of your reasoning. It may read a clean checkout of the commit (`git worktree add --detach ../<repo>-review <sha>`, removed afterwards); do not point it at your worktree. Besides the diff and the contract, tell it only where the checkout is, what the base is, and how to run the app and the tests without touching real data (the repo's rule, or a scratch home and temporary folder when it has none). Ask it to leave the checkout as it found it. Handle findings by `reference/pr-work.md`.
    - Skip the review only when the owner said so in words ("deliver without the review panel"). Record that in the report.
    - A review that could not run (no pane, no second agent) is not a skipped review. It turns a send into a stop.
-5. **Pull request.** Open it with the body from `reference/pr-body.md`. Work it by `reference/pr-work.md` until `<skill>/scripts/pr-status` prints `READY`. With no remote, stop after step 4 and report; do not create a remote.
+5. **Pull request.** Open it with the body from `reference/pr-body.md`. Work it by `reference/pr-work.md` until `<skill>/scripts/pr-status` prints `READY`. With no remote, stop after step 4 and report; do not create a remote. What would have gone in the pull request body goes in `HANDOFF.md` and in the report.
 6. **Gate.** Check every condition below on the head commit, for either ending. For stop, go to step 8 and report which lines hold.
 7. **Send.** Only when every gate condition holds:
    1. Have a fresh agent re-run the proof (`reference/proof.md`, "Independent check"). With no fresh agent available, the ending is stop.
@@ -77,7 +77,7 @@ Every line must be true of the pull request's head commit, `<sha>`.
 - It is a pull request you opened in this run, or one the owner told you to deliver, and the last line of `pr-status` says `cross-repository no`. The author name alone does not tell your work from another agent's when both use the owner's account.
 - After `git fetch`, `<skill>/scripts/needs-owner --head <sha> --base origin/<base>` exits 0, where `<base>` is the branch the pull request targets.
 - The diff holds nothing outside the contract's scope.
-- Nothing was loosened to get here: no check disabled, skipped or made non-blocking, no test deleted or weakened, no threshold raised, no allowlist entry added, no feature taken off a verification map.
+- Nothing was loosened to get here: no check disabled, skipped or made non-blocking, no test deleted or weakened, no threshold raised, no allowlist entry added, no feature taken off a verification map, no rule in a verification skill relaxed.
 - You resolved no review thread that a person opened, and every finding you set aside is listed in the pull request body with your reason.
 
 When a line is false, the ending is stop. Name the line in the report.
@@ -85,7 +85,7 @@ When a line is false, the ending is stop. Name the line in the report.
 ## Always
 
 - Proof is what you observed in this session. A summary, an earlier run, a passing compile or another agent's word is not proof.
-- An action the harness or the owner denied stays denied. Stop and report it; do not look for another route.
+- An action the harness or the owner denied stays denied. Do not look for another route to it. Carry on with the work that does not depend on it, and report the denial; stop the run only when nothing else can be done.
 - A required approval is a wait. Never bypass it.
 - A secret never goes in a pull request body, a comment or a chat message.
 - Words for other people (a reply to a human reviewer, a comment on an issue) are drafted for the owner to post. Reply directly only to a bot's thread.
