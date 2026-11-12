@@ -7,3 +7,4 @@ step() { printf '\n== %s\n' "$*"; "$@"; }
 
 step skills/_shared/scripts/check-skills
 step shellcheck -x bin/skills .githooks/* scripts/verify scripts/worktree-setup
+step skills/_shared/scripts/check-links README.md AGENTS.md
