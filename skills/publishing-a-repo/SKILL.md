@@ -43,6 +43,8 @@ The same scan lists `path`, `email`, `host`, `ticket` and `author` hits across c
 - Names and emails of people, in files and in commit authorship: list them. Whether each person agreed to be public is the owner's call.
 - Home-folder paths, machine names, internal codenames: fail.
 
+Publishing also exposes what is not in the tree: issues, pull requests and their comments (`gh issue list --state all`, `gh pr list --state all`), workflow run logs (`gh run list`), and commits that exist only on the remote. Read them, and list the runs the owner may want deleted first.
+
 Also read by eye what a pattern cannot catch: `AGENTS.md` and other instruction files, code comments, test fixtures, sample data. Check that `git check-ignore -q AGENTS.local.md` and `git check-ignore -q HANDOFF.md` both exit 0 and that neither file was ever committed (`git log --all --oneline -- AGENTS.local.md HANDOFF.md` prints nothing).
 
 ### 3. Ownership and third-party licences
@@ -74,7 +76,7 @@ Read `reference/discovery.md`. Check the repo description and topics, the packag
 
 ### 7. Quickstart from a clean clone
 
-Clone the repo into a temporary folder (remove it afterwards) with no credentials for anything private, and follow the README quickstart exactly, by a fresh subagent that gets only the README where one is available.
+Clone the repo into a temporary folder (remove it afterwards) with no credentials for anything private and with `HOME` set to an empty temporary folder, so that an installer cannot touch the real machine, and follow the README quickstart exactly, by a fresh subagent that gets only the README where one is available.
 
 ```sh
 git clone --no-hardlinks . "${TMPDIR:-/tmp}/publish-check" && cd "${TMPDIR:-/tmp}/publish-check"
