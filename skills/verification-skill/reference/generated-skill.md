@@ -24,7 +24,7 @@ description: "Drive <app> (<what it is>) the way a user does, through <surfaces>
 ---
 ```
 
-Without frontmatter no harness registers the skill. Keep the description in double quotes; a colon followed by a space breaks unquoted YAML. Do not set `disable-model-invocation`: agents must reach for this skill unprompted.
+Without frontmatter no harness registers the skill. Keep the description in double quotes; a colon followed by a space breaks unquoted YAML (seen with Ruby's YAML parser on 2026-11-12). Do not set `disable-model-invocation`: agents must reach for this skill unprompted.
 
 ## Sections
 

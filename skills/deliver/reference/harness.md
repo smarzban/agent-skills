@@ -1,6 +1,6 @@
 # What each harness provides
 
-`deliver` names each step by what it needs. Use your harness's own tool for it where one exists. Where the harness's instructions and this skill differ on how to do a step, follow the harness.
+`deliver` names each step by what it needs. Use your harness's own tool for it where one exists. Where the harness's instructions and this skill differ on how to do a step (how to wait, how to ask, how to record a pull request), follow the harness. A harness rule never widens the ending or the gate.
 
 | Need | T3 Code | Claude Code | Codex, Pi, others |
 |---|---|---|---|
@@ -17,7 +17,7 @@ The T3 Code tool names are from that harness's own instructions on 2026-11-12. T
 A harness that ends your turn while you wait may wake you with your earlier context summarised. Everything `deliver` needs to continue is kept outside your memory for that reason:
 
 - the contract, the evidence and its commit: the pull request body;
-- the ending and where it came from, and the next action: `HANDOFF.md`;
+- the ending, where the grant is, and the next action: `HANDOFF.md`, written before the first wait. It points to the grant; it is not the grant. Read the grant again at its source;
 - the current state: `<skill>/scripts/pr-status`.
 
 Read all three before you act.

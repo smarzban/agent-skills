@@ -3,7 +3,7 @@ This skill draws on two MIT-licensed sources. The text is rewritten; the ideas a
 - `full-send` and `full-stop` in tstack (https://github.com/t3dotgg/tstack): the two endings, a spoken
   grant of autonomy, proof as evidence observed in the session, and a written merge gate.
 - The shipping, babysit, opening-a-pr and autopilot playbooks and the `blast-radius` skill in pstack
-  (https://github.com/cursor/plugins, plugins/pstack): a verdict belongs to a commit, the independent
+  (https://github.com/cursor/plugins, folder `pstack`): a verdict belongs to a commit, the independent
   check, the order of work on a pull request, classifying a failing check, and the proof ladder.
 
 ---- tstack ----

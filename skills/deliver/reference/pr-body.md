@@ -36,6 +36,7 @@ Commit: <full sha the evidence ran on>
 
 ## Review
 <Who or what reviewed it, on which commit, and the outcome. Or: skipped at the owner's request.>
+<Each finding that was set aside, with the reason.>
 ```
 
 - Title: what the change does, in the repo's own commit style.
