@@ -16,6 +16,7 @@ Use these headings in this order. Drop one that has nothing to say, except **Don
 ## Scope
 - Covers: <what>
 - Leaves out: <what, and where it goes instead>
+- Changed since the start: <what changed in the contract, and why>
 
 ## Done when
 | # | Result | Proved by | Proof | Step |
@@ -35,7 +36,7 @@ Commit: <full sha the evidence ran on. When items ran on different commits, name
 <Who or what this touches beyond the diff, and why that is safe. One or two sentences.>
 
 ## For the owner to decide
-<A choice that is the owner's and that this change leaves open. Drop the heading when there is none.>
+<A choice that is the owner's and that this change leaves open.>
 
 ## Review
 <Who or what reviewed it, on which commit, and the outcome. Or: skipped at the owner's request.>
@@ -62,6 +63,9 @@ Send it at the end, for either ending. Lead with the result; the owner should be
 
 **Your steps**
 <For stop: the exact commands or clicks for the items that are the owner's to prove, then how to merge. For send: nothing, or what to look at.>
+
+**For you to decide**
+<The open choices from the pull request body, each with what you would do.>
 
 **Decisions**
 <What you decided that the owner did not, and why.>

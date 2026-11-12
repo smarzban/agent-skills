@@ -56,4 +56,4 @@ Read the log of each failing check before you do anything.
 | A timeout, a network error, a runner fault | Start the run again once. If it fails the same way, it is not a flake: read it again as one of the rows above. |
 | A check that finished as stale or cancelled | Start it again once. |
 
-Never make a check pass by loosening it: no skipped or deleted test, no disabled job, no raised threshold, no new allowlist entry. If a check is wrong, say so in the report and stop; changing it is the owner's decision.
+Never make a check pass by loosening it, in any of the ways the gate lists (`SKILL.md`, "Nothing was loosened"). If a check is wrong, say so in the report and stop; changing it is the owner's decision.
