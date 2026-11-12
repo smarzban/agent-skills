@@ -11,9 +11,9 @@ Agent skills for Claude Code, Codex, Cursor, Pi and Grok, kept in one repo that 
 | `writing-readmes` | Write, overhaul or review a README, with the quickstart proven by a cold run. |
 | `writing-docs` | Write, audit or update user docs and maintainer docs from the source, as plain Markdown or for a docs framework. |
 | `publishing-a-repo` | Check a private repo before it goes public. Runs only when asked by name. |
-| `verification-skill` | Create, adopt or maintain a project's own `verify-<app>` skill: launch the real app, drive a feature the way a user does, capture proof. Adapted from pstack; see its `NOTICE`. |
-| `deliver` | Take one task from agreed to proven: state what done means, build, prove, review, open the pull request, then stop for you or merge when told to. Draws on tstack and pstack; see its `NOTICE`. |
-| `correct` | Turn a mistake agents keep making in a repo into a check that fails: a design change, a type, a lint or a test, with a written rule last. Adapted from pstack; see its `NOTICE`. |
+| `verification-skill` | Create, adopt or maintain a project's own `verify-<app>` skill: launch the real app, drive a feature the way a user does, capture proof. |
+| `deliver` | Take one task from agreed to proven: state what done means, build, prove, review, open the pull request, then stop for you or merge when told to. |
+| `correct` | Turn a mistake agents keep making in a repo into a check that fails: a design change, a type, a lint or a test, with a written rule last. |
 | `coordinator` | Run several builder agents: plan tasks, brief each builder, review its pull request, test the result, then hand it over or merge it when you said to. Works in T3 Code, Herdr, Rex or a plain terminal. |
 | `triage` | Check an issue or a pull request from outside: reproduce a bug, weigh a feature request, read what a diff really does. Ends with a verdict, a drafted reply, and a before and an after for you to test. |
 | `shared-skills` | Add or edit a skill in this repo. |
