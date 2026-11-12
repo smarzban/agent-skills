@@ -1,3 +1,5 @@
 #!/bin/sh
 # Refresh skill links after the repo changes.
+# Only from the main checkout: a linked worktree must never point the harnesses at itself.
+[ "$(git rev-parse --absolute-git-dir)" = "$(cd "$(git rev-parse --git-common-dir)" && pwd -P)" ] || exit 0
 "$(git rev-parse --show-toplevel)/bin/skills" link --quiet || true
