@@ -1,0 +1,200 @@
+#!/usr/bin/env python3
+"""List the mapped features that a change touches, from each feature file's "Source" section.
+
+usage: features-for [--base REV] [--all] [PATH...]
+
+Run it from anywhere inside the repo. It reads ../features/*.md beside this script.
+
+  PATH...   treat these repo-relative paths as the change (no git diff)
+  --base    compare with this revision. Default: the merge base with origin/HEAD,
+            origin/main, main or master, whichever exists first. Uncommitted and
+            untracked files always count.
+  --all     list every feature and check the map itself, as a maintenance pass needs
+
+A feature file names its source under a "## Source" heading, one path per bullet,
+in backticks. A folder ends with "/", and * and ? are wildcards.
+
+features/README.md may hold two more lists, with paths in backticks:
+  "## Not mapped yet"        one bullet per known feature that has no file yet
+  "## Paths with no feature" paths whose change needs no drive (docs, tests, CI)
+
+Output, one finding per line, with paths relative to the repo root:
+  DRIVE <feature file>      a source path of this feature changed (the paths follow, indented)
+  NOT-MAPPED <feature>      a changed path belongs to a feature listed as not mapped yet
+  UNMAPPED <path>           a changed path that nothing in the map names
+  NO-SOURCE <feature file>  the feature file has no "## Source" paths
+  DEAD <pattern>            a source path that matches no tracked file
+
+Exit status: 0 nothing to drive, 1 at least one DRIVE or NOT-MAPPED line, 2 usage or repo error.
+With --all: 0 the map is sound, 1 a NO-SOURCE or DEAD line was printed.
+"""
+import fnmatch
+import os
+import re
+import subprocess
+import sys
+
+
+def git(cwd, *args):
+    r = subprocess.run(["git", "-C", cwd] + list(args), capture_output=True, text=True)
+    return r.stdout if r.returncode == 0 else None
+
+
+def covers(pattern, path):
+    if pattern.endswith("/"):
+        return path.startswith(pattern)
+    return path == pattern or fnmatch.fnmatchcase(path, pattern)
+
+
+def section_lines(text, heading):
+    out, inside = [], False
+    for line in text.splitlines():
+        if line.startswith("## "):
+            inside = line[3:].strip().lower() == heading
+            continue
+        if inside and line.strip():
+            out.append(line)
+    return out
+
+
+def paths_in(line):
+    return re.findall(r"`([^`\s]+)`", line)
+
+
+def source_paths(text):
+    return [p for line in section_lines(text, "source") for p in paths_in(line)]
+
+
+def main(argv):
+    base, every, given = None, False, []
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a in ("-h", "--help"):
+            print(__doc__.strip())
+            return 0
+        if a == "--base":
+            i += 1
+            if i >= len(argv):
+                print("features-for: --base needs a revision", file=sys.stderr)
+                return 2
+            base = argv[i]
+        elif a == "--all":
+            every = True
+        elif a.startswith("-"):
+            print("features-for: unknown option %s" % a, file=sys.stderr)
+            return 2
+        else:
+            given.append(a)
+        i += 1
+
+    here = os.path.dirname(os.path.realpath(__file__))
+    skill = os.path.dirname(here)
+    fdir = os.path.join(skill, "features")
+    if not os.path.isdir(fdir):
+        print("features-for: no features folder at %s" % fdir, file=sys.stderr)
+        return 2
+    top = git(skill, "rev-parse", "--show-toplevel")
+    if top is None:
+        print("features-for: %s is not inside a git repository" % skill, file=sys.stderr)
+        return 2
+    top = top.strip()
+    skill_rel = os.path.relpath(skill, top) + "/"
+
+    features = []
+    for name in sorted(os.listdir(fdir)):
+        if not name.endswith(".md") or name.lower() == "readme.md":
+            continue
+        with open(os.path.join(fdir, name), encoding="utf-8") as f:
+            features.append((skill_rel + "features/" + name, source_paths(f.read())))
+    if not features:
+        print("features-for: no feature files in %s" % fdir, file=sys.stderr)
+        return 2
+
+    not_mapped, quiet = [], []
+    index = os.path.join(fdir, "README.md")
+    if os.path.isfile(index):
+        with open(index, encoding="utf-8") as f:
+            text = f.read()
+        for line in section_lines(text, "not mapped yet"):
+            label = re.sub(r"\s*\(?`[^`]*`\)?,?", "", line).strip(" -*,")
+            not_mapped.append((label or line.strip(" -*"), paths_in(line)))
+        quiet = [p for line in section_lines(text, "paths with no feature") for p in paths_in(line)]
+
+    tracked = [p for p in (git(top, "ls-files") or "").splitlines() if p]
+
+    if every:
+        changed = []
+    elif given:
+        changed = given
+    else:
+        changed = []
+        if base is None:
+            for cand in ("origin/HEAD", "origin/main", "main", "master"):
+                if git(top, "rev-parse", "-q", "--verify", cand + "^{commit}"):
+                    base = cand
+                    break
+        outs = []
+        if base is not None:
+            mb = (git(top, "merge-base", base, "HEAD") or "").strip()
+            if not mb:
+                print("features-for: no merge base with %s" % base, file=sys.stderr)
+                return 2
+            outs.append(git(top, "diff", "--name-only", mb, "HEAD"))
+        outs.append(git(top, "diff", "--name-only", "HEAD"))
+        outs.append(git(top, "ls-files", "--others", "--exclude-standard"))
+        for out in outs:
+            for p in (out or "").splitlines():
+                if p and p not in changed:
+                    changed.append(p)
+        def own(p):   # the skill itself, or a link to it from another harness's folder
+            full = os.path.join(top, p)
+            return p.startswith(skill_rel) or (os.path.islink(full) and os.path.realpath(full) == os.path.realpath(skill))
+        changed = [p for p in changed if not own(p)]
+
+    findings, drive, broken = [], 0, 0
+    covered = set()
+    for fname, pats in features:
+        if not pats:
+            findings.append("NO-SOURCE %s" % fname)
+            broken += 1
+        hits = [c for c in changed if any(covers(p, c) for p in pats)]
+        covered.update(hits)
+        if every or hits:
+            drive += 1
+            findings.append("DRIVE %s" % fname)
+            findings.extend("  %s" % h for h in hits)
+        for p in pats:
+            if not any(covers(p, t) for t in tracked):
+                findings.append("DEAD %s  (in %s)" % (p, fname))
+                broken += 1
+    if every:
+        for p in [p for _, pats in not_mapped for p in pats] + quiet:
+            if not any(covers(p, t) for t in tracked):
+                findings.append("DEAD %s  (in the index)" % p)
+                broken += 1
+    for label, pats in not_mapped:
+        hits = [c for c in changed if any(covers(p, c) for p in pats)]
+        covered.update(hits)
+        if hits:
+            drive += 1
+            findings.append("NOT-MAPPED %s" % label)
+            findings.extend("  %s" % h for h in hits)
+    for c in changed:
+        if c not in covered and not any(covers(p, c) for p in quiet):
+            findings.append("UNMAPPED %s" % c)
+
+    for line in findings:
+        print(line)
+    if every:
+        print("features-for: %d feature(s) mapped, %d problem(s) in the map" % (len(features), broken))
+    else:
+        print("features-for: %d feature(s) mapped, %d changed path(s), %d to drive"
+              % (len(features), len(changed), drive))
+    if every:
+        return 1 if broken else 0
+    return 1 if drive else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
