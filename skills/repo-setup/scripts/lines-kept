@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Prove a migration lost nothing: every non-blank line of ORIGINAL is a whole line in one of the FILES.
+# usage: lines-kept ORIGINAL FILE...
+# Leading and trailing spaces and a change of heading level (# to ##) are ignored; any other edit is LOST.
+# Save the original first: cp CLAUDE.md "${TMPDIR:-/tmp}/original-instructions.md"
+set -euo pipefail
+[ "$#" -ge 2 ] || { echo "usage: lines-kept ORIGINAL FILE..." >&2; exit 2; }
+orig="$1"; shift
+[ -f "$orig" ] || { echo "lines-kept: no such file: $orig" >&2; exit 2; }
+for f in "$@"; do [ -f "$f" ] || { echo "lines-kept: no such file: $f" >&2; exit 2; }; done
+
+norm() { sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^#\{1,6\}[[:space:]]\{1,\}//' "$@"; }
+have="$(mktemp)"; trap 'rm -f "$have"' EXIT
+norm "$@" > "$have"
+
+lost=0; total=0
+while IFS= read -r line || [ -n "$line" ]; do
+  [ -n "$line" ] || continue
+  total=$((total + 1))
+  if ! grep -qxF -- "$line" "$have"; then
+    printf 'LOST %s\n' "$line"
+    lost=$((lost + 1))
+  fi
+done < <(norm "$orig")
+printf 'lines-kept: %s of %s non-blank line(s) kept\n' "$((total - lost))" "$total"
+[ "$lost" -eq 0 ]

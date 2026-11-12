@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+# Report what a repo has and lacks before repo-setup changes anything. Read-only.
+# usage: repo-audit [DIR]     (default: the current folder)
+set -euo pipefail
+
+dir="${1:-.}"
+cd "$dir" 2>/dev/null || { echo "repo-audit: no such folder: $dir" >&2; exit 2; }
+git rev-parse --git-dir >/dev/null 2>&1 || { echo "repo-audit: not inside a git repository" >&2; exit 2; }
+cd "$(git rev-parse --show-toplevel)"
+
+state() {  # tracked | ignored | untracked | missing
+  if [ ! -e "$1" ]; then echo missing
+  elif git ls-files --error-unmatch -- "$1" >/dev/null 2>&1; then echo tracked
+  elif git check-ignore -q -- "$1" 2>/dev/null; then echo ignored
+  else echo untracked; fi
+}
+size() { printf '%s lines, %s bytes' "$(wc -l < "$1" | tr -d ' ')" "$(wc -c < "$1" | tr -d ' ')"; }
+row() {  # row <label> <path>...   prints the first path that exists
+  local label="$1" p; shift
+  for p in "$@"; do
+    if [ -e "$p" ]; then printf '  %-9s %-34s %s\n' "$(state "$p")" "$label" "$p"; return 0; fi
+  done
+  printf '  %-9s %s\n' missing "$label"
+}
+ignored() {  # ignored <label> <path>   present only when a .gitignore tracked in the repo has the rule
+  local src
+  src="$(git check-ignore -v -- "$2" 2>/dev/null | cut -d: -f1 || true)"
+  case "$src" in
+    "")                  printf '  %-9s %s
+' missing "$1" ;;
+    .gitignore|*/.gitignore)
+      case "$src" in /*) printf '  %-9s %s  (ignored only by %s, outside the repo)
+' missing "$1" "$src" ;;
+                     *)  printf '  %-9s %s
+' present "$1" ;; esac ;;
+    *)                   printf '  %-9s %s  (ignored only by %s, which other clones do not have)
+' missing "$1" "$src" ;;
+  esac
+}
+
+commits="$(git rev-list --count HEAD 2>/dev/null || echo 0)"
+authors="$( (git log --format='%ae' 2>/dev/null || true) | sort -u | wc -l | tr -d ' ')"
+remote="$(git remote get-url origin 2>/dev/null || echo none)"
+printf 'repo       %s\n' "$PWD"
+printf 'history    %s commit(s), %s author(s)\n' "$commits" "$authors"
+printf 'remote     %s\n' "$remote"
+
+printf 'stack     '
+found=0
+for pair in package.json:node pnpm-workspace.yaml:pnpm-workspace Cargo.toml:rust go.mod:go pyproject.toml:python \
+            requirements.txt:python Gemfile:ruby pom.xml:java build.gradle:java build.gradle.kts:kotlin \
+            composer.json:php mix.exs:elixir Package.swift:swift deno.json:deno; do
+  f="${pair%%:*}"
+  if [ -e "$f" ]; then printf ' %s (%s)' "${pair##*:}" "$f"; found=1; fi
+done
+[ "$found" = 1 ] || printf ' none detected'
+printf '\n\ncore\n'
+row 'AGENTS.md' AGENTS.md
+[ -f AGENTS.md ] && printf '            %s\n' "$(size AGENTS.md)"
+ignored 'ignore rule for AGENTS.local.md' AGENTS.local.md
+ignored 'ignore rule for HANDOFF.md' HANDOFF.md
+row '.gitignore' .gitignore
+row 'verify command' scripts/verify bin/verify
+# A repo may have its own verify entry point; list the likely ones so the agent can confirm.
+for f in Makefile makefile justfile Justfile; do
+  [ -f "$f" ] || continue
+  t="$(grep -oE '^(verify|check|ci|test):' "$f" | tr -d ':' | tr '\n' ' ')"
+  [ -z "$t" ] || printf '            candidates in %s: %s\n' "$f" "$t"
+  break
+done
+if [ -f package.json ]; then
+  t="$(grep -oE '"(verify|check|ci|test)"[[:space:]]*:' package.json | tr -d '": ' | tr '\n' ' ')"
+  [ -z "$t" ] || printf '            candidates in package.json scripts: %s\n' "$t"
+fi
+row 'worktree setup script' scripts/worktree-setup bin/worktree-setup
+row 'CI workflow' .github/workflows .gitlab-ci.yml .circleci/config.yml .buildkite azure-pipelines.yml
+
+printf '\noptional\n'
+row 'issue template' .github/ISSUE_TEMPLATE .github/ISSUE_TEMPLATE.md
+row 'pull request template' .github/pull_request_template.md .github/PULL_REQUEST_TEMPLATE.md .github/PULL_REQUEST_TEMPLATE
+row 'CODEOWNERS' CODEOWNERS .github/CODEOWNERS docs/CODEOWNERS
+row '.editorconfig' .editorconfig
+row '.gitattributes' .gitattributes
+row 'secret-scanning config' .gitleaks.toml .gitleaksignore .secrets.baseline .trufflehog.yml
+
+printf '\nowner decisions (never created by repo-setup)\n'
+row 'LICENSE' LICENSE LICENSE.md LICENSE.txt COPYING
+row 'SECURITY.md' SECURITY.md .github/SECURITY.md
+
+printf '\ninstruction files found\n'
+any=0
+for f in AGENTS.md AGENTS.local.md AGENTS.override.md CLAUDE.md CLAUDE.local.md .claude/CLAUDE.md GEMINI.md \
+         .cursorrules .cursor/rules .github/copilot-instructions.md .windsurfrules; do
+  [ -e "$f" ] || continue
+  any=1
+  if [ -L "$f" ]; then printf '  %-9s %-34s -> %s\n' "$(state "$f")" "$f" "$(readlink "$f")"
+  elif [ -f "$f" ]; then printf '  %-9s %-34s %s\n' "$(state "$f")" "$f" "$(size "$f")"
+  else printf '  %-9s %s\n' "$(state "$f")" "$f"; fi
+done
+[ "$any" = 1 ] || echo '  none'
+nested="$(git ls-files 2>/dev/null | grep -E '(^|/)AGENTS\.md$' | grep / || true)"
+[ -z "$nested" ] || printf '  nested:   %s\n' $nested
+
+printf '\ncommands found\n'
+if [ -f package.json ] && command -v python3 >/dev/null 2>&1; then
+  python3 - <<'PY' || true
+import json
+try:
+    scripts = json.load(open("package.json")).get("scripts", {})
+except Exception:
+    scripts = {}
+for name, cmd in scripts.items():
+    print("  package.json  %-12s %s" % (name, cmd))
+PY
+fi
+prev=""
+for f in Makefile makefile justfile Justfile Taskfile.yml; do
+  [ -f "$f" ] || continue
+  if [ -n "$prev" ] && [ "$f" -ef "$prev" ]; then continue; fi   # same file on a case-insensitive disk
+  prev="$f"
+  printf '  %-13s targets: %s\n' "$f" "$(grep -oE '^[A-Za-z0-9_.-]+:' "$f" | tr -d ':' | grep -v '^\.' | tr '\n' ' ')"
+done
+if [ -d .github/workflows ]; then
+  grep -HnE '^[[:space:]]*(- )?run:' .github/workflows/*.y*ml 2>/dev/null | sed 's/^/  /' || true
+fi
+
+packages="$(git ls-files 2>/dev/null | grep -E '/(package\.json|Cargo\.toml|go\.mod|pyproject\.toml)$' | grep -v node_modules | sed 's|/[^/]*$||' | sort -u || true)"
+if [ -n "$packages" ]; then
+  printf '\npackages (a monorepo: each may take its own AGENTS.md)\n'
+  printf '  %s\n' $packages
+fi
