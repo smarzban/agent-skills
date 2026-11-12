@@ -56,7 +56,7 @@ Checks must be green on the head commit itself in every case.
 
 ## Independent check
 
-Required before a send merge. The author checks what it meant to build, so the check is done by an agent that did not write the code.
+Required before a send merge, except as step 7.1 of the skill says. The author checks what it meant to build, so the check is done by an agent that did not write the code.
 
 1. Make a clean checkout of the exact head commit: `git worktree add --detach ../<repo>-check <sha>`. Where your harness gives a fresh agent its own checkout, that one is used instead, set to the head commit.
 2. Start a fresh agent there: a subagent, or an agent in another harness. Give it the pull request body (as text in its task, or a file beside the checkout), where the checkout is, what the base is, and the repo's rule for running the app without touching real data. Nothing else: no notes, no reasoning, no summary of what you found.
