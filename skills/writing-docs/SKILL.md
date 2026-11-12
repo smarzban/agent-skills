@@ -9,7 +9,7 @@ The code is the source of truth. A page states only what you confirmed in the li
 
 This skill edits docs and the docs map. It never edits product code.
 
-When a write or an update starts while you are in the repo's main checkout (`git rev-parse --git-dir` has no `/worktrees/` in it), do not edit there: another session may be working in it. Make the edits on a new branch in a worktree of your own (`git worktree add -b docs ../<repo>-docs`; the unattended update names its own branch) and give its path and branch in the report. A repo with no commits cannot have a second worktree; work in place.
+When a write or an update starts while you are in the repo's main checkout (`git rev-parse --path-format=absolute --git-dir --git-common-dir` prints the same path twice), do not edit there: another session may be working in it. Make the edits on a new branch in a worktree of your own (from the repo root, `git worktree add -b docs-write ../<repo>-docs-write`; if that branch or folder exists, pick another name, never reuse or delete it) and give its path and branch in the report. Two cases stay in place: a repo with no commits, and an update for a change that is not committed yet, because a worktree does not hold it. The unattended update keeps its own branch.
 
 ## Choose three things first
 
