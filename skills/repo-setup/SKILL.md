@@ -50,7 +50,7 @@ Work on the current repo unless you are given a path.
 `reference/templates.md` holds the template. It carries:
 
 - The commands, including how to prepare a fresh worktree.
-- Three pointers: read `HANDOFF.md` first if it exists, where the docs index is, and "a change to a user-facing surface updates its docs page in the same change".
+- Three pointers: read `HANDOFF.md` first if it exists, where the docs index is, and "a change to a user-facing surface updates its docs page in the same change", naming the `writing-docs` update mode.
 - A rule table that pairs each rule with what enforces it: a lint, a test, a type, or "nothing yet". A rule with "nothing yet" is a candidate for a check, and the table makes that visible.
 - The split: a note a stranger who cloned the repo could use goes in `AGENTS.md`; local paths, personal workflow and private context go in `AGENTS.local.md`.
 

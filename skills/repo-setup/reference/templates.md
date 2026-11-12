@@ -20,7 +20,7 @@ Fill every `<...>` with a fact from the repo. Delete a line whose fact does not 
 - If `HANDOFF.md` exists, read it before starting.
 - If `AGENTS.local.md` exists, read it. It holds private notes for this checkout and git ignores it.
 - Docs index: `<docs/README.md>`
-- A change to a user-facing surface updates its docs page in the same change.
+- A change to a user-facing surface updates its docs page in the same change. If the `writing-docs` skill is installed, run it in update mode.
 
 ## Rules
 
