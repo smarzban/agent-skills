@@ -27,7 +27,7 @@ Use this when the repo already holds real instructions in a file that does not f
    ```
 
    It must report every line kept. Fix any `LOST` line before you go on.
-7. If `CLAUDE.md` is a link (the audit prints `-> <target>`), stop and report it: writing through the link would overwrite its target. Otherwise, only then replace the content of `CLAUDE.md` with the single line `@AGENTS.md`. Show this as a diff and get a yes. Claude Code ignores `AGENTS.md` while a `CLAUDE.md` without that import exists (`harness-loading.md`). Leave other tool-specific files (`.cursorrules`, `GEMINI.md`) in place and report them; whether to retire them is the owner's call.
+7. If `CLAUDE.md` is a link (the audit prints `-> <target>`), stop and report it: writing through the link would overwrite its target. Otherwise, and only after step 6 passed, replace the content of `CLAUDE.md` with the single line `@AGENTS.md`. Show this as a diff and get a yes. Claude Code ignores `AGENTS.md` while a `CLAUDE.md` without that import exists (`harness-loading.md`). Leave other tool-specific files (`.cursorrules`, `GEMINI.md`) in place and report them; whether to retire them is the owner's call.
 8. If the migrated `AGENTS.md` is over the size budget, report the size and propose what could move to a nested file or to the docs. Do not cut it.
 
 ## When a private file becomes public

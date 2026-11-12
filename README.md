@@ -44,7 +44,7 @@ bin/skills link           # relink now, prune links to deleted skills
 bin/skills uninstall      # remove every link and hook it created
 ```
 
-Use only `name` and `description` in frontmatter; both are honoured by all five harnesses. One skill also sets `disable-model-invocation: true`, which Claude Code and Pi honour (the skill runs only when asked for) and Codex ignores, as observed on 2026-11-12; Cursor and Grok are untested. Its text therefore also tells the agent when not to run it.
+Use only `name` and `description` in frontmatter; both are honoured by all five harnesses. One skill also sets `disable-model-invocation: true`, which Claude Code and Pi honoured (the skill runs only when asked for) and Codex ignored when this repo was set up in November 2026; Cursor and Grok are untested. Its text therefore also tells the agent when not to run it.
 
 Before you commit a change to a skill, run `skills/_shared/scripts/check-skills`. It checks frontmatter, referenced files and the links into `skills/_shared`.
 

@@ -21,7 +21,7 @@ This skill edits docs and the docs map. It never edits product code.
 
 - **Plain Markdown**: `.md` files read as they are, on the code host or in an editor. The default when the repo has no docs tooling. Read `reference/plain-markdown.md`.
 - **Docs framework**: pages that a tool such as Starlight, MkDocs or Docusaurus builds. Read `reference/docs-framework.md`. Setting up or hosting a framework is out of scope.
-- One source: when a framework holds the user docs, they live there only. The maintainer docs stay plain Markdown in a folder the framework does not publish: `docs/`, or `maintainers/` at the repo root when the framework owns `docs/`. The README links to both.
+- One source: when a framework holds the user docs, they live there only. The maintainer docs stay plain Markdown in a folder the framework does not publish: `docs/`, or `maintainers/` at the repo root when the framework owns `docs/`. In the second case pass `--map maintainers/docs-map.txt` to `<skill>/scripts/docs-scope`, and point the docs-index line in `AGENTS.md` at `maintainers/README.md`. The README links to both.
 
 The docs usually live in the source repo. When they are in a separate repo, take the source-repo path and the docs-repo path as two inputs (`reference/docs-framework.md`).
 
