@@ -1,6 +1,6 @@
 # agent-skills
 
-One repo of skills, read live by Claude Code, Codex, Cursor, Pi and Grok on this machine.
+Agent skills for Claude Code, Codex, Cursor, Pi and Grok, kept in one repo that every harness on your machine reads live.
 
 ## Skills
 
@@ -11,7 +11,7 @@ One repo of skills, read live by Claude Code, Codex, Cursor, Pi and Grok on this
 | `writing-readmes` | Write, overhaul or review a README, with the quickstart proven by a cold run. |
 | `writing-docs` | Write, audit or update user docs and maintainer docs from the source, as plain Markdown or for a docs framework. |
 | `publishing-a-repo` | Check a private repo before it goes public. Runs only when asked by name. |
-| `verification-skill` | Create, adopt or maintain a project's own `verify-<app>` skill: launch the real app, drive a feature the way a user does, capture proof. Adapted from pstack. |
+| `verification-skill` | Create, adopt or maintain a project's own `verify-<app>` skill: launch the real app, drive a feature the way a user does, capture proof. |
 | `deliver` | Take one task from agreed to proven: state what done means, build, prove, review, open the pull request, then stop for you or merge when told to. |
 | `correct` | Turn a mistake agents keep making in a repo into a check that fails: a design change, a type, a lint or a test, with a written rule last. |
 | `coordinator` | Run several builder agents: plan tasks, brief each builder, review its pull request, test the result, then hand it over or merge it when you said to. Works in T3 Code, Herdr, Rex or a plain terminal. |
@@ -24,8 +24,10 @@ Skills reach `skills/_shared` through relative symlinks, for example `skills/wri
 
 ## Install (once per machine)
 
+Needs `git`, `bash` and `python3` on the path, and a system with symlinks. Tested on macOS.
+
 ```sh
-git clone <this repo> ~/Workspace/agent-skills
+git clone https://github.com/smarzban/agent-skills.git ~/Workspace/agent-skills
 ~/Workspace/agent-skills/bin/skills install
 ```
 
@@ -42,7 +44,10 @@ Claude Code does not scan nested skill folders, so it needs a link per skill. Cu
 
 ## Daily use
 
+Run these from the repo root.
+
 ```sh
+cd ~/Workspace/agent-skills
 bin/skills new my-skill   # scaffold skills/my-skill/SKILL.md and link it
 bin/skills status         # what is linked, what conflicts
 bin/skills link           # relink now, prune links to deleted skills
@@ -51,7 +56,7 @@ bin/skills uninstall      # remove every link and hook it created
 
 Use only `name` and `description` in frontmatter; both are honoured by all five harnesses. One skill also sets `disable-model-invocation: true`, which Claude Code and Pi honoured (the skill runs only when asked for) and Codex ignored when this repo was set up in November 2026; Cursor and Grok are untested. Its text therefore also tells the agent when not to run it.
 
-Before you commit a change to a skill, run `skills/_shared/scripts/check-skills`. It checks frontmatter, referenced files and the links into `skills/_shared`.
+Before you commit a change to a skill, run `skills/_shared/scripts/check-skills` from the repo root. It checks frontmatter, referenced files and the links into `skills/_shared`.
 
 The linker never overwrites a file, folder or link it did not create. `status` shows same-named skills that already exist in a harness folder so you can retire the old copy.
 
@@ -61,8 +66,8 @@ Clone and run `bin/skills install`, then `git pull` to update. That is the route
 
 The repo also carries plugin manifests (`.claude-plugin/` for Claude Code and Grok, `package.json` for Pi). Plugin installs are cached copies that update only when the harness refreshes them, and these routes have not been install-tested:
 
-- Claude Code: `/plugin marketplace add <owner>/<repo>` then `/plugin install agent-skills@agent-skills`
-- Grok: `grok plugin install <owner>/<repo> --trust`
-- Pi: `pi install git:github.com/<owner>/<repo>`
+- Claude Code: `/plugin marketplace add smarzban/agent-skills` then `/plugin install agent-skills@agent-skills`
+- Grok: `grok plugin install smarzban/agent-skills --trust`
+- Pi: `pi install git:github.com/smarzban/agent-skills`
 
 Use one route per harness: links or a plugin, not both, or each skill loads twice.
