@@ -51,7 +51,7 @@ If the fix is a check, do not also write a rule for it. The rule table row is en
 ```markdown
 | Rule | Enforced by |
 |---|---|
-| Tests never write to the real data folder | `scripts/check-data-dir`, run by `scripts/verify` |
+| Tests never write to the real data folder | the `check-data-dir` step of the verify command |
 ```
 
 - Add or update the row for each class you fixed. Name the check, not the intention.
