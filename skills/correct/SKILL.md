@@ -20,13 +20,17 @@ Start from what you were told. If the owner named a mistake, that is the class; 
 - the rule table in `AGENTS.md`: every row whose "Enforced by" says "nothing yet";
 - comments that explain a workaround, and **Gotchas** in `HANDOFF.md` files.
 
-Group what you find into classes. A class counts when it has happened twice, or when the owner says it matters. For each class write one line: what goes wrong, and the commits, comments or files that show it.
+Group what you find into classes. A class counts when it has happened twice, or when the owner says it matters. For each class write one line: what goes wrong, and the commits, comments or files that show it. When the mistake left no trace in the repo (it happened in an agent's own shell), the owner's account of it is the evidence; say so.
 
 With more than three classes, take the three most frequent and list the rest in the report.
 
 ## 2. Choose the fix, highest level first
 
 For each class, take the first level that works and say why the ones above it did not.
+
+- Prefer a fix that stops the mistake where the harm happens over one that reports it afterwards. A check in the verify command is too late for a mistake that deletes or overwrites something when it runs.
+- A fix that changes what users see (a documented default, a command's behaviour) is the owner's decision. Take the strongest fix that keeps the documented behaviour, say plainly what it still lets through, and put the stronger fix in the pull request for the owner to decide.
+- A higher level that covers only part of the class can be joined with a lower one that covers the rest.
 
 1. **Design.** Make the wrong thing impossible to express. Give each piece of state one owner and each task one supported way. Hide internals so that the wrong import fails. Replace a list that is kept in step by hand with one source. Delete the old way and any dead code an agent would copy.
 2. **Type.** Make the bad state fail to compile or to load.
@@ -38,8 +42,9 @@ If the fix is a check, do not also write a rule for it. The rule table row is en
 
 ## 3. Fix and prove
 
-- One class per commit.
-- Prove each check against a real past mistake: apply the mistake (check out the old code, or write it back in), show that the check fails with the message you intended, then show that it passes on the fixed code. Paste both outputs in the pull request.
+- One class per commit. Fixes that come out of review are further commits.
+- Prove each check against the mistake as it was made: check out the old code, or write the mistake back in the way it was described. Show that the check fails with the message you intended, then show that it passes on the fixed code. Paste both outputs in the pull request, and say what tree each ran on. For a design fix, prove the design (the wrong thing is refused) and the test that guards it.
+- If making the mistake is itself harmful, make it in isolation: a temporary home folder, a copy of the data, a container. Check afterwards that nothing real was touched.
 - The check runs in the repo's verify command, so that it runs the same way locally and in CI. Use the linter and the test framework the repo already has, or a small script in the repo. Adding a new tool or dependency needs the owner's yes.
 - If the pattern is already common in the code, the check fails only on new occurrences: record the existing ones as a baseline in a file, and say how many there are.
 - An exception goes on the offending line, with the reason, an expiry date and the name of the person who approved it. Never add an exception to get your own change through.
@@ -56,12 +61,14 @@ If the fix is a check, do not also write a rule for it. The rule table row is en
 
 - Add or update the row for each class you fixed. Name the check, not the intention.
 - A row that said "nothing yet" and now has a check loses those words.
-- Drop a row once the design makes its mistake impossible.
+- A design fix that a later edit could undo keeps its row, naming the test that guards it. Drop a row only when nothing in the repo could bring the mistake back.
 - If the repo has no such table, add it under a `## Rules` heading.
 
 ## 5. Ship
 
-Open one pull request with the commits. It changes the verify command or the checks that guard the repo, so an agent never merges it alone: the ending is always stop, whatever was said. If the `deliver` skill is installed, follow it for the proof, the review and the pull request body.
+Open one pull request with the commits. It changes the checks that guard the repo, so an agent never merges it alone: the ending is always stop, whatever was said and whatever the repo's **Needs the owner** list holds.
+
+If the `deliver` skill is installed, follow all of it with the ending fixed at stop. The contract has one group of items per class: the check fails on the mistake, it passes on the fix, and behaviour the class does not concern is unchanged. Put what the owner must decide under a `## For the owner to decide` heading in the pull request body.
 
 When this runs with nobody present (a scheduled job, a coordinator): ask no questions, open the one pull request or none, and put what you could not decide in its description.
 

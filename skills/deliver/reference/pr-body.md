@@ -34,6 +34,9 @@ Commit: <full sha the evidence ran on. When items ran on different commits, name
 ## Could break
 <Who or what this touches beyond the diff, and why that is safe. One or two sentences.>
 
+## For the owner to decide
+<A choice that is the owner's and that this change leaves open. Drop the heading when there is none.>
+
 ## Review
 <Who or what reviewed it, on which commit, and the outcome. Or: skipped at the owner's request.>
 <Each finding that was set aside, with the reason.>

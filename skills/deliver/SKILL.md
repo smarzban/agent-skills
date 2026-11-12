@@ -47,7 +47,7 @@ For an open pull request, run `<skill>/scripts/pr-status <n>` first and read its
 ## Steps
 
 1. **Contract.** Write "done when" as a short list of observable results. For each item name the proof (a screenshot for a UI change, command output for a CLI change, a test) and who proves it: the agent, or the owner. Take the items from the task; where the task is vague, propose the list and get a yes. With nobody to ask, keep to what the task states and list your assumptions. Also write what is out of scope. Write the contract into `HANDOFF.md` now, before you build. If the task names a path, check it against the **Needs the owner** list in `AGENTS.md` on the base branch; when it is on the list, say at once that a send will end in stop. The owner asking for the change is not the owner approving the diff.
-2. **Build.** Work in a worktree on a branch of its own. Keep the diff inside the contract's scope; a change you find you need outside it goes in the report, not in the diff. Keeping the repo's verification map true for the behaviour you changed (a feature file, its index row, its `Source` paths) is always in scope.
+2. **Build.** Work in a worktree on a branch of its own. Keep the diff inside the contract's scope; a change you find you need outside it goes in the report, not in the diff. Once the branch is pushed, add commits; do not amend or force-push, because proof and review are tied to commits. If you change the contract after you started building, say what changed and why in the pull request body and in the report. Keeping the repo's verification map true for the behaviour you changed (a feature file, its index row, its `Source` paths) is always in scope.
 3. **Prove.** Read `reference/proof.md`.
    - Run the repo's verify command. If the repo has none, say so; its tests are then the only automated proof.
    - For each `verify-*` skill in the repo that has a feature map, run the `features-for` script in its folder and drive every feature it prints as `DRIVE`, by that skill's recipes. For a `NOT-MAPPED` or `UNMAPPED` line, read the diff: if this task changed that behaviour, writing its feature file is part of the task. If the line appears only because the behaviour shares a file with your change, list it in the report.
@@ -77,7 +77,7 @@ Every line must be true of the pull request's head commit, `<sha>`.
 - It is a pull request you opened in this run, or one the owner told you to deliver, and the last line of `pr-status` says `cross-repository no`. The author name alone does not tell your work from another agent's when both use the owner's account.
 - After `git fetch`, `<skill>/scripts/needs-owner --head <sha> --base origin/<base>` exits 0, where `<base>` is the branch the pull request targets.
 - The diff holds nothing outside the contract's scope.
-- Nothing was loosened to get here: no check disabled, skipped or made non-blocking, no test deleted or weakened, no threshold raised, no allowlist entry added, no feature taken off a verification map.
+- Nothing was loosened to get here: no check disabled, skipped or made non-blocking, no test deleted or weakened, no threshold raised, no allowlist entry added, no feature taken off a verification map, no rule in a verification skill relaxed.
 - You resolved no review thread that a person opened, and every finding you set aside is listed in the pull request body with your reason.
 
 When a line is false, the ending is stop. Name the line in the report.
