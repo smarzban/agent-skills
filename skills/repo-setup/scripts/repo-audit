@@ -99,6 +99,7 @@ for f in AGENTS.md AGENTS.local.md AGENTS.override.md CLAUDE.md CLAUDE.local.md 
 done
 [ "$any" = 1 ] || echo '  none'
 nested="$(git ls-files 2>/dev/null | grep -E '(^|/)AGENTS\.md$' | grep / || true)"
+# shellcheck disable=SC2086 # split on purpose: one line per path
 [ -z "$nested" ] || printf '  nested:   %s\n' $nested
 
 printf '\ncommands found\n'
@@ -127,5 +128,6 @@ fi
 packages="$(git ls-files 2>/dev/null | grep -E '/(package\.json|Cargo\.toml|go\.mod|pyproject\.toml)$' | grep -v node_modules | sed 's|/[^/]*$||' | sort -u || true)"
 if [ -n "$packages" ]; then
   printf '\npackages (a monorepo: each may take its own AGENTS.md)\n'
+  # shellcheck disable=SC2086 # split on purpose: one line per path
   printf '  %s\n' $packages
 fi
