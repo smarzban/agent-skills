@@ -16,13 +16,13 @@ Work on the current repo unless you are given a path.
 1. Run `<skill>/scripts/repo-audit` and read every file it lists as existing. On an empty repo the audit reports everything missing; run it anyway.
 2. Settle the repo type, because it selects the optional files: solo or team (the audit's author count, an existing `CODEOWNERS`), public or private. Ask when the evidence does not say.
 3. Show the owner the audit and one proposal: each file to create, each edit to an existing file as a diff, and each owner decision. Wait for a yes. If the owner already told you to proceed without asking, print the proposal and continue. The separate yes for making private content public (`reference/migration.md`) is asked in every case.
-4. Write what was agreed, from `reference/templates.md`.
+4. Write what was agreed, from `reference/templates.md`. When you are in the repo's main checkout (`git rev-parse --git-dir` has no `/worktrees/` in it), do not edit tracked files there: another session may be working in it. Put them on a new branch in a worktree of your own (`git worktree add -b repo-setup ../<repo>-setup`), and run the checks in step 5 from it. Two things stay in the owner's checkout: the audit, because it reads untracked and ignored files, and `AGENTS.local.md`, because git ignores it and a worktree does not carry it. A repo with no commits cannot have a second worktree; work in place.
 5. Check the result:
    - The verify command exits 0, and the CI workflow runs that same command.
    - `<skill>/scripts/repo-audit` now reports both ignore rules as present.
    - `git worktree add --detach ../<repo>-probe && (cd ../<repo>-probe && scripts/worktree-setup)` succeeds; then run `git worktree remove --force ../<repo>-probe`. A repo with no commits cannot have a second worktree: report this check as not run. A worktree holds only committed files, so if the new scripts are not committed yet, copy them into the probe and say that you did.
    - `AGENTS.md` is inside its budget. Over budget is a warning for the report, not a failure.
-6. Report: created, edited (with the diff), left alone, owner decisions still open, and anything a check did not prove.
+6. Report: the worktree path and branch if you made one, created, edited (with the diff), left alone, owner decisions still open, and anything a check did not prove.
 
 ## Files
 
