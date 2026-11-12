@@ -1,6 +1,6 @@
-# Target: published site
+# Location: docs site
 
-The main reader is a person. Use plain language, teach with tutorials that show the expected result of each step, and add a screenshot where it saves a paragraph. Use only images that exist in the repo; list a missing one for the owner.
+Pages built and served by a site framework. This file covers the framework's mechanics: where pages go, navigation, front matter and the build check. How to write for the reader is in `user-docs.md`.
 
 ## Follow the framework
 

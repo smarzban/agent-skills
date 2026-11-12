@@ -1,6 +1,13 @@
-# Scope: using
+# User docs
 
-Docs for people who run, install or call the project. They never need to open the source.
+Docs for people who run, install or call the project. They never need to open the source. This holds whether the pages are Markdown in the repo or a docs site.
+
+## Writing for the reader
+
+- Use plain language. Name a thing the way the product names it, not the way the code does, when the two differ.
+- Teach with tutorials that show the expected result of each step.
+- Add a screenshot where it saves a paragraph. Use only images that exist in the repo; list a missing one for the owner.
+- Do not send the reader to the source code to finish a task.
 
 ## Pages
 
@@ -45,7 +52,7 @@ Every example on a usage page is run, not only the quickstart and install comman
 
 Write these only for this scope and only from evidence.
 
-- `CONTRIBUTING.md`: belongs to the changing scope; link to it.
+- `CONTRIBUTING.md`: belongs to the maintainer docs; link to it.
 - `SECURITY.md`: needs a reporting channel the owner confirmed. A channel taken from commit metadata counts as invented. Without confirmation, do not create the file; report it.
 - `CHANGELOG.md`: only when a release process exists, and only entries that tags or releases support.
 - Licence and code of conduct: report a missing one for a public repo. Never choose one.

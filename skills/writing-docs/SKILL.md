@@ -1,6 +1,6 @@
 ---
 name: writing-docs
-description: Write, audit or update a project's docs from its source code. Usage docs (quickstart, install, configuration, a page per feature) and maintainer docs (architecture, data model, invariants), in the repo or on a docs site. Use for "write the docs", "document this repo", "user guide", "docs site", "website docs", "architecture docs", "audit the docs", "update the docs", "the docs are out of date".
+description: Write, audit or update a project's docs from its source code. User docs (quickstart, install, configuration, a page per feature) and maintainer docs (architecture, data model, invariants), as Markdown in the repo or on a docs site. Use for "write the docs", "document this repo", "user docs", "user guide", "docs site", "architecture docs", "audit the docs", "update the docs", "the docs are out of date".
 ---
 
 # writing-docs
@@ -11,17 +11,17 @@ This skill edits docs and the docs map. It never edits product code.
 
 ## Choose three things first
 
-**Scope**, from the repo type. Ask when it is unclear.
+**Scope**, from the repo type. Ask when it is unclear. The scope decides who a page is written for.
 
-- **Using**: quickstart, install, configuration, one page per feature. For projects that people outside the team run or call. Read `reference/using.md`.
-- **Changing**: architecture and why, data model, invariants per subsystem, security model, dev setup and contributing. For the people and agents who modify the code. Read `reference/changing.md`.
-- Both, when asked to document everything. Do using first.
+- **User docs**: quickstart, install, configuration, one page per feature. For people who run, install or call the project and never open the source. Read `reference/user-docs.md`.
+- **Maintainer docs**: architecture and why, data model, invariants per subsystem, security model, dev setup and contributing. For the people and agents who modify the code. Read `reference/maintainer-docs.md`.
+- Both, when asked to document everything. Do user docs first.
 
-**Target**. Look for docs tooling before you decide: `mkdocs.yml`, `docusaurus.config.*`, an Astro config that loads Starlight, `.vitepress/`, `conf.py`, `book.toml`. Follow what exists.
+**Location**. Look for docs tooling before you decide: `mkdocs.yml`, `docusaurus.config.*`, an Astro config that loads Starlight, `.vitepress/`, `conf.py`, `book.toml`. Follow what exists. The location decides the layout, the links and the build check. It does not change the reader: user docs are written for people in either place.
 
-- **In-repo** Markdown, read mostly by agents. Read `reference/in-repo.md`.
-- **Published site**, read mostly by people. Read `reference/site.md`. The site may be in another repo: take the source-repo path and the docs-repo path as two inputs. Setting up or hosting a site is out of scope.
-- One source: when a site exists, usage docs live on the site only. The repo keeps its README and its changing docs, and links to the site.
+- **Markdown in the repo**: a docs folder that is read on the code host or in an editor. The default when the repo has no site tooling. Read `reference/in-repo.md`.
+- **Docs site**: pages built by a site framework. Read `reference/site.md`. The site may be in another repo: take the source-repo path and the docs-repo path as two inputs. Setting up or hosting a site is out of scope.
+- One source: when a site exists, user docs live on the site only. The repo keeps its README and its maintainer docs, and links to the site.
 
 **Mode**: write, audit, or update for a diff. An update can also run unattended.
 
@@ -49,11 +49,11 @@ Move `verified-at` forward only when every page the map lists was checked agains
 
 ## Write
 
-1. Build the ledger from a mechanical source, never from an old doc or from memory: the command registrations or `--help` output, the route table, the public exports, the settings definition, the schema files. Rows for using are user-facing features. Rows for changing are modules, data models, entry points and invariants. List every exclusion with its reason (vendored, generated, deprecated and marked).
+1. Build the ledger from a mechanical source, never from an old doc or from memory: the command registrations or `--help` output, the route table, the public exports, the settings definition, the schema files. Rows for user docs are user-facing features. Rows for maintainer docs are modules, data models, entry points and invariants. List every exclusion with its reason (vendored, generated, deprecated and marked).
 2. Plan the pages: for each, its path, its kind (`reference/style.md`), the ledger rows it closes and the source paths it covers.
 3. Checkpoint. Show the owner the ledger and the planned file list, and wait for a yes before you write the tree.
 4. Read the source. For more than a few rows, start one read-only subagent per subsystem or feature, in parallel. Each returns a summary and edits nothing: what it does, entry points with paths, settings with defaults and the lines that define them, invariants and what enforces each, any evidence of rationale, open questions.
-5. Write the pages by the rules below and the reference files for your scope and target.
+5. Write the pages by the rules below and the reference files for your scope and location.
 6. Verify.
 7. Write `docs-map.txt`, update the index, and report.
 

@@ -1,6 +1,6 @@
-# Target: in-repo Markdown
+# Location: Markdown in the repo
 
-The main reader is an agent that opens one page in the middle of a task. It cannot ask what you meant, and it may not open a second page.
+Plain Markdown in a docs folder, read on the code host, in an editor, or by an agent. This file covers the layout, the index and the checks. Who a page is written for comes from its scope (`user-docs.md`, `maintainer-docs.md`).
 
 ## Layout
 
@@ -10,11 +10,11 @@ Follow the repo's existing docs layout. Without one:
 docs/
   README.md        index, routed by task
   docs-map.txt     page-to-source map
-  quickstart.md
+  quickstart.md          user docs
   install.md
   configuration.md
   usage/<feature>.md
-  architecture.md
+  architecture.md        maintainer docs
   data-model.md
   internals/<subsystem>.md
   security-model.md
@@ -32,7 +32,7 @@ If `docs/` already holds something else (specs, a site), put the tree in a named
 
 ## Index
 
-`docs/README.md` routes by task, not by file name:
+`docs/README.md` routes by task, not by file name. When the folder holds both scopes, give the index two tables: one for using the project and one for changing it.
 
 ```markdown
 | To do this | Read |

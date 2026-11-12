@@ -1,6 +1,8 @@
-# Scope: changing
+# Maintainer docs
 
 Docs for the people and agents who modify the code. They can read the code for what it does. These pages hold what the code cannot say: why it is built this way, and what must not break.
+
+The reader is often an agent that opens one page in the middle of a task. It cannot ask what you meant, and it may not open a second page. Write each page so that it works alone.
 
 ## Pages
 
