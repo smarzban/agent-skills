@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prepare a fresh git worktree: private notes, local env files.
+# Prepare a fresh git worktree: copy the private notes from the main checkout.
 # Run it from inside the new worktree. It never overwrites a file that exists.
 set -euo pipefail
 

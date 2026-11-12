@@ -4,7 +4,7 @@
 
 - Prepare a fresh worktree: `scripts/worktree-setup`
 - Verify, the same command CI runs: `scripts/verify`
-- Check the skills (frontmatter and referenced files): `skills/_shared/scripts/check-skills`
+- Check the skills only: `skills/_shared/scripts/check-skills`
 
 ## Before you start
 
@@ -16,8 +16,8 @@
 
 | Rule | Enforced by |
 |---|---|
-| Each skill's frontmatter has only `name` (matching its folder) and `description`, and its referenced files exist. YAML syntax is not parsed. | `skills/_shared/scripts/check-skills` |
-| `bin/skills`, `.githooks/` and `scripts/` pass shell lint (needs `shellcheck` on PATH) | `shellcheck -x`, in `scripts/verify` |
+| Each skill passes the structural checks in `check-skills`: frontmatter keys, `name` matching its folder, a description, some referenced paths, links into `_shared`, and script headers. It does not parse YAML or check every reference; read the script for the exact rules. | `skills/_shared/scripts/check-skills` |
+| `bin/skills`, `.githooks/*`, `scripts/verify` and `scripts/worktree-setup` pass shell lint (needs `shellcheck` on PATH) | `shellcheck -x`, in `scripts/verify` |
 
 ## Needs the owner
 
