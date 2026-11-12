@@ -29,7 +29,7 @@ A marker can be inherited by an agent that was started from inside one of these 
 Read these from `AGENTS.local.md`. What the owner told you in this conversation wins over it. Ask once for one that is missing only when a step needs it and no default below fits, and offer to record the answer there.
 
 - `Tracker:` where tasks and briefs live. `reference/trackers.md` covers the tsk board, another tracker, and a task file.
-- `Review:` how a change is reviewed here.
+- `Review:` how a change is reviewed here. Always settle this one with the owner before the first builder starts: with no line, ask ("How should changes be reviewed here: a fresh agent, a review step you name such as a panel, or you?"), and offer to record the answer. A fresh agent is the default only when nobody is there to ask.
 - `Evidence:` where pictures and recordings of proof are sent. Text evidence goes in the pull request.
 - `Plan:` where a plan is written down, when it is not the tracker.
 
@@ -59,7 +59,7 @@ The ending of every task is stop, unless the owner told you, in this conversatio
 
 ## Workflow
 
-1. **Ask for standing grants once**: push, changes to the dev machine, where test files may go, which credentials to set up. Never infer one, and a yes in one context does not carry to another.
+1. **Ask for standing grants once**, and how changes are reviewed if no `Review:` line says: push, changes to the dev machine, where test files may go, which credentials to set up. Never infer one, and a yes in one context does not carry to another.
 2. **Plan.** One task per unit of work. Check each task's premise against the code before you brief it. When a premise is wrong (the feature exists, the cause is elsewhere), write the task that is true and show the owner the difference; with nobody to ask, build the narrower task and end it in stop. Order tasks that depend on each other, and run tasks in parallel only when they change different files, or different functions of one file; tell each builder what the other owns, and settle the merge order now. Check the paths each task will touch against the **Needs the owner** list in `AGENTS.md`.
 3. **Brief.** Write the brief into the task, following `reference/brief.md`.
 4. **Settle the endings.** Show the owner each task's "done when" list, then ask which tasks to send. If they already said, do not ask again; show the lists and say that the send holds for these. Record each yes under **Sends**. Tell them which tasks will stop whatever they say, and why.
