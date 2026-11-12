@@ -19,8 +19,8 @@ This skill edits docs and the docs map. It never edits product code.
 
 **Location**. Look for docs tooling before you decide: `mkdocs.yml`, `docusaurus.config.*`, an Astro config that loads Starlight, `.vitepress/`, `conf.py`, `book.toml`. Follow what exists. The location decides the layout, the links and the build check. It does not change the reader: user docs are written for people in either place.
 
-- **Markdown in the repo**: a docs folder that is read on the code host or in an editor. The default when the repo has no site tooling. Read `reference/in-repo.md`.
-- **Docs site**: pages built by a site framework. Read `reference/site.md`. The site may be in another repo: take the source-repo path and the docs-repo path as two inputs. Setting up or hosting a site is out of scope.
+- **Markdown in the repo**: a docs folder that is read on the code host or in an editor. The default when the repo has no site tooling. Read `reference/repo-markdown.md`.
+- **Docs site**: pages built by a site framework. Read `reference/docs-site.md`. The site may be in another repo: take the source-repo path and the docs-repo path as two inputs. Setting up or hosting a site is out of scope.
 - One source: when a site exists, user docs live on the site only. The repo keeps its README and its maintainer docs, and links to the site.
 
 **Mode**: write, audit, or update for a diff. An update can also run unattended.
@@ -123,7 +123,7 @@ Check each concrete claim against its defining line as you write it.
 - Fact-check by an independent subagent, as the default. Give it the pages and the source, and none of your notes or reasoning: "Find every statement in these pages that the code contradicts: values, names, paths, commands, behaviour. Cite the source line for each. Report facts only, not style." Fix each confirmed error. With no subagent available, re-read every page against the source yourself and say the check was not independent.
 - Coverage: every ledger row has a page or a listed exclusion. `scripts/docs-scope --coverage` prints no `UNMAPPED`.
 - No placeholders: no "TBD", "TODO", "coming soon" or empty section.
-- For a site: the build check in `reference/site.md`.
+- For a site: the build check in `reference/docs-site.md`.
 
 ## Report
 
