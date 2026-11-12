@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# The one command that says whether this checkout is good. CI runs this same file.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+step() { printf '\n== %s\n' "$*"; "$@"; }
+
+step skills/_shared/scripts/check-skills
+step shellcheck -x bin/skills .githooks/*
