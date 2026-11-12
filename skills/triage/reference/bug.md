@@ -33,6 +33,7 @@ Decide this first, before you reproduce anything. A report is a security report 
 ## When it is reproduced
 
 - Find the cause before you write the task: the file and line, and since when (`git log -S`, `git bisect` when it is cheap).
-- Look for the same mistake nearby. List what you find; do not widen the fix.
+- Look for the same mistake nearby. List what you find. Include a nearby case in the fix only when the same change to the same lines covers it, and say that you did.
+- When the report accepts two outcomes ("create it, or tell me"), build the smaller one and put the other under "for the owner to decide".
 - Rate it for the owner: who meets it, how often, what it costs them, whether there is a workaround. Data loss or a crash on the main path goes in the verdict's flags.
 - Write the task in your own words. Its first "done when" item is your reproduction turning into the right behaviour. Then follow `deliver`, ending stop.

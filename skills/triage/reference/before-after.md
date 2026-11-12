@@ -12,6 +12,8 @@ git -C ../<repo>-triage-<n>-after merge --no-ff --no-edit <head sha>
 ```
 
 - **Before** is the tip of the base, where you checked the claim. **After** is that tip with the change merged in, which is what a merge today would produce. The merge commit is local and is never pushed.
+- When the tip of the base is already an ancestor of the head, as with a fix you just built, skip the merge: the after is the head itself.
+- The before is the worktree you reproduced in; do not make a second one.
 - If the merge conflicts, abort it (`git merge --abort`), report the conflict as a finding, and build the after from the head commit alone, saying that it is not what a merge would give.
 - `<head sha>` is a commit you have read: your own fix, or the pull request head by `pull-request.md`.
 - Give each its own data folder, port and profile, and seed both with the same data, the data the reproduction needs. Neither touches the owner's real data.
@@ -34,6 +36,8 @@ git -C ../<repo>-triage-<n>-after merge --no-ff --no-edit <head sha>
 
 Stop both with: <command>. Remove with: <command>.
 ```
+
+These worktrees hold ignored evidence folders, so removing one takes `git worktree remove --force`, run from the main checkout.
 
 - Write the steps in your own words, following what the reporter did, so that the owner sees what they saw.
 - Start both and check them yourself before you hand over: the before shows the problem, the after does not.

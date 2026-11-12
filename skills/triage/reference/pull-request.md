@@ -37,11 +37,12 @@ Then read it as a reviewer would: does it do what it says, on the failure paths 
 
 ## 3. Run it
 
-Only after the reading, and only where the owner allows outside code to run: the `Outside code:` line in `AGENTS.local.md` names the machine or the rule. With no such line, do not run it; give the verdict from the reading, and list the run under "Not checked".
+Only after the reading, and only where the owner allows outside code to run: their word in the conversation, or the `Outside code:` line in `AGENTS.local.md`, names the machine or the rule. With neither, do not run it; give the verdict from the reading, and list the run under "Not checked".
 
 - Make the checkout from the commit you read, never from the branch: `git worktree add --detach ../<repo>-triage-<n>-head <sha>`.
 - If the diff touches nothing the verify command runs and nothing in `<verify>`, those are the same as on the base: run the repo's verify command, and drive the features that `features-for` lists.
-- If it does touch them, run the base's copies where that is possible, and otherwise do not run. Either way the flag says the proof cannot be trusted as it stands.
+- If it does touch them, run the base's copies against the head's code where the tools allow it (the base worktree's tests and scripts, started from the head folder), say how you did, and check that the head's code was what ran. Otherwise do not run. Either way the flag says the proof cannot be trusted as it stands.
+- For a pull request you will recommend declining, run only what the flags need as evidence, and list the rest under "Not checked".
 - Reproduce the bug on the base and show it gone on the head, or drive the new feature.
 - If the pull request's own checks did not run because it comes from a fork, say so. Never approve a workflow run.
 
@@ -52,6 +53,7 @@ Only after the reading, and only where the owner allows outside code to run: the
 | Take as is | Wanted, correct, proven by you on its head commit, no flags |
 | Take with changes | Wanted, and the faults are small. List each with file and line |
 | Rebuild it ourselves | Wanted, but this diff is not the way. Credit the contributor in the task |
+| Owner's call | Nobody has ruled on whether the thing is wanted. Say whether the diff itself is sound, so that the decision is the only thing left |
 | Decline | Not wanted, or unsafe. Say which, with the evidence |
 | Needs more information | The claim cannot be checked as written |
 
