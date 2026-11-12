@@ -1,6 +1,6 @@
 # In a plain terminal
 
-None of the markers is set: no `T3CODE_THREAD_ID`, `HERDR_ENV` is not `1`, and no `REX_SESSION`.
+None of the markers is set, or a marker is set and its probe failed.
 
 ## Starting a builder
 
@@ -11,7 +11,7 @@ None of the markers is set: no `T3CODE_THREAD_ID`, `HERDR_ENV` is not `1`, and n
   git worktree add -b <branch> ../<repo>-<task> <base>
   ```
 
-- Give it where the brief is and "Follow the `deliver` skill." With the tsk board outside Herdr and Rex, `tsk dispatch` answers `no-host`: set the task started with `tsk status T12 started --no-dispatch` and start the agent yourself.
+- Give it where the brief is and "Follow the `deliver` skill." With the tsk board, see `trackers.md` for starting a task outside Herdr and Rex.
 - Confirm that the agent started working before you turn to the next task.
 
 ## Waiting
@@ -20,10 +20,14 @@ None of the markers is set: no `T3CODE_THREAD_ID`, `HERDR_ENV` is not `1`, and n
 - Without one, the signal is the builder's `HANDOFF.md` and its pull request: run the `handoff` skill's `handoff-status` script, and the `deliver` skill's `pr-status` on the branch.
 - A subagent hands back when it ends; a command-line run ends when its process does. Do not assume either means the work is proven; read the report.
 
+## Sending work back
+
+A subagent or a command-line run that has handed back is finished. For findings to fix, a failing check, or a branch to bring up to date, start a new one in the same worktree: give it the pull request number, the list, and "Follow the `deliver` skill for an open pull request. Started by a coordinator: your ending is stop, and you run no review."
+
 ## Reviewing
 
 Start the reviewer as a fresh subagent, or as a command-line run of another agent in a clean checkout of the head commit. It gets the diff range, the contract and the areas to look at.
 
 ## Cleaning up
 
-Close the builder's tab or let its process end, then `git worktree remove <worktree>` and `git branch -D <branch>`, once its pull request reads as merged.
+Once the pull request reads as merged, by you or by the owner: close the builder's tab or let its process end, then `git worktree remove <worktree>` and `git branch -D <branch>`.

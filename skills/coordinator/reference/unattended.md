@@ -2,11 +2,12 @@
 
 ## Before they go
 
-Walk every task through build, proof, review, merge and deploy in your head, and ask for everything that would stop you, in one batch.
+Walk every task through build, proof, review and merge in your head, and ask for everything that would stop you, in one batch.
 
 | Ask for | Examples |
 |---|---|
-| The ending of each task | Which tasks to send, which to stop. Record each in the ledger in their words |
+| Which tasks to send | Show each task's "done when" first. Record each yes under **Sends**, in their words |
+| What a merge sets off | Whether a merge to this branch deploys or releases anything. If it does, it is a go-live: ask for it by name, or those tasks stop |
 | Access | Logins, tokens, signing, cloud or CI access, test accounts, devices |
 | Settings only they can change | Dashboards, DNS, anything that needs admin rights |
 | Decisions | Open design questions, naming, scope cuts, forks you can foresee |
@@ -20,13 +21,17 @@ Prove each thing with one cheap probe while they are still there:
 - the review step is reachable and returns a result;
 - a fresh agent can be started for the independent check, if any task is to be sent.
 
-A task whose paths are on the repo's **Needs the owner** list will stop however it was granted. Tell them which tasks those are before they go.
+Tell them before they go:
+
+- which tasks will stop whatever was granted, because they touch a **Needs the owner** path;
+- that if your context is summarised and their words are lost, or another agent takes over, every send becomes a stop;
+- in T3 Code, that a builder that stalls after you end your turn will not wake you.
 
 ## While they are away
 
 - Blocked on the owner: block the task with the exact question, and move to the next.
-- These wait for the owner, whatever was granted: anything that cannot be undone, anything other people see (a comment that closes out a pull request or an issue, a release note, a message), production data, a go-live, an admin command, and anything outside the grants.
-- A task without a ledger entry ends in stop.
+- These wait for the owner, whatever was granted: anything other people see (a comment that closes out a pull request or an issue, a release note, a message, a picture sent to the `Evidence:` destination), production data, a go-live they did not name, an admin command, anything outside the grants, and anything that cannot be undone other than the merge of a task they said to send.
+- After a send merges, keep its evidence files and its worktree until they are back.
 - Keep `HANDOFF.md` current after every state change. If you are replaced or woken with no memory, it is all the next agent has.
 - Stop when the limit they gave is reached, and write down where things stand.
 

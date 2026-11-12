@@ -10,27 +10,27 @@ The brief is everything the builder knows. It goes into the task, in the place `
 - <A fact you checked, with `file:line` for every claim about existing code.>
 
 ## Decisions
-1. <The design, as numbered decisions already made. The builder does not reopen them.>
+1. <The design, as numbered decisions already made. Do not reopen them.>
 
 ## Done when
-| # | Result | Proof | Proved by |
+| # | Result | Proved by | Proof |
 |---|---|---|---|
-| 1 | <observable result> | <screenshot, command output, test> | builder |
-| 2 | <observable result> | <the exact steps> | owner |
+| 1 | <observable result> | agent | <screenshot, command output, test> |
+| 2 | <observable result> | owner | <the exact steps> |
 
 ## Out of scope
 - <What this task does not touch, and who owns it if another builder does.>
 
 ## How to work
 Follow the `deliver` skill, with these settings:
-- Ending: stop. Open the pull request, get its checks green, then hand back with the report. Do not merge.
-- Review: coordinator. Do not run a review; the coordinator runs it on your pull request.
-- Do not write or change a `Merge:` line on this task.
-- Base branch: <branch>.
+- Started by: a coordinator. Your ending is stop: open the pull request, get its checks green, then hand back with the report. Never merge.
+- Do not run a review. The coordinator reviews your pull request.
+- Branch from <base branch>, at its current tip.
+- Never deploy, and never restart a service that others use.
+- If this brief is wrong, stop and say so. Do not build something else.
 - Hand back by: <the completion signal from the environment reference>.
 ```
 
-- **Done when** is the contract. Choose the proof from the task: a screenshot or recording for something a person looks at, output and exit code for a CLI, a response for an API, a test for logic with no surface. Name the owner as the prover only for what an agent cannot do.
-- The builder's ending is always stop, whatever the task's ending is. A send is yours to carry out after review, so the brief never passes a merge grant on.
-- Leave out what `deliver` and the repo's `AGENTS.md` already say: reading the project rules, running the verify command, not printing secrets.
-- A builder that finds the brief wrong stops and says so. It does not quietly build something else.
+- **Done when** is the contract. Name the owner as the prover only for what an agent cannot do.
+- The brief never carries a merge grant, and the builder's ending is stop whatever the task's ending is. A send is yours to carry out after review.
+- Leave out what `deliver` and the repo's `AGENTS.md` already say.

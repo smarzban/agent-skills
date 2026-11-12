@@ -60,6 +60,8 @@ Private notes for this checkout. Git ignores this file.
 
 Review: <how a change is reviewed here, such as the command or skill to run>
 Evidence: <where pictures and recordings of proof are sent, such as a chat channel>
+Tracker: <where tasks and briefs live>
+Plan: <where a plan is written down, when it is not the tracker>
 ```
 
 ## CLAUDE.md
