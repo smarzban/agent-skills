@@ -35,9 +35,16 @@ git clone https://github.com/smarzban/agent-skills.git ~/Workspace/agent-skills
 ~/Workspace/agent-skills/bin/skills install
 ```
 
-`install` creates links, turns on the repo's git hooks, and adds a Claude Code `SessionStart` hook (a backup of `~/.claude/settings.json` is written next to it). It prints one line per link, then the status table. Each skill shows `linked` for Claude Code and Cursor, and the bundle line shows `(linked)  -> Codex, Pi, Grok`:
+`install` creates links, turns on the repo's git hooks, and adds a Claude Code `SessionStart` hook (a backup of `~/.claude/settings.json` is written next to it). It prints a line per link and per hook, then the status table. Each skill shows `linked` for Claude Code and Cursor, and the bundle line shows `(linked)  -> Codex, Pi, Grok`:
 
 ```text
+linked   /Users/you/.agents/skills/agent-skills
+linked   /Users/you/.claude/skills/coordinator
+...
+enabled  git hooks (.githooks)
+added    Claude Code SessionStart hook in /Users/you/.claude/settings.json
+
+repo     /Users/you/Workspace/agent-skills
 bundle   /Users/you/.agents/skills/agent-skills  (linked)  -> Codex, Pi, Grok
 
 skill                        claude     cursor     same name elsewhere
