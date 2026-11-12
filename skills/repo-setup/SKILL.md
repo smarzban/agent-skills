@@ -16,7 +16,7 @@ Work on the current repo unless you are given a path.
 1. Run `<skill>/scripts/repo-audit` and read every file it lists as existing. On an empty repo the audit reports everything missing; run it anyway.
 2. Settle the repo type, because it selects the optional files: solo or team (the audit's author count, an existing `CODEOWNERS`), public or private. Ask when the evidence does not say.
 3. Show the owner the audit and one proposal: each file to create, each edit to an existing file as a diff, and each owner decision. Wait for a yes. If the owner already told you to proceed without asking, print the proposal and continue. The separate yes for making private content public (`reference/migration.md`) is asked in every case.
-4. Write what was agreed, from `reference/templates.md`.
+4. Write what was agreed, from `reference/templates.md`. Stay on the branch you found. If `git status` shows changes you did not make, another session is working here: leave its files alone, and ask the owner before you edit a file it has changed.
 5. Check the result:
    - The verify command exits 0, and the CI workflow runs that same command.
    - `<skill>/scripts/repo-audit` now reports both ignore rules as present.

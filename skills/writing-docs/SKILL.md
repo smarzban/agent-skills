@@ -9,6 +9,8 @@ The code is the source of truth. A page states only what you confirmed in the li
 
 This skill edits docs and the docs map. It never edits product code.
 
+When a write or an update starts while you are in the repo's main checkout (`git rev-parse --path-format=absolute --git-dir --git-common-dir` prints the same path twice), do not edit there: another session may be working in it. Do the whole run on a new branch in a worktree of your own (from the repo root, `git worktree add -b docs-write ../<repo>-docs-write`; if that branch or folder exists, pick another name, never reuse or delete it) and give its path and branch in the report. Work in place when the repo has no commits, or when the docs or the change being documented are not committed yet, because a worktree does not hold them. The unattended update uses a worktree on `docs/update` and reuses that branch and worktree when they exist.
+
 ## Choose three things first
 
 **Scope**, from the repo type. Ask when it is unclear. The scope decides who a page is written for.

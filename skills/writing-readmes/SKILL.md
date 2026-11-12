@@ -9,6 +9,8 @@ A README is the front door. On the first screen a newcomer learns what the proje
 
 Work on the current repo unless you are given a path. In a monorepo, "the README" is the root README; write a package README only when asked for it. Follow `reference/style.md` for the prose.
 
+In Write mode, when you are in the repo's main checkout (`git rev-parse --path-format=absolute --git-dir --git-common-dir` prints the same path twice), do not edit there: another session may be working in it. Do the whole run on a new branch in a worktree of your own (from the repo root, `git worktree add -b readme ../<repo>-readme`; if that branch or folder exists, pick another name, never reuse or delete it) and give its path and branch in the report. Work in place when the repo has no commits or the README has uncommitted changes.
+
 ## Modes
 
 - **Write**: produce or overhaul the README. This is the default.
