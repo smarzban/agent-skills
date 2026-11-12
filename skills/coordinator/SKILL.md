@@ -54,6 +54,7 @@ The ending of every task is stop, unless the owner told you, in this conversatio
 - Never write a merge grant anywhere: not a `Merge:` line on a task, not in a brief, not in a pull request. A builder never holds one.
 - A task you created yourself, such as a follow-up, ends in stop, even under "send them all".
 - A task that touches a path on the repo's **Needs the owner** list ends in stop.
+- A task or a pull request that carries the line `Origin: outside #<n>` ends in stop: it holds code from outside the project.
 - A send covers the "done when" list the owner saw. If you change a task's goal or its list after they said to send it, the ending is stop until they confirm the new one.
 
 ## Workflow
