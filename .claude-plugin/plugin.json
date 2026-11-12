@@ -1,5 +1,5 @@
 {
   "name": "agent-skills",
-  "description": "Personal skills shared across Claude Code, Codex, Cursor, Pi and Grok.",
+  "description": "Agent skills for Claude Code, Codex, Cursor, Pi and Grok: deliver, coordinate, triage, repo setup, docs and READMEs, from one repo.",
   "version": "0.1.0"
 }
