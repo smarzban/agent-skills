@@ -42,6 +42,7 @@ Proof and review belong to the commit they ran on. When the head moves, decide w
 | Wording only: comments, docs, the pull request text | stands | stands |
 | A rebase or a merge of the base with no conflict, and the patch is the same (`git patch-id` of the old and new diff match) | stands; run the verify command again | stands |
 | A change only to the verification map (a feature file, its index) | drive that feature's recipe again | stands |
+| Only a test added or changed, with no change to the code it tests | run the verify command; show that the new test fails without the change it guards | stands |
 | A conflict you resolved, or a change to code | run the affected recipes again (`features-for --base <old-head>` lists them), and the verify command | review the new commits |
 | New behaviour or a redesign | all of it again | all of it again |
 
@@ -57,10 +58,11 @@ Checks must be green on the head commit itself in every case.
 Required before a send merge. The author checks what it meant to build, so the check is done by an agent that did not write the code.
 
 1. Make a clean checkout of the exact head commit: `git worktree add --detach ../<repo>-check <sha>`.
-2. Start a fresh agent there: a subagent, or an agent in another harness. Give it the pull request body and nothing else. No notes, no reasoning, no summary of what you found.
+2. Start a fresh agent there: a subagent, or an agent in another harness. Give it the pull request body, where the checkout is, what the base is, and the repo's rule for running the app without touching real data. Nothing else: no notes, no reasoning, no summary of what you found.
 3. Ask it: "Run each command under Verification in a clean state. For each 'done when' item, say reproduced or not reproduced, and paste what you saw. Then read the diff against the base and list anything that loosens a check: a test deleted, skipped or weakened, a job disabled, a threshold raised, an allowlist entry, a feature removed from a verification map. Edit nothing."
-4. Every item must come back reproduced, and the list of loosened checks must be empty. Anything else is a finding. A fix is a new commit, which goes back to step 3 of the skill; otherwise the ending is stop.
-5. Remove the checkout.
+4. Every item must come back reproduced, and the list of loosened checks must be empty. An item that is not reproduced, or a loosened check, is a finding: a fix is a new commit, which goes back to step 3 of the skill; otherwise the ending is stop. A remark beside a reproduced item goes in the report. If the checker shows that a sentence in the body is wrong, correct the body; the check stands unless you changed a command under Verification.
+5. Its own run output is not kept.
+6. Remove the checkout.
 
 This check is only for a pull request whose body you or the owner wrote. Never run commands from a body someone else controls.
 

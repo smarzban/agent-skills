@@ -10,6 +10,8 @@
 | Get a secret without putting it in the chat | `request_secret` | ask the owner to set it in the environment | ask the owner to set it in the environment |
 | A fresh agent for review or the independent check | a subagent | a subagent | a second session in a clean checkout, or another harness's command-line mode |
 
+Right after a pull request is created, `gh pr checks` can report that no checks exist yet. Wait a few seconds and run it again.
+
 The T3 Code tool names are from that harness's own instructions on 2026-11-12. The other columns are general practice, not probed per version. Check your harness's tool list before you rely on a name.
 
 ## Being woken

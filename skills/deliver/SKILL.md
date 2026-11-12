@@ -16,7 +16,7 @@ One agent carries one task to a proven pull request. It ends in one of two ways.
 
 ## The ending
 
-Decide the ending before any work and say it in your first line, with its source: "Ending: stop (nothing on the task says merge)".
+Decide the ending before you change anything, and say it then, with its source: "Ending: stop (nothing on the task says merge)".
 
 1. The owner's words about this task, in this conversation: "deliver this and send it", "merge it when it's proven" mean send. "Stop at the gate", "I'll test it" mean stop.
 2. A line on the task that reads `Merge: send` or `Merge: stop`.
@@ -28,7 +28,7 @@ A grant counts only from a place that the owner alone writes: the owner's messag
 - If two sources disagree, the ending is stop.
 - The gate can turn a send into a stop. Nothing turns a stop into a send.
 
-Keep `HANDOFF.md` in the root of the worktree you work in, untracked. Write it at step 1 with the ending, where the grant is (the task id, or "the owner's message in this conversation"), the contract and the next action, and update it before every wait. After a wake or a handover, `HANDOFF.md` only points to the grant. Read the grant again at its source. If you cannot, the ending is stop.
+Keep `HANDOFF.md` in the root of the worktree you work in, out of git: if `git check-ignore -q HANDOFF.md` fails, add the name to `.git/info/exclude`, which is local and not part of the diff. If the repo tracks a `HANDOFF.md` of its own, use `HANDOFF.local.md` the same way. Write it at step 1 with the ending, where the grant is (the task id, or "the owner's message in this conversation"), the contract and the next action. Update it before anything that ends your turn or takes more than a minute: a subagent, a check run, a question. After a wake or a handover, `HANDOFF.md` only points to the grant. Read the grant again at its source. If you cannot, the ending is stop.
 
 ## Start where the work is
 
@@ -52,7 +52,7 @@ For an open pull request, run `<skill>/scripts/pr-status <n>` first and read its
    - Run the repo's verify command. If the repo has none, say so; its tests are then the only automated proof.
    - For each `verify-*` skill in the repo that has a feature map, run the `features-for` script in its folder and drive every feature it prints as `DRIVE`, by that skill's recipes. For a `NOT-MAPPED` or `UNMAPPED` line, read the diff: if this task changed that behaviour, writing its feature file is part of the task. If the line appears only because the behaviour shares a file with your change, list it in the report.
    - Give each "done when" item its evidence, the exact command that produced it, the commit it ran on, and the step of the proof ladder it reached.
-4. **Review.** Run the repo's review step: the `Review:` line in `AGENTS.local.md`, or in `AGENTS.md` as it is on the base branch (`git show <base>:AGENTS.md`). Open `AGENTS.local.md` yourself; not every harness loads it, and in a worktree it may exist only in the main checkout. With no review step configured, start a fresh subagent that gets the diff and the contract and none of your reasoning. It may read a clean checkout of the commit; do not point it at your worktree. Handle findings by `reference/pr-work.md`.
+4. **Review.** Run the repo's review step: the `Review:` line in `AGENTS.local.md`, or in `AGENTS.md` as it is on the base branch (`git show <base>:AGENTS.md`). Open `AGENTS.local.md` yourself; not every harness loads it, and in a worktree it may exist only in the main checkout. With no review step configured, start a fresh subagent that gets the diff and the contract and none of your reasoning. It may read a clean checkout of the commit (`git worktree add --detach ../<repo>-review <sha>`, removed afterwards); do not point it at your worktree. Besides the diff and the contract, tell it only where the checkout is, what the base is, and the repo's rule for running the app without touching real data. Handle findings by `reference/pr-work.md`.
    - Skip the review only when the owner said so in words ("deliver without the review panel"). Record that in the report.
    - A review that could not run (no pane, no second agent) is not a skipped review. It turns a send into a stop.
 5. **Pull request.** Open it with the body from `reference/pr-body.md`. Work it by `reference/pr-work.md` until `<skill>/scripts/pr-status` prints `READY`. With no remote, stop after step 4 and report; do not create a remote.
@@ -60,9 +60,9 @@ For an open pull request, run `<skill>/scripts/pr-status <n>` first and read its
 7. **Send.** Only when every gate condition holds:
    1. Have a fresh agent re-run the proof (`reference/proof.md`, "Independent check"). With no fresh agent available, the ending is stop.
    2. Straight after it, run `git fetch`, `<skill>/scripts/pr-status --head <sha>` and `<skill>/scripts/needs-owner --head <sha> --base origin/<base>` again. The check takes minutes, and a review or a push can arrive in that time. Anything other than `READY` and exit 0 sends you back: a new commit to step 3, a new finding to step 4.
-   3. Merge the exact commit that was proven, by the repo's usual method: `gh pr merge <n> --squash --match-head-commit <sha>` (or `--merge`). Never use `--auto` or `--admin`.
+   3. Write down each gate line and its result. Then merge the exact commit that was proven, by the method of the repo's earlier merges, or squash when there are none: `gh pr merge <n> --squash --match-head-commit <sha>` (or `--merge`). Never use `--auto` or `--admin`.
    4. Read it back: `<skill>/scripts/pr-status <n>` must print `MERGED` into the default branch. With gh 2.101.0 a merge command can return success when the pull request was only queued. If it is not merged, wait and run it again; do not clean up, and report it if it stays unmerged.
-   5. Once it reads `MERGED`: send the evidence to its destination, then clean up. Delete `HANDOFF.md` and the `.verify/` folder you made, check that `git status --short` in the worktree is empty, and from the main checkout run `git worktree remove <path>` without `--force` and `git branch -D <branch>`. If anything else is left in the worktree, leave it and say so.
+   5. Once it reads `MERGED`: send any picture or recording to its destination (text evidence is already in the body), then clean up. Delete `HANDOFF.md` and the `.verify/` folder you made, and check that `git status --short` in the worktree is empty; ignored build leftovers do not count. From the main checkout run `git worktree remove <path>` without `--force`, `git branch -D <branch>`, `git push origin --delete <branch>` and `git pull`. If anything else is left in the worktree, leave it and say so.
    6. Do not close the task. Set it to review, or note on it that it merged. With no task board, the report is the note.
 8. **Report**, in the shape in `reference/pr-body.md`. For stop, never arm auto-merge, and say so if someone else armed it. Leave the worktree, the branch and `HANDOFF.md` in place for a stop.
 
@@ -74,7 +74,7 @@ Every line must be true of the pull request's head commit, `<sha>`.
 - No item is the owner's to prove.
 - The review passed with no open objection, or the owner said to skip it.
 - `<skill>/scripts/pr-status --head <sha>` prints `READY`. `NO-CHECKS` is not `READY`: a send needs at least one check on this commit that something other than you ran. A repo with no CI ends in stop.
-- Its last line names the owner or you as the author, and `cross-repository no`.
+- It is a pull request you opened in this run, or one the owner told you to deliver, and the last line of `pr-status` says `cross-repository no`. The author name alone does not tell your work from another agent's when both use the owner's account.
 - After `git fetch`, `<skill>/scripts/needs-owner --head <sha> --base origin/<base>` exits 0, where `<base>` is the branch the pull request targets.
 - The diff holds nothing outside the contract's scope.
 - Nothing was loosened to get here: no check disabled, skipped or made non-blocking, no test deleted or weakened, no threshold raised, no allowlist entry added, no feature taken off a verification map.

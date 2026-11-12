@@ -43,6 +43,8 @@ Commit: <full sha the evidence ran on. When items ran on different commits, name
 - Do not write the ending or a merge grant in the body.
 - Look for a pull request template in the repo first. If there is one, keep its headings and put these sections under the ones that match.
 - Update **Verification** and its commit whenever the proof is run again.
+- Features you drove because `features-for` printed them, and that no "done when" item covers, go under **Verification** as "also driven", with the result.
+- If running the app can touch real data, state under **Verification** how to run it safely. The independent check reads only this body.
 
 ## Report
 
