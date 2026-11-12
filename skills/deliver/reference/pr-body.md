@@ -79,4 +79,6 @@ Send it at the end, for either ending. Lead with the result; the owner should be
 
 Use **Ready for you** when the pull request is proven, reviewed and green and waits for the owner, including a send that the gate turned into a stop; the first line then says which gate condition was false. Use **Stopped** when the work ended before that.
 
+With no remote there is no pull request: the body goes in `HANDOFF.md`, the first line says "Ready for you" with the branch name and its head commit, and the merge step is `git merge --squash <branch>` after checking that commit.
+
 For a stop, **Your steps** ends with the merge command pinned to the proven commit, `gh pr merge <n> --squash --match-head-commit <sha>`, using the method of the repo's earlier merges, or squash when there are none.

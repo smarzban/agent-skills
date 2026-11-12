@@ -39,6 +39,7 @@ They come from the repo's review step, from review bots and from people.
 - Block only on a problem you can show: a bug a user would hit, a failed check, a doc line the change made wrong.
 - Each round uses a fresh reviewer on the whole diff. A review counts from the first one you run, before or after the pull request exists. An objection that you fixed, followed by a round that passes, is a pass. A fix that changes only wording or the verification map needs no further round.
 - Stop after three rounds. If findings keep coming, report what is still open and let the owner decide.
+- When the last round passes and still shows a small real finding, fix it, run the proof again on the new commit, and say in the body that this one commit was not reviewed. For a send, that commit needs a review of its own.
 
 Threads and replies:
 
