@@ -46,6 +46,19 @@ Functions and private helpers are not rows. A private detail earns a mention onl
 
 A page that does not get its reader there is a summary. Deepen it or fold it into another page. A page that restates the code line by line is waste; describe the mechanism and stop.
 
+## Diagrams
+
+Draw a flow or a set of states as a Mermaid block in the page when order or transitions are the point, and only then.
+
+| Draw | When |
+|---|---|
+| A system map (`flowchart`) | Several processes or services: what runs where, and who talks to whom. Put the fact on the arrow ("read-only", "default-deny") |
+| A sequence diagram, with `autonumber` | A flow where the order matters; refer to its steps by number in the notes below |
+| A state diagram | A status the code stores or derives |
+| A table instead | One decision with several outcomes, or two independent flags |
+
+Under each chart, list the files and the names it was drawn from. Draw nothing the code does not hold. Split a chart that no longer reads at a glance, and say what the page leaves undrawn and where to find it.
+
 ## Subsystem page
 
 ```markdown
