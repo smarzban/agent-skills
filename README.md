@@ -71,7 +71,3 @@ The repo also carries plugin manifests (`.claude-plugin/` for Claude Code and Gr
 - Pi: `pi install git:github.com/smarzban/agent-skills`
 
 Use one route per harness: links or a plugin, not both, or each skill loads twice.
-
-## Licence
-
-MIT. See [LICENSE](LICENSE). Three skills adapt MIT-licensed work from pstack and tstack; each keeps the upstream notice in its `NOTICE` file.
