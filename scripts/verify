@@ -6,4 +6,4 @@ cd "$(git rev-parse --show-toplevel)"
 step() { printf '\n== %s\n' "$*"; "$@"; }
 
 step skills/_shared/scripts/check-skills
-step shellcheck -x bin/skills .githooks/*
+step shellcheck -x bin/skills .githooks/* scripts/*

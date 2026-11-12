@@ -16,8 +16,8 @@
 
 | Rule | Enforced by |
 |---|---|
-| Each skill has valid frontmatter and its referenced files exist | `skills/_shared/scripts/check-skills` |
-| `bin/skills` and `.githooks/` pass shell lint | `shellcheck -x` |
+| Each skill's frontmatter has only `name` (matching its folder) and `description`, and its referenced files exist. YAML syntax is not parsed. | `skills/_shared/scripts/check-skills` |
+| `bin/skills`, `.githooks/` and `scripts/` pass shell lint (needs `shellcheck` on PATH) | `shellcheck -x`, in `scripts/verify` |
 
 ## Needs the owner
 
