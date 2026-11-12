@@ -1,6 +1,6 @@
-# Location: Markdown in the repo
+# Format: plain Markdown
 
-Plain Markdown in a docs folder, read on the code host, in an editor, or by an agent. This file covers the layout, the index and the checks. Who a page is written for comes from its scope (`user-docs.md`, `maintainer-docs.md`).
+`.md` files in a docs folder, read as they are on the code host, in an editor, or by an agent. This file covers the layout, the index and the checks. Who a page is written for comes from its scope (`user-docs.md`, `maintainer-docs.md`).
 
 ## Layout
 
@@ -14,12 +14,15 @@ docs/
   install.md
   configuration.md
   usage/<feature>.md
-  architecture.md        maintainer docs
-  data-model.md
-  internals/<subsystem>.md
-  security-model.md
-  development.md
+  maintainers/           maintainer docs
+    architecture.md
+    data-model.md
+    internals/<subsystem>.md
+    security-model.md
+    development.md
 ```
+
+The top level holds what a user looks for; the maintainer pages sit under `maintainers/`. A repo with maintainer docs only keeps them at the top level of `docs/`, with no `maintainers/` folder.
 
 If `docs/` already holds something else (specs, a site), put the tree in a named subfolder and exclude the rest in the map.
 
@@ -37,9 +40,9 @@ If `docs/` already holds something else (specs, a site), put the tree in a named
 ```markdown
 | To do this | Read |
 |---|---|
-| Add a command | [internals/cli.md](internals/cli.md) |
-| Change the task schema | [data-model.md](data-model.md) |
-| Run the tests | [development.md](development.md) |
+| Add a command | [maintainers/internals/cli.md](maintainers/internals/cli.md) |
+| Change the task schema | [maintainers/data-model.md](maintainers/data-model.md) |
+| Run the tests | [maintainers/development.md](maintainers/development.md) |
 ```
 
 `AGENTS.md` points to this index in one line. If it does not, add the line `Docs index: docs/README.md` under its pointers and report that you did. Do not copy docs content into `AGENTS.md`.

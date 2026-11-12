@@ -1,6 +1,6 @@
-# Location: docs site
+# Format: docs framework
 
-Pages built and served by a site framework. This file covers the framework's mechanics: where pages go, navigation, front matter and the build check. How to write for the reader is in `user-docs.md`.
+Pages that a docs tool builds, usually into a website. This file covers the framework's mechanics: where pages go, navigation, front matter and the build check. How to write for the reader is in `user-docs.md`.
 
 ## Follow the framework
 
@@ -21,9 +21,11 @@ This table was written from the frameworks' documented behaviour and checked aga
 - A new page is added to the navigation in the same change. A page that the navigation does not reach is unfinished.
 - Link the way the existing pages link (site-absolute paths or relative files). Do not mix.
 
-## Code and docs in different repos
+## Where the framework lives
 
-Take two paths: the source repo and the docs repo.
+In the source repo, the framework is a folder with its own config, such as `site/`. Keep `docs-map.txt` beside that config, with `source .`, and write the page paths relative to the map. Run `scripts/docs-scope --map site/docs-map.txt` from the repo root. Add an `exclude` line for the framework folder itself (`exclude  site/  docs framework`), so that its own files are not reported as source with no page.
+
+In a separate docs repo, take two paths: the source repo and the docs repo.
 
 - Read and check every claim in the source repo.
 - Write only in the docs repo.

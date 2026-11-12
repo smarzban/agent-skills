@@ -1,6 +1,6 @@
 ---
 name: writing-docs
-description: Write, audit or update a project's docs from its source code. User docs (quickstart, install, configuration, a page per feature) and maintainer docs (architecture, data model, invariants), as Markdown in the repo or on a docs site. Use for "write the docs", "document this repo", "user docs", "user guide", "docs site", "architecture docs", "audit the docs", "update the docs", "the docs are out of date".
+description: Write, audit or update a project's docs from its source code. User docs (quickstart, install, configuration, a page per feature) and maintainer docs (architecture, data model, invariants), as Markdown in the repo or on a docs site. Use for "write the docs", "document this repo", "user docs", "user guide", "docs site", "website docs", "architecture docs", "audit the docs", "update the docs", "the docs are out of date".
 ---
 
 # writing-docs
@@ -17,17 +17,19 @@ This skill edits docs and the docs map. It never edits product code.
 - **Maintainer docs**: architecture and why, data model, invariants per subsystem, security model, dev setup and contributing. For the people and agents who modify the code. Read `reference/maintainer-docs.md`.
 - Both, when asked to document everything. Do user docs first.
 
-**Location**. Look for docs tooling before you decide: `mkdocs.yml`, `docusaurus.config.*`, an Astro config that loads Starlight, `.vitepress/`, `conf.py`, `book.toml`. Follow what exists. The location decides the layout, the links and the build check. It does not change the reader: user docs are written for people in either place.
+**Format**. Look for docs tooling before you decide: `mkdocs.yml`, `docusaurus.config.*`, an Astro config that loads Starlight, `.vitepress/`, `conf.py`, `book.toml`. It may sit in a subfolder such as `site/` or `website/`. Follow what exists. The format decides the layout, the navigation and the build check. It does not change the reader: user docs are written for people in either format.
 
-- **Markdown in the repo**: a docs folder that is read on the code host or in an editor. The default when the repo has no site tooling. Read `reference/repo-markdown.md`.
-- **Docs site**: pages built by a site framework. Read `reference/docs-site.md`. The site may be in another repo: take the source-repo path and the docs-repo path as two inputs. Setting up or hosting a site is out of scope.
-- One source: when a site exists, user docs live on the site only. The repo keeps its README and its maintainer docs, and links to the site.
+- **Plain Markdown**: `.md` files read as they are, on the code host or in an editor. The default when the repo has no docs tooling. Read `reference/plain-markdown.md`.
+- **Docs framework**: pages that a tool such as Starlight, MkDocs or Docusaurus builds. Read `reference/docs-framework.md`. Setting up or hosting a framework is out of scope.
+- One source: when a framework holds the user docs, they live there only. The maintainer docs stay plain Markdown in `docs/`, and the README links to both.
+
+The docs usually live in the source repo. When they are in a separate repo, take the source-repo path and the docs-repo path as two inputs (`reference/docs-framework.md`).
 
 **Mode**: write, audit, or update for a diff. An update can also run unattended.
 
 ## The docs map
 
-`docs-map.txt` sits in the docs folder, or at the root of a separate docs repo.
+Each docs tree has one `docs-map.txt` at its root: `docs/docs-map.txt` for plain Markdown, and beside the framework's config (`site/docs-map.txt`) for a docs framework. A repo with both has two maps; pass `--map <file>` to `scripts/docs-scope` to pick one.
 
 ```
 source       .
@@ -53,7 +55,7 @@ Move `verified-at` forward only when every page the map lists was checked agains
 2. Plan the pages: for each, its path, its kind (`reference/style.md`), the ledger rows it closes and the source paths it covers.
 3. Checkpoint. Show the owner the ledger and the planned file list, and wait for a yes before you write the tree.
 4. Read the source. For more than a few rows, start one read-only subagent per subsystem or feature, in parallel. Each returns a summary and edits nothing: what it does, entry points with paths, settings with defaults and the lines that define them, invariants and what enforces each, any evidence of rationale, open questions.
-5. Write the pages by the rules below and the reference files for your scope and location.
+5. Write the pages by the rules below and the reference files for your scope and format.
 6. Verify.
 7. Write `docs-map.txt`, update the index, and report.
 
@@ -123,7 +125,7 @@ Check each concrete claim against its defining line as you write it.
 - Fact-check by an independent subagent, as the default. Give it the pages and the source, and none of your notes or reasoning: "Find every statement in these pages that the code contradicts: values, names, paths, commands, behaviour. Cite the source line for each. Report facts only, not style." Fix each confirmed error. With no subagent available, re-read every page against the source yourself and say the check was not independent.
 - Coverage: every ledger row has a page or a listed exclusion. `scripts/docs-scope --coverage` prints no `UNMAPPED`.
 - No placeholders: no "TBD", "TODO", "coming soon" or empty section.
-- For a site: the build check in `reference/docs-site.md`.
+- For a docs framework: the build check in `reference/docs-framework.md`.
 
 ## Report
 

@@ -3,7 +3,7 @@
 
 usage: docs-scope [--map FILE] [--source DIR] [--to REV] [--coverage]
 
-docs-map.txt lives in the docs folder (or the root of a separate docs repo):
+docs-map.txt lives at the root of a docs tree (docs/, a framework folder such as site/, or a separate docs repo):
 
     source       .                    # "." or the source repo's remote URL
     verified-at  <commit>             # source commit the pages were checked against
