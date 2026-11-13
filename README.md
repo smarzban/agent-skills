@@ -28,11 +28,11 @@ Needs `git`, `bash` and `python3` on the path, and a system with symlinks. Teste
 
 There are two ways to install. A clone reaches all five harnesses and stays live; a plugin needs no clone and is a cached copy. Use one per harness, not both, or each skill loads twice.
 
-**Clone.** Once per machine:
+**Clone.** Once per machine, in any folder you like. Keep the clone where it is afterwards: the links point into it.
 
 ```sh
-git clone https://github.com/smarzban/agent-skills.git ~/Workspace/agent-skills
-~/Workspace/agent-skills/bin/skills install
+git clone https://github.com/smarzban/agent-skills.git
+agent-skills/bin/skills install
 ```
 
 `install` creates links, turns on the repo's git hooks, and adds a Claude Code `SessionStart` hook (a backup of `~/.claude/settings.json` is written next to it). It prints a line per link and per hook, then the status table. Each skill shows `linked` for Claude Code and Cursor, and the bundle line shows `(linked)  -> Codex, Pi, Grok`.
@@ -60,10 +60,9 @@ Claude Code does not scan nested skill folders, so it needs a link per skill. Cu
 
 ## Daily use
 
-Run these from the repo root.
+Run these from the clone.
 
 ```sh
-cd ~/Workspace/agent-skills
 bin/skills new my-skill   # scaffold skills/my-skill/SKILL.md and link it
 bin/skills status         # what is linked, what conflicts
 bin/skills link           # relink now, prune links to deleted skills
@@ -78,12 +77,12 @@ The linker never overwrites a file, folder or link it did not create. `status` s
 ## Updating
 
 ```sh
-~/Workspace/agent-skills/bin/skills update
+bin/skills update
 ```
 
 It fetches `main`, fast-forwards and relinks, and prints `updated  <old> -> <new>` or `already up to date`. It changes nothing and exits 1 when the clone is not on `main`, has uncommitted changes, has commits of its own, or cannot reach GitHub. A session that is already open keeps the skills it loaded; the next one gets the new ones.
 
-To update every day, schedule that command yourself, for example with cron: `0 9 * * * ~/Workspace/agent-skills/bin/skills update --quiet`. Whatever lands on `main` then becomes instructions your agents follow, without you reading it first.
+To update every day, schedule that command yourself, for example with cron: `0 9 * * * <clone>/bin/skills update --quiet`, with the full path of your clone. Whatever lands on `main` then becomes instructions your agents follow, without you reading it first.
 
 A plugin updates through its harness: `pi update --extensions` for Pi, `codex plugin marketplace upgrade` for Codex, and the plugin commands or panel of the others.
 
