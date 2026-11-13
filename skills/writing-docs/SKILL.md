@@ -58,7 +58,7 @@ Move `verified-at` forward only when every page the map lists was checked agains
 
 1. Build the ledger from a mechanical source, never from an old doc or from memory: the command registrations or `--help` output, the route table, the public exports, the settings definition, the schema files. Rows for user docs are user-facing features. Rows for maintainer docs are modules, data models, entry points and invariants. List every exclusion with its reason (vendored, generated, deprecated and marked). If the ledger is empty because there is no code yet, stop and say so.
 2. Plan the pages: for each, its path, its kind (`reference/style.md`), the ledger rows it closes and the source paths it covers.
-3. Checkpoint. Show the owner the ledger and the planned file list, and wait for a yes before you write the tree.
+3. Checkpoint. Show the owner the ledger and the planned file list, and wait for a yes before you write the tree. A broad request ("document everything", "update all the docs") is not that yes: the owner has not seen the list yet.
 4. Read the source. For more than a few rows, start one read-only subagent per subsystem or feature, in parallel. Each returns a summary and edits nothing: what it does, entry points with paths, settings with defaults and the lines that define them, invariants and what enforces each, any evidence of rationale, open questions.
 5. Write the pages by the rules below and the reference files for your scope and format.
 6. Verify.
