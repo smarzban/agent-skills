@@ -121,7 +121,7 @@ Check each concrete claim against its defining line as you write it.
 | Data shape | the schema or migration |
 
 - CI is the ground truth for commands. Take build, test and run commands from the CI config and the package scripts, not from an older doc.
-- Run every dev and test command and every usage example before it goes on a page. Trace deploy and operations sequences against the scripts; never run them. Report each one you did not run, with the reason. A note or a doc that says a command fails is not a reason: run it and see.
+- Run every dev and test command and every usage example before it goes on a page. Trace deploy and operations sequences against the scripts; never run them. Report each dev command, test command and usage example you did not run, with the reason. A note or a doc that says one of them fails is not a reason: run it and see.
 - No hand-written per-function reference: the code already says it, and a copy drifts. The exception is a library whose API is called from outside the repo. It gets a public reference, generated where a generator exists.
 - Rationale comes only from evidence: an ADR, a commit message, a pull request, a code comment, or the owner. Cite it. Where there is none, write "rationale unknown" and list it in the report.
 - Every invariant names what enforces it (a type, a test, a lint, a constraint). One that nothing enforces is marked "unenforced" and reported as a candidate for a check.
