@@ -179,7 +179,7 @@ cmd_update() {
   [ -z "$(git -C "$REPO" status --porcelain --untracked-files=no)" ] || { warn "update: skipped, the clone has uncommitted changes"; exit 1; }
   before="$(git -C "$REPO" rev-parse --short HEAD)"
   git -C "$REPO" fetch --quiet origin main || { warn "update: skipped, could not reach origin"; exit 1; }
-  git -C "$REPO" merge --quiet --ff-only FETCH_HEAD || { warn "update: skipped, main has commits that origin does not"; exit 1; }
+  git -C "$REPO" merge --quiet --ff-only FETCH_HEAD 2>/dev/null || { warn "update: skipped, main has commits that origin does not"; exit 1; }
   after="$(git -C "$REPO" rev-parse --short HEAD)"
   QUIET=1 cmd_link
   if [ "$before" = "$after" ]; then say "already up to date ($after)"; else say "updated  $before -> $after"; fi
