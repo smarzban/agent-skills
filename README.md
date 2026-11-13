@@ -83,8 +83,6 @@ The clone above is the route that stays live and reaches all five harnesses. Thr
 - Grok: `grok plugin install smarzban/agent-skills --trust`
 - Pi: `pi install git:github.com/smarzban/agent-skills`
 
-Each of these was installed into an empty home folder in November 2026 and kept the files under `skills/_shared`. Loading the skills in a session from a plugin has not been tested. Install the whole repo: an installer that copies single skill folders drops the links to `skills/_shared`.
-
 Use one route per harness: links or a plugin, not both, or each skill loads twice.
 
 ## Use with agents
