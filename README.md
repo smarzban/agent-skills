@@ -80,7 +80,7 @@ The linker never overwrites a file, folder or link it did not create. `status` s
 bin/skills update
 ```
 
-It fetches `main`, fast-forwards and relinks, and prints `updated  <old> -> <new>` or `already up to date`. It changes nothing and exits 1 when the clone is not on `main`, has uncommitted changes, has commits of its own, or cannot reach GitHub. A session that is already open keeps the skills it loaded; the next one gets the new ones.
+It fetches `main`, fast-forwards and relinks, and prints `updated  <old> -> <new>` or `already up to date`. It changes nothing and exits 1 when the clone is not on `main`, has uncommitted changes, cannot be fast-forwarded, or cannot reach GitHub. A session that is already open keeps the skills it loaded; the next one gets the new ones.
 
 To update every day, schedule that command yourself, for example with cron: `0 9 * * * <clone>/bin/skills update --quiet`, with the full path of your clone. Whatever lands on `main` then becomes instructions your agents follow, without you reading it first.
 

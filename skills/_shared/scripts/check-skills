@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Check every skill under a skills folder: frontmatter, referenced files, links into _shared, scripts.
+# Check every skill under a skills folder: frontmatter, referenced files, copies of _shared files, scripts.
 # usage: check-skills [SKILLS_DIR]     (default: the folder that holds _shared)
 set -uo pipefail
 
@@ -62,12 +62,10 @@ for skill in "$root"/*/; do
   if [ -s "${TMPDIR:-/tmp}/check-skills.$$" ]; then cat "${TMPDIR:-/tmp}/check-skills.$$"; fail=$((fail + $(wc -l < "${TMPDIR:-/tmp}/check-skills.$$"))); fi
   rm -f "${TMPDIR:-/tmp}/check-skills.$$"
 
-  # Links resolve and stay inside the skills folder. A plain copy of a shared file must match it.
+  # No links inside a skill: some installers drop them. A copy of a shared file must match it.
   while IFS= read -r f; do
     if [ -L "$f" ]; then
-      target="$(cd -P "$(dirname "$f")" 2>/dev/null && cd -P "$(dirname "$(readlink "$f")")" 2>/dev/null && pwd)/$(basename "$(readlink "$f")")"
-      if [ ! -e "$f" ]; then bad "$name: broken link ${f#"$root"/} -> $(readlink "$f")"
-      else case "$target" in "$root"/*) ;; *) bad "$name: ${f#"$root"/} points outside the skills folder" ;; esac; fi
+      bad "$name: ${f#"$root"/} is a link; make it a real file"
     elif [ -d "$shared" ]; then
       twin="$(find "$shared" -type f -name "$(basename "$f")" | head -1)"
       if [ -n "$twin" ] && ! cmp -s "$f" "$twin"; then bad "$name: ${f#"$root"/} is a copy that differs from ${twin#"$root"/}"; fi
