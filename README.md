@@ -20,22 +20,32 @@ Agent skills for Claude Code, Codex, Cursor, Pi and Grok, in one repo that every
 | `triage` | Check an issue or a pull request from outside: reproduce a bug, weigh a feature request, read what a diff really does. Ends with a verdict, a drafted reply, and a before and an after for you to test. |
 | `shared-skills` | Add or edit a skill in this repo. |
 
-`skills/_shared` holds the prose style and the scripts that several skills link to. It is not a skill.
-
-Skills reach `skills/_shared` through relative symlinks, for example `skills/writing-docs/reference/style.md`. The links work when a harness reads this repo in place, which is what `bin/skills install` sets up. Copying a single skill folder out of the repo breaks them: copy `skills/_shared` beside it, or replace the links with the files they point to. Whether the plugin install routes keep the links is not tested.
+`skills/_shared` holds the prose style and the scripts that several skills use. It is not a skill. Each skill carries its own copy of the shared files it needs, so a skill folder works on its own, and `check-skills` fails when a copy differs from the original.
 
 ## Quickstart
 
 Needs `git`, `bash` and `python3` on the path, and a system with symlinks. Tested on macOS.
 
-Install once per machine:
+There are two ways to install. A clone reaches all five harnesses and stays live; a plugin needs no clone and is a cached copy. Use one per harness, not both, or each skill loads twice.
+
+**Clone.** Once per machine, in any folder you like. Keep the clone where it is afterwards: the links point into it.
 
 ```sh
-git clone https://github.com/smarzban/agent-skills.git ~/Workspace/agent-skills
-~/Workspace/agent-skills/bin/skills install
+git clone https://github.com/smarzban/agent-skills.git
+agent-skills/bin/skills install
 ```
 
 `install` creates links, turns on the repo's git hooks, and adds a Claude Code `SessionStart` hook (a backup of `~/.claude/settings.json` is written next to it). It prints a line per link and per hook, then the status table. Each skill shows `linked` for Claude Code and Cursor, and the bundle line shows `(linked)  -> Codex, Pi, Grok`.
+
+**Plugin.** In the harness you use:
+
+| Harness | Install |
+|---|---|
+| Claude Code | `/plugin marketplace add smarzban/agent-skills` then `/plugin install agent-skills@smarzban` |
+| Codex | `codex plugin marketplace add smarzban/agent-skills` then `codex plugin add agent-skills@smarzban` |
+| Cursor | `cursor-agent plugin marketplace add https://github.com/smarzban/agent-skills`, then install `agent-skills` from the plugins panel |
+| Grok | `grok plugin install smarzban/agent-skills --trust` |
+| Pi | `pi install git:github.com/smarzban/agent-skills` |
 
 To try a skill, start a new agent session in a git repo and ask it to "write a handoff". The `handoff` skill writes `HANDOFF.md` for the current branch.
 
@@ -50,13 +60,13 @@ Claude Code does not scan nested skill folders, so it needs a link per skill. Cu
 
 ## Daily use
 
-Run these from the repo root.
+Run these from the clone.
 
 ```sh
-cd ~/Workspace/agent-skills
 bin/skills new my-skill   # scaffold skills/my-skill/SKILL.md and link it
 bin/skills status         # what is linked, what conflicts
 bin/skills link           # relink now, prune links to deleted skills
+bin/skills update         # pull the newest skills and relink
 bin/skills uninstall      # remove every link and hook it created
 ```
 
@@ -64,17 +74,17 @@ Use only `name` and `description` in frontmatter; both are honoured by all five 
 
 The linker never overwrites a file, folder or link it did not create. `status` shows same-named skills that already exist in a harness folder so you can retire the old copy.
 
-## Other machines
+## Updating
 
-Clone and run `bin/skills install`, then `git pull` to update. That is the route that stays live.
+```sh
+bin/skills update
+```
 
-The repo also carries plugin manifests (`.claude-plugin/` for Claude Code and Grok, `package.json` for Pi). Plugin installs are cached copies that update only when the harness refreshes them, and these routes have not been install-tested:
+It fetches `main`, fast-forwards and relinks, and prints `updated  <old> -> <new>` or `already up to date`. It changes nothing and exits 1 when the clone is not on `main`, has uncommitted changes, cannot be fast-forwarded, or cannot reach GitHub. A session that is already open keeps the skills it loaded; the next one gets the new ones.
 
-- Claude Code: `/plugin marketplace add smarzban/agent-skills` then `/plugin install agent-skills@agent-skills`
-- Grok: `grok plugin install smarzban/agent-skills --trust`
-- Pi: `pi install git:github.com/smarzban/agent-skills`
+To update every day, schedule that command yourself, for example with cron: `0 9 * * * <clone>/bin/skills update --quiet`, with the full path of your clone. Whatever lands on `main` then becomes instructions your agents follow, without you reading it first.
 
-Use one route per harness: links or a plugin, not both, or each skill loads twice.
+A plugin updates through its harness: `pi update --extensions` for Pi, `codex plugin marketplace upgrade` for Codex, and the plugin commands or panel of the others.
 
 ## Use with agents
 

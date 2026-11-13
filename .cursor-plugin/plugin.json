@@ -1,0 +1,6 @@
+{
+  "name": "agent-skills",
+  "description": "Agent skills for Claude Code, Codex, Cursor, Pi and Grok: deliver, coordinate, triage, repo setup, docs and READMEs, from one repo.",
+  "repository": "https://github.com/smarzban/agent-skills",
+  "license": "MIT"
+}

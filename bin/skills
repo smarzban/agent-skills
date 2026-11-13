@@ -3,6 +3,7 @@
 #
 #   bin/skills install     link + git hooks + Claude Code SessionStart hook (run once)
 #   bin/skills link        (re)create links, prune links to deleted skills
+#   bin/skills update      pull the newest skills (fast-forward only) and relink
 #   bin/skills status      show what is linked and what is in the way
 #   bin/skills new <name>  scaffold skills/<name>/SKILL.md and link it
 #   bin/skills uninstall   remove every link and hook this script created
@@ -170,6 +171,20 @@ cmd_install() {
   cmd_status
 }
 
+cmd_update() {
+  local branch before after
+  git -C "$REPO" rev-parse --git-dir >/dev/null 2>&1 || { warn "update: $REPO is not a git clone"; exit 1; }
+  branch="$(git -C "$REPO" symbolic-ref --quiet --short HEAD || true)"
+  [ "$branch" = main ] || { warn "update: skipped, the clone is on '${branch:-a detached commit}', not main"; exit 1; }
+  [ -z "$(git -C "$REPO" status --porcelain --untracked-files=no)" ] || { warn "update: skipped, the clone has uncommitted changes"; exit 1; }
+  before="$(git -C "$REPO" rev-parse --short HEAD)"
+  git -C "$REPO" fetch --quiet origin main || { warn "update: skipped, could not reach origin"; exit 1; }
+  git -C "$REPO" merge --quiet --ff-only FETCH_HEAD 2>/dev/null || { warn "update: skipped, could not fast-forward main (run git pull in the clone to see why)"; exit 1; }
+  after="$(git -C "$REPO" rev-parse --short HEAD)"
+  QUIET=1 cmd_link
+  if [ "$before" = "$after" ]; then say "already up to date ($after)"; else say "updated  $before -> $after"; fi
+}
+
 cmd_uninstall() {
   local link
   for link in "$CLAUDE_DIR"/* "$CURSOR_DIR"/* "$BUNDLE"; do
@@ -187,8 +202,9 @@ for a in "$@"; do [ "$a" = "--quiet" ] && QUIET=1; done
 case "$cmd" in
   install)   cmd_install ;;
   link)      cmd_link ;;
+  update)    cmd_update; exit ;;  # exit here: the pull may have replaced this file
   status)    cmd_status ;;
   new)       cmd_new "${1:-}" ;;
   uninstall) cmd_uninstall ;;
-  *)         sed -n '2,9p' "$SELF" | sed 's/^# \{0,1\}//'; exit 2 ;;
+  *)         sed -n '2,10p' "$SELF" | sed 's/^# \{0,1\}//'; exit 2 ;;
 esac

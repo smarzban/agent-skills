@@ -16,7 +16,7 @@
 
 | Rule | Enforced by |
 |---|---|
-| Each skill passes the structural checks in `check-skills`: frontmatter that parses as YAML (needs `ruby` on PATH), its keys, `name` matching its folder, a description, some referenced paths, links into `_shared`, and script headers. It does not check every reference; read the script for the exact rules. | `skills/_shared/scripts/check-skills` |
+| Each skill passes the structural checks in `check-skills`: frontmatter that parses as YAML (needs `ruby` on PATH), its keys, `name` matching its folder, a description, some referenced paths, copies of `_shared` files that match the original, and script headers. It does not check every reference; read the script for the exact rules. | `skills/_shared/scripts/check-skills` |
 | `bin/skills`, `.githooks/*`, `scripts/verify`, `scripts/worktree-setup` and the skills' shell scripts (named one by one in `scripts/verify`) pass shell lint (needs `shellcheck` on PATH) | `shellcheck -x`, in `scripts/verify` |
 | Relative links and anchors in `README.md` and `AGENTS.md` resolve, and so do code-span paths whose first folder exists. `skills/` is not link-checked: skill docs name files in the repo a skill works on. | `skills/_shared/scripts/check-links`, in `scripts/verify` |
 
