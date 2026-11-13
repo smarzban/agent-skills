@@ -22,7 +22,7 @@ Agent skills for Claude Code, Codex, Cursor, Pi and Grok, in one repo that every
 
 `skills/_shared` holds the prose style and the scripts that several skills link to. It is not a skill.
 
-Skills reach `skills/_shared` through relative symlinks, for example `skills/writing-docs/reference/style.md`. The links work when a harness reads this repo in place, which is what `bin/skills install` sets up. Copying a single skill folder out of the repo breaks them: copy `skills/_shared` beside it, or replace the links with the files they point to. Whether the plugin install routes keep the links is not tested.
+Skills reach `skills/_shared` through relative symlinks, for example `skills/writing-docs/reference/style.md`. The links work when a harness reads this repo in place, which is what `bin/skills install` sets up. Copying a single skill folder out of the repo breaks them: copy `skills/_shared` beside it, or replace the links with the files they point to. The plugin routes below copy the whole repo and keep them.
 
 ## Quickstart
 
@@ -57,6 +57,7 @@ cd ~/Workspace/agent-skills
 bin/skills new my-skill   # scaffold skills/my-skill/SKILL.md and link it
 bin/skills status         # what is linked, what conflicts
 bin/skills link           # relink now, prune links to deleted skills
+bin/skills update         # pull the newest skills and relink
 bin/skills uninstall      # remove every link and hook it created
 ```
 
@@ -64,15 +65,25 @@ Use only `name` and `description` in frontmatter; both are honoured by all five 
 
 The linker never overwrites a file, folder or link it did not create. `status` shows same-named skills that already exist in a harness folder so you can retire the old copy.
 
-## Other machines
+## Updating
 
-Clone and run `bin/skills install`, then `git pull` to update. That is the route that stays live.
+```sh
+~/Workspace/agent-skills/bin/skills update
+```
 
-The repo also carries plugin manifests (`.claude-plugin/` for Claude Code and Grok, `package.json` for Pi). Plugin installs are cached copies that update only when the harness refreshes them, and these routes have not been install-tested:
+It fetches `main`, fast-forwards and relinks, and prints `updated  <old> -> <new>` or `already up to date`. It changes nothing and exits 1 when the clone is not on `main`, has uncommitted changes, has commits of its own, or cannot reach GitHub. A session that is already open keeps the skills it loaded; the next one gets the new ones.
 
-- Claude Code: `/plugin marketplace add smarzban/agent-skills` then `/plugin install agent-skills@agent-skills`
+To update every day, schedule that command yourself, for example with cron: `0 9 * * * ~/Workspace/agent-skills/bin/skills update --quiet`. Whatever lands on `main` then becomes instructions your agents follow, without you reading it first.
+
+## Install as a plugin
+
+The clone above is the route that stays live and reaches all five harnesses. Three harnesses can also install the repo as a plugin, without `bin/skills`. A plugin is a cached copy that updates when the harness refreshes it, and its skills are named `agent-skills:<skill>`.
+
+- Claude Code: `/plugin marketplace add smarzban/agent-skills` then `/plugin install agent-skills@smarzban`
 - Grok: `grok plugin install smarzban/agent-skills --trust`
 - Pi: `pi install git:github.com/smarzban/agent-skills`
+
+Each of these was installed into an empty home folder in November 2026 and kept the files under `skills/_shared`. Loading the skills in a session from a plugin has not been tested. Install the whole repo: an installer that copies single skill folders drops the links to `skills/_shared`.
 
 Use one route per harness: links or a plugin, not both, or each skill loads twice.
 
