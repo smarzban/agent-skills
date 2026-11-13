@@ -1,0 +1,11 @@
+{
+  "name": "smarzban",
+  "owner": { "name": "smarzban" },
+  "plugins": [
+    {
+      "name": "agent-skills",
+      "source": "./",
+      "description": "Agent skills for Claude Code, Codex, Cursor, Pi and Grok: deliver, coordinate, triage, repo setup, docs and READMEs, from one repo."
+    }
+  ]
+}

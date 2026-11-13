@@ -20,15 +20,15 @@ Agent skills for Claude Code, Codex, Cursor, Pi and Grok, in one repo that every
 | `triage` | Check an issue or a pull request from outside: reproduce a bug, weigh a feature request, read what a diff really does. Ends with a verdict, a drafted reply, and a before and an after for you to test. |
 | `shared-skills` | Add or edit a skill in this repo. |
 
-`skills/_shared` holds the prose style and the scripts that several skills link to. It is not a skill.
-
-Skills reach `skills/_shared` through relative symlinks, for example `skills/writing-docs/reference/style.md`. The links work when a harness reads this repo in place, which is what `bin/skills install` sets up. Copying a single skill folder out of the repo breaks them: copy `skills/_shared` beside it, or replace the links with the files they point to. The plugin routes below copy the whole repo and keep them.
+`skills/_shared` holds the prose style and the scripts that several skills use. It is not a skill. Each skill carries its own copy of the shared files it needs, so a skill folder works on its own, and `check-skills` fails when a copy differs from the original.
 
 ## Quickstart
 
 Needs `git`, `bash` and `python3` on the path, and a system with symlinks. Tested on macOS.
 
-Install once per machine:
+There are two ways to install. A clone reaches all five harnesses and stays live; a plugin needs no clone and is a cached copy. Use one per harness, not both, or each skill loads twice.
+
+**Clone.** Once per machine:
 
 ```sh
 git clone https://github.com/smarzban/agent-skills.git ~/Workspace/agent-skills
@@ -36,6 +36,16 @@ git clone https://github.com/smarzban/agent-skills.git ~/Workspace/agent-skills
 ```
 
 `install` creates links, turns on the repo's git hooks, and adds a Claude Code `SessionStart` hook (a backup of `~/.claude/settings.json` is written next to it). It prints a line per link and per hook, then the status table. Each skill shows `linked` for Claude Code and Cursor, and the bundle line shows `(linked)  -> Codex, Pi, Grok`.
+
+**Plugin.** In the harness you use:
+
+| Harness | Install |
+|---|---|
+| Claude Code | `/plugin marketplace add smarzban/agent-skills` then `/plugin install agent-skills@smarzban` |
+| Codex | `codex plugin marketplace add smarzban/agent-skills` then `codex plugin add agent-skills@smarzban` |
+| Cursor | `cursor-agent plugin marketplace add https://github.com/smarzban/agent-skills`, then install `agent-skills` from the plugins panel |
+| Grok | `grok plugin install smarzban/agent-skills --trust` |
+| Pi | `pi install git:github.com/smarzban/agent-skills` |
 
 To try a skill, start a new agent session in a git repo and ask it to "write a handoff". The `handoff` skill writes `HANDOFF.md` for the current branch.
 
@@ -75,15 +85,7 @@ It fetches `main`, fast-forwards and relinks, and prints `updated  <old> -> <new
 
 To update every day, schedule that command yourself, for example with cron: `0 9 * * * ~/Workspace/agent-skills/bin/skills update --quiet`. Whatever lands on `main` then becomes instructions your agents follow, without you reading it first.
 
-## Install as a plugin
-
-The clone above is the route that stays live and reaches all five harnesses. Three harnesses can also install the repo as a plugin, without `bin/skills`. A plugin is a cached copy that updates when the harness refreshes it, and its skills are named `agent-skills:<skill>`.
-
-- Claude Code: `/plugin marketplace add smarzban/agent-skills` then `/plugin install agent-skills@smarzban`
-- Grok: `grok plugin install smarzban/agent-skills --trust`
-- Pi: `pi install git:github.com/smarzban/agent-skills`
-
-Use one route per harness: links or a plugin, not both, or each skill loads twice.
+A plugin updates through its harness: `pi update --extensions` for Pi, `codex plugin marketplace upgrade` for Codex, and the plugin commands or panel of the others.
 
 ## Use with agents
 
