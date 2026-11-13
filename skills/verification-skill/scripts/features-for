@@ -126,6 +126,7 @@ def main(argv):
 
     tracked = [p for p in (git(top, "ls-files") or "").splitlines() if p]
 
+    mb = None
     if every:
         changed = []
     elif given:
@@ -151,11 +152,14 @@ def main(argv):
             for p in (out or "").splitlines():
                 if p and p not in changed:
                     changed.append(p)
+    touched = []
+    if not every:   # a diff, or paths given in its place: a changed feature file is driven either way
         def own(p):   # the skill itself, or a link to it from another harness's folder
             full = os.path.join(top, p)
             return p.startswith(skill_rel) or (os.path.islink(full) and os.path.realpath(full) == os.path.realpath(skill))
         touched = [p for p in changed if p.startswith(skill_rel + "features/")]
         changed = [p for p in changed if not own(p)]
+    if mb:
         # A change cannot take itself off the map: also match the Source paths each feature had at the base.
         for n, (fname, pats) in enumerate(features):
             old = git(top, "show", "%s:%s" % (mb, fname))
@@ -164,7 +168,6 @@ def main(argv):
 
     findings, drive, broken = [], 0, 0
     covered = set()
-    touched = locals().get("touched", [])
     for feature in features:
         fname, pats = feature[0], feature[1]
         before = feature[2] if len(feature) > 2 else []
