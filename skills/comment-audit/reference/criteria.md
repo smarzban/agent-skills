@@ -65,7 +65,7 @@ A workaround for something outside the repo (a bug in a library, a limit of a pl
 ## Hard cases
 
 - **A doc comment on a private function** is judged like any other comment.
-- **A doc comment the lint requires** stays, even when it only repeats the name. Say how many there are; the owner may want the lint rule changed.
+- **A doc comment on something exported that only repeats the name** (`/** Gets the name. */`) is the owner's call at the checkpoint, because it shows in the published docs and in editors. One the lint requires stays whatever the answer; say how many there are, since the owner may want the lint rule changed.
 - **A comment in a test** that names the case being tested stays when the test name does not say it.
 - **A comment over a suppression** (`// lint-disable: flaky on CI`) is two things: the directive is code, and the reason is a Report whose task is to remove the suppression.
 - **A long explanation that is true** stays. Length is not a reason to remove. Say in the report that it may belong in the docs.
