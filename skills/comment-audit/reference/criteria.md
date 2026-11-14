@@ -48,7 +48,7 @@ The reworded comment follows the same test and is one or two lines. Do not expla
 
 ## Report
 
-These comments are symptoms. The right end is that the code is fixed and the comment leaves with the fix. This run changes no code, so each one becomes a task and the comment stays until that task is done.
+These comments are symptoms. The right end is that the code is fixed and the comment leaves with the fix. This run changes no code, so each one becomes a task on the project's board or an issue, and the comment stays until that task is done. Every task ends by saying that the fix removes or corrects the comment.
 
 | Class | The task |
 |---|---|

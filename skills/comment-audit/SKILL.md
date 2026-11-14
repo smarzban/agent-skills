@@ -42,10 +42,10 @@ Read `reference/criteria.md` for what falls under each. Two rules decide the har
    - the counts by verdict and class
    - three samples of each class you would remove, with file and line
    - every Fix, as before and after
-   - every Report
+   - every Report, as the task you would create and where you would create it
    - any class you are unsure of, as a question
 
-   A broad request ("clean up all the comments") is not that yes: the owner has not seen the classes yet. When nobody is present, apply only Remove, and leave every Fix beside the Reports.
+   A broad request ("clean up all the comments") is not that yes: the owner has not seen the classes yet. When nobody is present, apply only Remove, create no task, and leave every Fix and every Report in the pull request body.
 
 4. **Apply.** One commit per folder or module, removals and fixes apart. Remove the whole comment, and the blank line it leaves when that line was only there for it. Change no code, not even whitespace inside a statement. In a large repo, one pull request holds one area; say what is left.
 
@@ -55,7 +55,9 @@ Read `reference/criteria.md` for what falls under each. Two rules decide the har
    - Run the repo's verify command. A failure in a snapshot, a baseline or a coverage file keyed by line number is from the moved lines: regenerate it the way the repo says, and say so.
    - Run the doc build and the linters that read comments, if they are not part of verify.
 
-6. **Report.** Counts by verdict and class, the proof from step 5, every Fix, and what was out of scope. Write each Report as a task someone can pick up: what is wrong, the file and line, and what done looks like, most harmful first. The owner decides which become work; `deliver` takes one task, and a class that keeps coming back is a case for `correct`. Create no issue and no board task unless the owner asked.
+6. **Report.** Counts by verdict and class, the proof from step 5, every Fix, and what was out of scope. A class that keeps coming back is a case for `correct`.
+
+7. **Create the tasks.** After the yes, each Report becomes one task where the project tracks its work: its task board if it has one, otherwise an issue in the repo. Look for an existing task first and add to it. A task says what is wrong, the file and line, what done looks like, and ends with: "When this is fixed, remove or correct the comment at `<file>:<line>` in the same change." Several comments with one cause are one task. A secret, a private detail or a security weakness never goes in a public issue: give it to the owner directly. List the tasks you created in the report.
 
 ## Reference
 
