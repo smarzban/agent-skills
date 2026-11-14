@@ -19,6 +19,7 @@ Agent skills for Claude Code, Codex, Cursor, Pi and Grok, in one repo that every
 | `coordinator` | Run several builder agents: plan tasks, brief each builder, review its pull request, test the result, then hand it over or merge it when you said to. Works in T3 Code, Herdr, Rex or a plain terminal. |
 | `triage` | Check an issue or a pull request from outside: reproduce a bug, weigh a feature request, read what a diff really does. Ends with a verdict, a drafted reply, and a before and an after for you to test. |
 | `release` | Cut a release the way the repo does it: a short changelog with thanks to contributors, the version bump, the release pull request, then the tag and the publish, checked afterwards. |
+| `comment-audit` | Audit a repo's code comments: remove the ones that add nothing, fix the ones that are wrong, and report the ones that point at a real problem. |
 | `shared-skills` | Add or edit a skill in this repo. |
 
 `skills/_shared` holds the prose style and the scripts that several skills use. It is not a skill. Each skill carries its own copy of the shared files it needs, so a skill folder works on its own, and `check-skills` fails when a copy differs from the original.
