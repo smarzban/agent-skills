@@ -13,7 +13,7 @@ In a repo that has a changelog, keep its heading style, its section names, its f
 
 ## Unreleased
 
-## 1.4.0 - 2026-03-09
+## 1.4.0
 
 ### Breaking
 
