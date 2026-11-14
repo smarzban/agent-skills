@@ -25,12 +25,12 @@ You read every comment in scope and give it one of four verdicts. You remove and
 | Keep | It passes the test | Nothing |
 | Remove | It fails the test and nothing is lost with it | Delete it |
 | Fix | It is worth keeping but says something untrue, and the code proves what is true | Reword it, as short as the truth allows |
-| Report | It points at a problem that removing it would hide | No edit; list it for the owner |
+| Report | It points at a problem in the code: a likely bug, a workaround, undone work | No edit in this run; write it up as a task |
 
 Read `reference/criteria.md` for what falls under each. Two rules decide the hard cases:
 
 - You cannot judge a comment as misleading from the comment alone. Read the code it describes. When the two disagree and you cannot prove which is right, the code may be the bug: report it.
-- A true comment that explains a workaround, a suppression or a hack stays. Deleting it hides the workaround. List it in the report.
+- A comment that marks a workaround, a hack, a suppression or undone work is a sign the code needs work, and the right end is that the work is done and the comment leaves with it. That is not this run: you change no code here, because a code change needs its own proof. Report it as a task, and leave the comment until the change that fixes it.
 
 ## Steps
 
@@ -55,7 +55,7 @@ Read `reference/criteria.md` for what falls under each. Two rules decide the har
    - Run the repo's verify command. A failure in a snapshot, a baseline or a coverage file keyed by line number is from the moved lines: regenerate it the way the repo says, and say so.
    - Run the doc build and the linters that read comments, if they are not part of verify.
 
-6. **Report.** Counts by verdict and class, the proof from step 5, every Fix and every Report, and what was out of scope. A class that keeps coming back is a case for `correct`.
+6. **Report.** Counts by verdict and class, the proof from step 5, every Fix, and what was out of scope. Write each Report as a task someone can pick up: what is wrong, the file and line, and what done looks like, most harmful first. The owner decides which become work; `deliver` takes one task, and a class that keeps coming back is a case for `correct`. Create no issue and no board task unless the owner asked.
 
 ## Reference
 
