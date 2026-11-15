@@ -33,5 +33,5 @@ Decide what to send back by how likely a finding is and how much it would cost:
 
 - You write the outcome into the pull request body under **Review**: who reviewed, on which commit, the result, and each finding set aside with its reason. Read the body into a file beside your note (`gh pr view <n> --json body --jq .body`), edit it, and write it back with `gh pr edit <n> --body-file <file>`. Change nothing under Verification.
 - Keep each reviewer's full report beside your note.
-- Never resolve a review thread that a person opened, and check that the builder did not: `pr-status` prints the open threads, and the pull request page shows who resolved one.
+- Never resolve a review thread that a person opened, and check that the builder did not: `pr-status` prints the count of open threads, and the pull request page shows who resolved one.
 - A close-out comment, or any other words posted where other people read them, is drafted for the owner. Post it only when the owner says so, and never while they are away.

@@ -1,6 +1,6 @@
 ---
 name: correct
-description: Turn a mistake that agents keep making in a repo into a check that fails, so the next agent cannot make it. Tries a design change first, then a type, then a lint, then a test, and writes a rule only as a last resort. Use for "correct this so it can't happen again", "agents keep doing X", "make this mistake impossible", "enforce this rule". Not for a one-off fix or a typo, and not for a finding inside a pull request that is still under review.
+description: Turn a mistake that agents keep making in a repo into a check that fails. A design change, a type, a lint or a test, with a written rule last. Use for "correct this so it can't happen again", "agents keep doing X", "make this mistake impossible", "enforce this rule". Not for a one-off fix or a typo, and not for a finding inside a pull request that is still under review.
 ---
 
 # correct

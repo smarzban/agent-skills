@@ -58,7 +58,7 @@ A note that a stranger who cloned this repo could use goes in this file. Local p
 ````
 
 - Leave out the docs-index line until a docs index exists.
-- **Needs the owner** lists the paths the owner names: migrations, billing, auth, release scripts. Ask for them; do not guess. With none, leave the heading and write `- none yet`. The `deliver` skill reads this list from the base branch before it merges anything, and treats CI configuration and the list itself as always on it.
+- **Needs the owner** lists the paths the owner names: migrations, billing, auth, release scripts. Ask for them; do not guess. With none, leave the heading and write `- none yet`. The `deliver` skill reads this list from the base branch before it merges anything, and treats CI configuration, the verify command, `Makefile`, `CODEOWNERS` and the list itself as always on it.
 - Start the rule table with rules the repo already enforces (the formatter, the linter, the type checker, the test suite). Add a "nothing yet" row only for a rule the owner states.
 - **Fix the cause** and **Comments** are copied as written. Where the repo already has its own rule on the matter, under any heading, leave that section out; the audit matches the heading only.
 - The last line is an import. Claude Code expands it and skips it when the file is absent. Codex and Pi show it as plain text and rely on the "read it" line above. See `harness-loading.md`.
@@ -95,9 +95,10 @@ Do not create one. When the repo already has a `CLAUDE.md`, it becomes this sing
 Add these lines if they are missing. Append; never reorder or remove existing lines.
 
 ```gitignore
-# Private agent notes and the per-worktree handoff note
+# Private agent notes, the per-worktree handoff note and proof output
 AGENTS.local.md
 HANDOFF.md
+.verify/
 ```
 
 Then add the rules for the detected stack that are missing:

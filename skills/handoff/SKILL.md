@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Write or pick up HANDOFF.md, the resume note that lets a new session, an agent in a different harness, or a coordinator continue a branch's work cold. Use when asked to "write a handoff", "hand off", "save state for a new session", "pick up where we left off", "resume this branch", or "what is each worktree doing", and when starting work in a worktree that contains HANDOFF.md.
+description: Write or pick up HANDOFF.md, the note that lets a new session or another harness continue a branch's work cold. Use when asked to "write a handoff", "hand off", "save state for a new session", "pick up where we left off", "resume this branch", or "what is each worktree doing", and when starting work in a worktree that contains HANDOFF.md.
 ---
 
 # handoff
