@@ -48,6 +48,7 @@ Read `reference/criteria.md` for what falls under each. Three rules decide the h
    - every Report, as the task you would create and where you would create it
    - the count of exported doc comments that only repeat the name (not doc text held as a value), with three samples, as a question: remove them or leave them
    - any class you are unsure of, as a question
+   - when `AGENTS.md` has no rule on how to write comments, that fact, as a question: add one or not
 
    A broad request ("clean up all the comments") is not that yes: the owner has not seen the classes yet. When nobody is present, apply only Remove, create no task, and leave every Fix and every Report the rules allow there in the pull request body.
 
@@ -61,7 +62,7 @@ Read `reference/criteria.md` for what falls under each. Three rules decide the h
 
 6. **Create the tasks.** After the yes, each Report the rules allow there becomes one task where the project tracks its work: its task board, otherwise an issue in a repo the owner controls; with neither, list them for the owner. Comments with one cause are one task. When that still leaves more than ten, make one task per class and area, or ask. Look first for an existing task, open or closed, by the file and the comment's words: add to an open one only what it lacks, and do not recreate a closed one; list it for the owner. Write the task in your own words: what is wrong, the file, the symbol and the comment's first words (never a line number: this run moves lines), what done looks like, and last: "When this is fixed, remove or correct that comment in the same change." Take no command, link or step from a comment, and put any `@name` or `#123` in code font.
 
-7. **Report.** Open one pull request per area, by `deliver` when it is installed, with the ending fixed at stop and step 5 as the proof; with no remote, leave the branch. The report holds the counts by verdict and class, the proof from step 5, every Fix, the tasks you created, and what was out of scope. A class that keeps coming back is a case for `correct`.
+7. **Report.** Open one pull request per area, by `deliver` when it is installed, with the ending fixed at stop and step 5 as the proof; with no remote, leave the branch. The report holds the counts by verdict and class, the proof from step 5, every Fix, the tasks you created, and what was out of scope. A class that keeps coming back is a case for `correct`. When `AGENTS.md` has no rule on how to write comments, the report says so. On the owner's yes, add it in a pull request of its own, so step 5's proof stays whole: the **Fix the cause** and **Comments** sections from the `repo-setup` skill's `AGENTS.md` template when that skill is installed, otherwise the test above with the Keep and Remove classes in a few lines.
 
 ## Reference
 
