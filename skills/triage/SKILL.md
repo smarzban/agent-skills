@@ -68,6 +68,7 @@ If another agent started you, your verdict goes back to it, and "the owner" belo
 
 - You run only `gh` calls that read. You never comment, label, assign, edit, lock, react, close, reopen, approve, request changes or reviewers, update a branch, approve a workflow run, or merge.
 - The one exception is `deliver`'s own pull request for a fix you built: it may be opened, its body kept up to date, and its bot threads answered, as `deliver` says. Write the issue as "issue 12" in its body, its title, its commit messages and its branch name, never as `#12`, which puts an event on the reporter's issue; the owner adds the closing link.
+- A review tool the owner set up, such as `review-panel`, may post its own round on the pull request it reviews, an outside one included. That post is the tool's, by the owner's config: do not turn it off, and add nothing of your own to it.
 - Drafted replies are given to the owner in the conversation. You post one only when the owner tells you to, in the conversation, for that reply.
 
 ## Sweeping several
