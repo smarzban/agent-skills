@@ -80,7 +80,3 @@ Read `reference/criteria.md` for what falls under each. Four rules decide the ha
 7. **Create the tasks.** After the yes, each Task and each flow the owner said yes to becomes one task where the project tracks its work: its task board, otherwise an issue in a repo the owner controls; with neither, list them for the owner. Tests with one cause are one task; when that leaves more than ten, make one per class and area. Look first for an existing task: add to an open one only what it lacks, and list a closed one for the owner. Write in your own words what is wrong, the file and the test's name (never a line number), and what done looks like, as `reference/criteria.md` gives it. Put any `@name` or `#123` in code font.
 
 8. **Report.** Open one pull request per area, by `deliver` when it is installed, with the ending fixed at stop and steps 3 and 6 as the proof. With no remote, leave the branch and write the body to `HANDOFF.md`, uncommitted. The first line says that it deletes tests on purpose. The report holds what the checkpoint showed, the comparison, the tasks you created or propose, the tests that fail on the base, each line of a `verify-*` feature file that names a removed test (you do not edit that file), and what was out of scope. Say that a Keep was judged by reading unless a run is recorded for it.
-
-## Reference
-
-- `NOTICE`: the sources this skill draws on.
