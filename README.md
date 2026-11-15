@@ -107,5 +107,3 @@ Several skills build on ideas from other people's work:
 - [pstack](https://github.com/cursor/plugins/tree/main/pstack) by Lauren Tan: `correct`, `verification-skill`, `deliver`, `test-audit` and `code-audit`.
 - [tstack](https://github.com/t3dotgg/tstack) by Theo Browne: the two endings of `deliver`.
 - [OpenClaw](https://github.com/openclaw/openclaw)'s `test-audit` skill: `test-audit`.
-
-`verification-skill` and `correct` contain text adapted from pstack; its licence is in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
