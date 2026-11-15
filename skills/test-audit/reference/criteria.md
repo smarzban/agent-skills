@@ -40,7 +40,7 @@ When a convicted test was the only one that drove a flow, the flow goes on the l
 | Does not run | Skipped or disabled; left out by a config or an `only`; it returns before its assertion | It runs and passes, or the owner decided it goes |
 | A test on the list in `SKILL.md` that does not catch what it is there for | A regression test that passes with the fix reverted, when the revert changes a result; a default pinned by a tautology | It fails when the fix or the default is gone |
 | Passes or fails by chance | A fixed sleep before an assert; the clock; test order, or state another test leaves; a shared port, temp path or env var; the network | It gives one result on every run |
-| Production code only tests use | An export or a flag with no caller in the product. A hook that stands in for something outside the repo is not one | It has a caller in the product, or it goes with its test |
+| Production code only tests use | An export or a flag with no caller in the product. A hook that stands in for something outside the repo is not one | It has a caller in the product, or it goes with its test: a case for `code-audit` |
 
 ## Hard cases
 

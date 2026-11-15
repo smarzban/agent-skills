@@ -16,7 +16,8 @@ Resolve the link: `readlink ~/.agents/skills/agent-skills` prints `<repo>/skills
 1. Run `<repo>/bin/skills new <name>` (lowercase letters, digits, hyphens). It creates `skills/<name>/SKILL.md` and links it.
 2. Write the frontmatter with only `name` and `description`; those two fields work in every harness. The description decides when an agent loads the skill, so state what it does and the phrases that should trigger it.
 3. Write the body as direct instructions. Put scripts and reference files next to `SKILL.md` and refer to them by relative path.
-4. Keep the skill harness-neutral: name tools generically ("run the command", "read the file") instead of one harness's tool names.
+4. Hold text only for what can cause harm or a wrong result, or what is structural. A passage only one branch of the work needs goes in a reference file.
+5. Keep the skill harness-neutral: name tools generically ("run the command", "read the file") instead of one harness's tool names.
 
 ## Edit or remove a skill
 
@@ -24,6 +25,6 @@ Edit the files in place; every harness reads them through a link, so the change 
 
 ## Check
 
-Run `<repo>/bin/skills status`. A `CONFLICT` or an entry under "same name elsewhere" means an older copy of that skill lives in a harness folder and may shadow the repo copy; tell the user instead of deleting it.
+Read `<repo>/AGENTS.md`, run `<repo>/scripts/verify`, and give a new skill its row in the README table. Run `<repo>/bin/skills status`. A `CONFLICT` or an entry under "same name elsewhere" means an older copy of that skill lives in a harness folder and may shadow the repo copy; tell the user instead of deleting it.
 
 Commit only when the user asks.

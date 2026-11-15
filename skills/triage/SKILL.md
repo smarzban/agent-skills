@@ -1,6 +1,6 @@
 ---
 name: triage
-description: Check an issue or a pull request that came from outside before anyone acts on it. For a bug report, reproduce it in the real app. For a feature request, check it against what the project is for. For a pull request, read what the diff really does. Ends with a verdict, a reply drafted for the owner, and for a reproduced bug a fix taken through `deliver` to a stop, with a before and an after set up for the owner to test. Use for "triage issue 12", "triage this PR", "check this bug report", "is this feature request worth doing", "sweep the new issues". Not for a task the owner wrote; that is `deliver`.
+description: Check an issue or a pull request from outside before anyone acts on it. Reproduce a bug, weigh a feature request, read what a diff really does. Ends with a verdict and a reply drafted for the owner; a reproduced bug is fixed through `deliver` to a stop. Use for "triage issue 12", "triage this PR", "check this bug report", "is this feature request worth doing", "sweep the new issues". Not for a task the owner wrote; that is `deliver`.
 ---
 
 # triage
@@ -44,7 +44,7 @@ An issue that holds both a bug and a wish is two verdicts.
    | Verdict | What you do next |
    |---|---|
    | Security, any | Stop. Push nothing and open no pull request. See `reference/bug.md` |
-   | Bug: reproduced | Write the task (on the tracker, or in the fix worktree's `HANDOFF.md`), and take the fix through `deliver` with ending stop |
+   | Bug: reproduced | Write the task (on the owner's task board or task file, never as an issue on the host, or in the fix worktree's `HANDOFF.md`), and take the fix through `deliver` with ending stop |
    | Bug: already fixed, not reproduced, could not test, needs more information, not a bug | Stop, with the drafted reply |
    | Feature: any verdict | Stop. Wanting a feature is the owner's decision |
    | Pull request: take as is | Stop, with the before and the after ready. The owner merges |

@@ -1,6 +1,6 @@
 ---
 name: repo-setup
-description: Set up or audit a repo's working baseline for people and agents. Public AGENTS.md plus a gitignored AGENTS.local.md, ignore rules, one verify command that CI also runs, and a worktree setup script. Migrates an existing CLAUDE.md without losing a line. Use for "set up this repo for agents", "repo setup", "bootstrap the repo", "add AGENTS.md", "migrate CLAUDE.md to AGENTS.md". Not for installing dependencies or getting a project to run locally.
+description: Set up or check a repo's baseline for agents. AGENTS.md with a private AGENTS.local.md, ignore rules, one verify command that CI also runs, a worktree setup script. Migrates an existing CLAUDE.md. Use for "set up this repo for agents", "repo setup", "bootstrap the repo", "add AGENTS.md", "migrate CLAUDE.md to AGENTS.md". Not for installing dependencies or getting a project to run locally.
 ---
 
 # repo-setup
@@ -16,13 +16,14 @@ Work on the current repo unless you are given a path.
 1. Run `<skill>/scripts/repo-audit` and read every file it lists as existing. On an empty repo the audit reports everything missing; run it anyway.
 2. Settle the repo type, because it selects the optional files: solo or team (the audit's author count, an existing `CODEOWNERS`), public or private. Ask when the evidence does not say.
 3. Show the owner the audit and one proposal: each file to create, each edit to an existing file as a diff, and each owner decision. Wait for a yes. If the owner already told you to proceed without asking, print the proposal and continue. The separate yes for making private content public (`reference/migration.md`) is asked in every case.
-4. Write what was agreed, from `reference/templates.md`. Stay on the branch you found. If `git status` shows changes you did not make, another session is working here: leave its files alone, and ask the owner before you edit a file it has changed.
+4. Write what was agreed, from `reference/templates.md`. In a repo with commits, if you are on the default branch, start a branch first (`git switch -c repo-setup`); otherwise stay on the branch you found. If `git status` shows changes you did not make, another session is working here: leave its files alone, and ask the owner before you edit a file it has changed.
 5. Check the result:
    - The verify command exits 0, and the CI workflow runs that same command.
    - `<skill>/scripts/repo-audit` now reports both ignore rules as present.
    - `git worktree add --detach ../<repo>-probe && (cd ../<repo>-probe && scripts/worktree-setup)` succeeds; then run `git worktree remove --force ../<repo>-probe`. A repo with no commits cannot have a second worktree: report this check as not run. A worktree holds only committed files, so if the new scripts are not committed yet, copy them into the probe and say that you did.
    - `AGENTS.md` is inside its budget. Over budget is a warning for the report, not a failure.
-6. Report: created, edited (with the diff), left alone, owner decisions still open, and anything a check did not prove.
+6. **Land it.** Uncommitted work is not done. Commit it on a branch of its own and open a pull request, by `deliver` when it is installed, with the ending fixed at stop (write "Ending: stop (fixed by `repo-setup`)" in `HANDOFF.md`) and step 5 as the proof. With no remote, leave the branch; with no commits yet, list the files for the owner's first commit.
+7. Report: created, edited (with the diff), left alone, owner decisions still open, and anything a check did not prove.
 
 ## Files
 
@@ -50,14 +51,7 @@ Work on the current repo unless you are given a path.
 
 ## AGENTS.md
 
-`reference/templates.md` holds the template. It carries:
-
-- The commands, including how to prepare a fresh worktree.
-- The pointers: read `HANDOFF.md` first if it exists, where the docs index is, and "a change to a user-facing surface updates its docs page in the same change", naming the `writing-docs` update mode.
-- A rule table that pairs each rule with what enforces it: a lint, a test, a type, or "nothing yet". A rule with "nothing yet" is a candidate for a check, and the table makes that visible.
-- Two fixed sections: **Fix the cause** and **Comments**.
-- A **Needs the owner** list: the paths an agent never merges alone.
-- The split: a note a stranger who cloned the repo could use goes in `AGENTS.md`; local paths, personal workflow and private context go in `AGENTS.local.md`.
+`reference/templates.md` holds the template.
 
 Budget: keep the root `AGENTS.md` under 150 lines and 8 KB. The three harnesses probed load the whole file at the start of every session (`reference/harness-loading.md`), so each line is paid for on every task. When an existing file is over budget, report it and propose moves; do not cut content yourself.
 

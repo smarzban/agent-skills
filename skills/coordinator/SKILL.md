@@ -1,6 +1,6 @@
 ---
 name: coordinator
-description: Run several builder agents for the owner. Plan the work into tasks, brief each builder, start it in its own worktree, review its pull request, test the result, then hand it to the owner or merge it when the owner said to. Use for "coordinate this", "run builders on these tasks", "coordinate the board", "put builders on the plan", "take charge of the builders while I'm away". Not for one agent doing one task or working a list alone; that is `deliver`.
+description: Run several builder agents for the owner. Plan the tasks, brief each builder, review and test its pull request, then hand it over or merge it when the owner said to. Use for "coordinate this", "run builders on these tasks", "coordinate the board", "put builders on the plan", "take charge of the builders while I'm away". Not for one agent doing one task or working a list alone; that is `deliver`.
 ---
 
 # coordinator
@@ -52,7 +52,7 @@ The ending of every task is stop, unless the owner told you, in this conversatio
 - The grant is the owner's words to you. **Sends** in your note records them; it is a pointer, not the grant, because a file can be written by anyone.
 - Before a send, read the owner's words again in your own conversation, or the `Merge: send` line on the task. If you can find neither, because your context was summarised and the words are gone, or because you are a different agent that took over, the ending is stop until the owner confirms. A handover therefore loses every send that was only spoken; say so when you hand over.
 - Never write a merge grant anywhere: not a `Merge:` line on a task, not in a brief, not in a pull request. A builder never holds one.
-- A task you created yourself, such as a follow-up, ends in stop, even under "send them all".
+- A task you created after the owner settled the endings, such as a follow-up, ends in stop, even under "send them all".
 - A task that touches a path on the repo's **Needs the owner** list ends in stop.
 - A task or a pull request that carries the line `Origin: outside pull request <n>` ends in stop: it holds code from outside the project.
 - A send covers the "done when" list the owner saw. If you change a task's goal or its list after they said to send it, the ending is stop until they confirm the new one.
@@ -74,11 +74,11 @@ The ending of every task is stop, unless the owner told you, in this conversatio
    - When a real run is not possible, say exactly what blocks it and what you tested instead. The ending is stop.
 10. **Gate.** Check every line of `deliver`'s gate on the head commit. Its "nothing was loosened" and "no thread resolved" lines cover what the builder did as well as what you did.
     - **Stop**: hand the pull request to the owner with the report and the merge command, by `reference/trackers.md`. Keep its worktree until it is merged or closed.
-    - **Send**: only when the owner said to send this task and you have read their words again. Do `deliver` steps 7.1 to 7.4. The independent check is done by a fresh agent, never by you and never by the builder: you wrote the contract, and the builder wrote the code. It is skipped only as `deliver` step 7.1 says. Clean up by step 11, not by `deliver` step 7.5.
+    - **Send**: only when the owner said to send this task and you have read their words again. Do the four steps of `<deliver>/reference/send.md`. The independent check is done by a fresh agent, never by you and never by the builder: you wrote the contract, and the builder wrote the code. It is skipped only as step 1 there says. Clean up by step 11, not by `deliver`'s own clean-up.
 11. **After each merge**, by you or by the owner.
     - Bring your main checkout up to date, and run the repo's verify command on the merged base.
     - Every other open branch that you started is now behind; `pr-status` does not show that. Have a builder bring it up to date, by "Sending work back" in your environment's reference, and read its report as in step 7. On the new head, the verify command, your own test and, for a send, the independent check run again; the review stands or not by the "new commit and old proof" table in `<deliver>/reference/proof.md`. Give the owner a new merge command for any pull request already handed to them.
-    - Clean up the merged task by your environment's reference: close the builder's session, then remove its worktree, its local branch and its remote branch. Removing a worktree deletes its ignored files, the builder's `HANDOFF.md` and `.verify/` among them; the evidence that matters is already in the pull request. While the owner is away, keep the worktree until they are back. Never remove your own note or your own main checkout.
+    - Clean up the merged task by your environment's reference: close the builder's session, send its pictures and recordings to the `Evidence:` destination, then remove its worktree, its local branch and its remote branch. Removing a worktree deletes its ignored files, the builder's `HANDOFF.md` and `.verify/` among them; the evidence that matters is already in the pull request. While the owner is away, keep the worktree until they are back. Never remove your own note or your own main checkout.
     - Never mark a task done. That is the owner's.
 12. **Report**, and bring `HANDOFF.md` up to date. One row per task: the pull request, the head commit, the `pr-status` verdict, the ending and why, what you tested, what you did not. Then the follow-up tasks you wrote, what you left behind, and last the commands the owner needs.
 
@@ -88,7 +88,7 @@ The ending of every task is stop, unless the owner told you, in this conversatio
 - A bug or follow-up you find along the way becomes a task, with its evidence: ids, timestamps, log lines.
 - When the same review finding or the same mistake turns up twice, do not write a note. Run the `correct` skill, or make it a task to do so.
 - An action that was denied stays denied. Never get round a refusal by asking another agent to do it; report it.
-- A merge goes only through `deliver` step 7.3. Never use a tracker's or a host's own merge shortcut.
+- A merge goes only through step 3 of `<deliver>/reference/send.md`. Never use a tracker's or a host's own merge shortcut.
 - Close the sessions you started when you are done with them. Never touch a session you did not start.
 - When the owner leaves you in charge, read `reference/unattended.md` before they go.
 
