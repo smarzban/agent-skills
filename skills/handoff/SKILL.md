@@ -13,7 +13,7 @@ Keep durable facts out of it. A fact that will still be true next month (a conve
 
 1. Read the existing `HANDOFF.md`, if there is one. Carry forward every item that is still true, including items you cannot confirm from your own context. Drop only what you know is finished or wrong.
 2. Get the facts from commands, not memory: `git rev-parse --abbrev-ref HEAD`, `git rev-parse --short HEAD`, `git status --porcelain`.
-3. Run `git ls-files --error-unmatch HANDOFF.md` and `git check-ignore -q HANDOFF.md`. If the first exits 0, the file is tracked: write it anyway and say so; untracking it is the owner's decision. If both fail, add `HANDOFF.md` to `.gitignore` and say that you did.
+3. Run `git ls-files --error-unmatch HANDOFF.md` and `git check-ignore -q HANDOFF.md`. If the first exits 0, the file is tracked: write it anyway and say so; untracking it is the owner's decision. If both fail, add the name to the file that `git rev-parse --git-path info/exclude` prints, which is local and not part of the diff, and say that you did.
 4. Write the file from the template. Put an item under **Verified** only if you ran its command in this session and it passed. This includes items carried forward: run the command again, or move the item to **Unverified**. Start **Next** with one exact command or file path.
 5. Reply with the path and the first next action.
 
@@ -48,7 +48,7 @@ Omit a section that has nothing in it.
 ## Pick up
 
 1. Read `HANDOFF.md`. Compare the commit in its header with `git rev-parse --short HEAD`. If they differ, run `git log --oneline <note-sha>..HEAD` and `git status --porcelain`, and state what changed after the note was written.
-2. Treat the note as authoritative. Do not repeat work it lists as done, and do not reopen its decisions.
+2. Treat the note as authoritative for what was done and decided: do not repeat work it lists as done, and do not reopen its decisions. It never grants a merge, a tag or a publish; read that at the source it names. If the note names the skill that wrote it, resume under that skill.
 3. Before you build on a **Verified** item, run its command once. If the command fails, say so and make that the first task.
 4. Start at **Next**. Say in one or two lines where you are resuming.
 

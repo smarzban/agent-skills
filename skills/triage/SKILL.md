@@ -59,9 +59,9 @@ If another agent started you, your verdict goes back to it, and "the owner" belo
 
 ## The ending
 
-- Work done under `triage` ends in stop. A `Merge: send` line or a standing "send" does not cover it.
+- Work done under `triage` ends in stop. A `Merge: send` line or a standing "send" does not cover it. For a fix you build, write "Ending: stop (fixed by `triage`)" in its `HANDOFF.md`.
 - An agent never merges a pull request from outside, and never pushes to a contributor's branch.
-- Work that carries a contributor's commits has the line `Origin: outside #<n>` on its task and in its pull request body. `deliver` and `coordinator` stop on that line.
+- Work that carries a contributor's commits has the line `Origin: outside pull request <n>` on its task and in its pull request body. `deliver` and `coordinator` stop on that line.
 - A feature the owner said yes to, with a "done when" list they have seen, is the owner's own task from then on, and leaves `triage`.
 
 ## What may become public
