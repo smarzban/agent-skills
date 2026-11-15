@@ -59,7 +59,7 @@ row 'AGENTS.md' AGENTS.md
 if [ -f AGENTS.md ]; then
   printf '            %s\n' "$(size AGENTS.md)"
   for h in 'Fix the cause' 'Comments'; do
-    if grep -qiE "^#+ +$h *\$" AGENTS.md; then s=present; else s=missing; fi
+    if grep -qiE "^#+[[:space:]]+${h}[[:space:]]*\$" AGENTS.md; then s=present; else s=missing; fi
     printf '  %-9s %s\n' "$s" "AGENTS.md section: $h"
   done
 fi

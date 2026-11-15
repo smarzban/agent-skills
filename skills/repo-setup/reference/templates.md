@@ -32,10 +32,10 @@ Fill every `<...>` with a fact from the repo. Delete a line whose fact does not 
 
 When something does not work, find why before you change anything.
 
-- **A fault in this repo, inside your task:** fix it. Do not get past it with a timer, a retry, a guard, a special case or a suppressed check. A comment that says why the shortcut is safe does not make it a fix.
+- **A fault in this repo, inside your task:** fix it. Do not hide it behind a timer, a retry, a guard, a special case or a suppressed check.
 - **A fault in this repo, outside your task:** tell the owner what it is and what fixing it takes. Work around it only on the owner's word, with a task for the real fix named in a comment on the workaround.
-- **A fault outside the repo** (a library, a platform): work around it, and say so in a comment with a link.
-- Do the work the task needs. What you leave undone goes in your report or in a task, never in a TODO.
+- **A fault outside the repo** (a library, a platform): work around it, and say so in a comment.
+- What you leave undone goes in your report or in a task, never in a TODO.
 
 ## Comments
 

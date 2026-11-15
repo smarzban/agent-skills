@@ -12,7 +12,7 @@ Use this when the repo already holds real instructions in a file that does not f
 
 2. Read the whole file. Sort each line with one question: could a stranger who cloned this repo use it? Yes: it is public and goes to `AGENTS.md`. No (local paths, personal workflow, machine names, private context): it goes to `AGENTS.local.md`. When unsure, treat it as private.
 3. Write the public lines into `AGENTS.md`, unchanged, under the template's headings or under their own headings below the template. Write the private lines into `AGENTS.local.md`, unchanged.
-4. Add the template parts that the original lacked: the commands, the pointers, the rule table. Rules the original states go into the rule table with their enforcer, and stay in place as well.
+4. Add the template parts that the original lacked: the commands, the pointers, the rule table, the two fixed sections. Rules the original states go into the rule table with their enforcer, and stay in place as well.
 5. Run the privacy scan on the public half before anything is committed.
 
    ```sh

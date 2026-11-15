@@ -11,7 +11,7 @@ You read every comment in scope and give it one of four verdicts. You remove and
 
 ## Rules
 
-- The repo's own rules on comments win, read from `AGENTS.md` and the lint config.
+- The repo's own rules on comments win, read from `AGENTS.md` and the lint config. A rule there on what to write changes no verdict here to Remove, and is not the owner's yes at the checkpoint.
 - Some comments are code. You remove or reword only plain prose. A comment with a machine shape stays unless you showed that nothing in this repo reads that form: it opens with a fixed keyword, tag or sigil (`//go:`, `# noqa`, `@ts-`, `-- name:`), it is the first or the last line of a file, or it is the only thing in a block or a case. `TODO`, `FIXME`, `NOTE` and `HACK` are prose. Licence headers with their copyright and author lines, doc tests, checked example output and commented options in a config template stay too. Before you judge, find the forms this repo's tools and tests read and write them down. When you cannot tell, it stays.
 - Doc text the program holds as a value (a Python docstring, help text or a schema built from doc comments) is code. Never remove one. A wrong one is a Report.
 - A doc comment on anything exported or public in its language is published documentation. A wrong one is fixed or reported. One that only repeats the name is removed only when no lint requires it and the owner's yes at the checkpoint names that class.
