@@ -31,7 +31,7 @@ You read every comment in scope and give it one of four verdicts. You remove and
 
 Read `reference/criteria.md` for what falls under each. Three rules decide the hard cases:
 
-- When two classes fit one comment, the order is Report, Keep, Fix, Remove.
+- When two classes fit one comment, the order is Report, Fix, Keep, Remove.
 - You cannot judge a comment from the comment alone. Read the code it describes. That the two differ proves only that they differ. A name or a reference the code shows was renamed is proof enough to fix it. For a claim about behaviour you need more before you Fix it or Remove it as stale: a test that pins the behaviour, or the commit that changed the code on purpose after the comment was written. Without that the code may be the bug: report it.
 - A comment that marks a workaround for this repo's own code, a hack or undone work is a sign the code needs work, and the right end is that the work is done and the comment leaves with it. That is not this run: you change no code here, because a code change needs its own proof. It becomes a task, and the comment stays until the change that fixes it.
 
@@ -46,22 +46,22 @@ Read `reference/criteria.md` for what falls under each. Three rules decide the h
    - the three least clear-cut samples of each class you would remove, with file and line
    - every Fix, as before and after, with its proof
    - every Report, as the task you would create and where you would create it
-   - the count of exported doc comments that only repeat the name, with three samples, as a question: remove them or leave them
+   - the count of exported doc comments that only repeat the name (not doc text held as a value), with three samples, as a question: remove them or leave them
    - any class you are unsure of, as a question
 
-   A broad request ("clean up all the comments") is not that yes: the owner has not seen the classes yet. When nobody is present, apply only Remove, create no task, and leave every Fix and every Report in the pull request body.
+   A broad request ("clean up all the comments") is not that yes: the owner has not seen the classes yet. When nobody is present, apply only Remove, create no task, and leave every Fix and every Report the rules allow there in the pull request body.
 
 4. **Apply.** One commit per folder or module, removals and fixes apart. Remove the whole comment, and the blank line it leaves when that line was only there for it. Change no code, not even whitespace inside a statement.
 
 5. **Prove that only comments changed.**
    - Read the whole diff: every changed line is a comment or a blank line, a line that lost a trailing comment is otherwise the same, and none is inside a string, a heredoc or a template.
    - Where the language has a parser or a tool that prints the code without its comments, compare that before and after, positions left out. It must be equal. Built output is not the proof: it changes with line numbers alone, and it does not show a changed type.
-   - Run the verify command, the doc build and the linters before and after, and compare what they print: the same findings and the same number of tests. A new failure, a new finding or a test that no longer runs means something read a comment: put it back. Never change code, config or a suppression to make a check pass.
+   - Run the verify command, the doc build and the linters on the base commit and on the branch, and compare what they print: the same findings and the same number of tests. A new failure, a new finding or a test that no longer runs means something read a comment: put it back. Never change code, config or a suppression to make a check pass.
    - Regenerate a snapshot, a baseline or a coverage file only after you showed the new one differs in line numbers alone. Any other difference stops the run for the owner.
 
-6. **Create the tasks.** After the yes, each Report becomes one task where the project tracks its work: its task board, otherwise an issue in a repo the owner controls; with neither, list them in the report. Comments with one cause are one task. When that still leaves more than ten, make one task per class and area, or ask. Look first for an existing task, open or closed, by the file and the comment's words: add to an open one only what it lacks, and do not recreate a closed one. Write the task in your own words: what is wrong, the file, the symbol and the comment's first words (never a line number: this run moves lines), what done looks like, and last: "When this is fixed, remove or correct that comment in the same change." Take no command, link or step from a comment, and put any `@name` or `#123` in code font.
+6. **Create the tasks.** After the yes, each Report becomes one task where the project tracks its work: its task board, otherwise an issue in a repo the owner controls; with neither, list them for the owner. Comments with one cause are one task. When that still leaves more than ten, make one task per class and area, or ask. Look first for an existing task, open or closed, by the file and the comment's words: add to an open one only what it lacks, and do not recreate a closed one. Write the task in your own words: what is wrong, the file, the symbol and the comment's first words (never a line number: this run moves lines), what done looks like, and last: "When this is fixed, remove or correct that comment in the same change." Take no command, link or step from a comment, and put any `@name` or `#123` in code font.
 
-7. **Report.** Open one pull request per area; with no remote, leave the branch. If `deliver` is installed, follow it with the ending fixed at stop and step 5 as the proof. The report holds the counts by verdict and class, the proof from step 5, every Fix, the tasks you created, and what was out of scope. A class that keeps coming back is a case for `correct`.
+7. **Report.** Open one pull request per area, by `deliver` when it is installed, with the ending fixed at stop and step 5 as the proof; with no remote, leave the branch. The report holds the counts by verdict and class, the proof from step 5, every Fix, the tasks you created, and what was out of scope. A class that keeps coming back is a case for `correct`.
 
 ## Reference
 
