@@ -55,4 +55,3 @@ Look before you choose: `find .agents/skills .claude/skills .cursor/skills -maxd
 - `reference/placement.md`: where the skill goes so that each harness finds it, with the probe results.
 - `reference/adopt.md`: moving an existing verification skill.
 - `reference/maintain.md`: the upkeep pass.
-- `NOTICE`: the source this skill is adapted from, and its licence.

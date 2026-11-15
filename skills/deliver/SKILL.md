@@ -99,4 +99,3 @@ When a line is false, the ending is stop. Name the line in the report.
 - `reference/pr-body.md`: the pull request body and the report.
 - `reference/pr-work.md`: what to do for each `pr-status` verdict.
 - `reference/harness.md`: the tools each harness has for these steps.
-- `NOTICE`: the sources this skill draws on.

@@ -1,5 +1,8 @@
-This skill is adapted from `create-verification-skill` and `maintain-verification-skill`
-in pstack (https://github.com/cursor/plugins, folder `pstack`), used under the MIT licence below.
+# Third-party notices
+
+Two skills in this repo contain text adapted from pstack (https://github.com/cursor/plugins, folder `pstack`):
+`skills/verification-skill` (from `create-verification-skill` and `maintain-verification-skill`) and
+`skills/correct` (from `correct`). That text is used under the licence below.
 
 MIT License
 
