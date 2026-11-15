@@ -5,7 +5,7 @@ description: Set up or audit a repo's working baseline for people and agents. Pu
 
 # repo-setup
 
-Bring a repo, empty or existing, to a baseline that any agent harness can work in. This skill writes machinery and facts it can check: commands, ignore rules, scripts, CI. Apart from two fixed sections in `AGENTS.md`, it writes no prose: the project overview, the README and the docs belong to `writing-readmes` and `writing-docs`.
+Bring a repo, empty or existing, to a baseline that any agent harness can work in. This skill writes machinery and facts it can check: commands, ignore rules, scripts, CI. It writes no prose. The project overview, the README and the docs belong to `writing-readmes` and `writing-docs`.
 
 Work on the current repo unless you are given a path.
 

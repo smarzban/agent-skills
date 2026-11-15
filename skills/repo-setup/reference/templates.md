@@ -35,7 +35,7 @@ When something does not work, find why before you change anything.
 - **A fault in this repo, inside your task:** fix it. Do not hide it behind a timer, a retry, a guard, a special case or a suppressed check.
 - **A fault in this repo, outside your task:** tell the owner what it is and what fixing it takes. Work around it only on the owner's word, with a task for the real fix named in a comment on the workaround.
 - **A fault outside the repo** (a library, a platform): work around it, and say so in a comment.
-- What you leave undone goes in your report or in a task, never in a TODO.
+- What you leave undone goes in your report or in a task, never in a TODO or a stub that looks finished.
 
 ## Comments
 
@@ -60,7 +60,7 @@ A note that a stranger who cloned this repo could use goes in this file. Local p
 - Leave out the docs-index line until a docs index exists.
 - **Needs the owner** lists the paths the owner names: migrations, billing, auth, release scripts. Ask for them; do not guess. With none, leave the heading and write `- none yet`. The `deliver` skill reads this list from the base branch before it merges anything, and treats CI configuration and the list itself as always on it.
 - Start the rule table with rules the repo already enforces (the formatter, the linter, the type checker, the test suite). Add a "nothing yet" row only for a rule the owner states.
-- **Fix the cause** and **Comments** are copied as written. The audit finds them by heading only, so read the file before you propose one: where the repo already has its own rule on the matter, under any heading, leave that section out.
+- **Fix the cause** and **Comments** are copied as written. Where the repo already has its own rule on the matter, under any heading, leave that section out; the audit matches the heading only.
 - The last line is an import. Claude Code expands it and skips it when the file is absent. Codex and Pi show it as plain text and rely on the "read it" line above. See `harness-loading.md`.
 - In a monorepo, add under **Before you start**: `- Before you change files under <packages/app/>, read <packages/app/AGENTS.md>.`
 
