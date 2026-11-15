@@ -21,6 +21,8 @@ Agent skills for Claude Code, Codex, Cursor, Pi and Grok, in one repo that every
 | `release` | Cut a release the way the repo does it: a short changelog with thanks to contributors, the version bump, the release pull request, then the tag and the publish, checked afterwards. |
 | `comment-audit` | Audit a repo's code comments: remove the ones that add nothing, fix the ones that are wrong, and report the ones that point at a real problem. |
 | `test-audit` | Audit a repo's tests: remove the ones a run proves catch nothing or repeat another test, and turn the ones that guard real behaviour badly into tasks. |
+||||||| 28c07d2
+| `code-audit` | Audit a repo's code: remove what a search and a run prove nothing uses, and turn drifted copies, needless layers and code that disagrees with its docs into tasks. |
 | `shared-skills` | Add or edit a skill in this repo. |
 
 `skills/_shared` holds the prose style and the scripts that several skills use. It is not a skill. Each skill carries its own copy of the shared files it needs, so a skill folder works on its own, and `check-skills` fails when a copy differs from the original.
@@ -100,3 +102,11 @@ Read [`AGENTS.md`](AGENTS.md) for the commands and the rules a change must pass.
 ## License
 
 MIT. See [`LICENSE`](LICENSE).
+
+## Credits
+
+Several skills build on ideas from other people's work:
+
+- [pstack](https://github.com/cursor/plugins/tree/main/pstack) by Lauren Tan: `correct`, `verification-skill`, `deliver`, `test-audit` and `code-audit`.
+- [tstack](https://github.com/t3dotgg/tstack) by Theo Browne: the two endings of `deliver`.
+- [OpenClaw](https://github.com/openclaw/openclaw)'s `test-audit` skill: `test-audit`.
