@@ -5,7 +5,7 @@ description: Set up or audit a repo's working baseline for people and agents. Pu
 
 # repo-setup
 
-Bring a repo, empty or existing, to a baseline that any agent harness can work in. This skill writes machinery and facts it can check: commands, ignore rules, scripts, CI. It writes no prose. The project overview, the README and the docs belong to `writing-readmes` and `writing-docs`.
+Bring a repo, empty or existing, to a baseline that any agent harness can work in. This skill writes machinery and facts it can check: commands, ignore rules, scripts, CI. Apart from two fixed sections in `AGENTS.md`, it writes no prose: the project overview, the README and the docs belong to `writing-readmes` and `writing-docs`.
 
 Work on the current repo unless you are given a path.
 
@@ -55,6 +55,7 @@ Work on the current repo unless you are given a path.
 - The commands, including how to prepare a fresh worktree.
 - The pointers: read `HANDOFF.md` first if it exists, where the docs index is, and "a change to a user-facing surface updates its docs page in the same change", naming the `writing-docs` update mode.
 - A rule table that pairs each rule with what enforces it: a lint, a test, a type, or "nothing yet". A rule with "nothing yet" is a candidate for a check, and the table makes that visible.
+- Two fixed sections on how code is written here: **Fix the cause** (no workaround for the repo's own fault, no TODO for undone work) and **Comments** (what a healthy comment is).
 - A **Needs the owner** list: the paths an agent never merges alone.
 - The split: a note a stranger who cloned the repo could use goes in `AGENTS.md`; local paths, personal workflow and private context go in `AGENTS.local.md`.
 

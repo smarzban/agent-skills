@@ -16,6 +16,7 @@ Use these headings in this order. Drop one that has nothing to say, except **Don
 ## Scope
 - Covers: <what>
 - Leaves out: <what, and where it goes instead>
+- Workarounds and undone work: <each one, why, and the task that holds the real fix>
 - Changed since the start: <what changed in the contract, and why>
 
 ## Done when

@@ -56,7 +56,13 @@ done
 [ "$found" = 1 ] || printf ' none detected'
 printf '\n\ncore\n'
 row 'AGENTS.md' AGENTS.md
-[ -f AGENTS.md ] && printf '            %s\n' "$(size AGENTS.md)"
+if [ -f AGENTS.md ]; then
+  printf '            %s\n' "$(size AGENTS.md)"
+  for h in 'Fix the cause' 'Comments'; do
+    if grep -qiE "^#+ +$h *\$" AGENTS.md; then s=present; else s=missing; fi
+    printf '  %-9s %s\n' "$s" "AGENTS.md section: $h"
+  done
+fi
 ignored 'ignore rule for AGENTS.local.md' AGENTS.local.md
 ignored 'ignore rule for HANDOFF.md' HANDOFF.md
 row '.gitignore' .gitignore
