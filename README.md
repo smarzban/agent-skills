@@ -21,7 +21,6 @@ Agent skills for Claude Code, Codex, Cursor, Pi and Grok, in one repo that every
 | `release` | Cut a release the way the repo does it: a short changelog with thanks to contributors, the version bump, the release pull request, then the tag and the publish, checked afterwards. |
 | `comment-audit` | Audit a repo's code comments: remove the ones that add nothing, fix the ones that are wrong, and report the ones that point at a real problem. |
 | `test-audit` | Audit a repo's tests: remove the ones a run proves catch nothing or repeat another test, and turn the ones that guard real behaviour badly into tasks. |
-||||||| 28c07d2
 | `code-audit` | Audit a repo's code: remove what a search and a run prove nothing uses, and turn drifted copies, needless layers and code that disagrees with its docs into tasks. |
 | `shared-skills` | Add or edit a skill in this repo. |
 
