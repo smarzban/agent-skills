@@ -44,7 +44,7 @@ Read `reference/criteria.md` for what falls under each. Four rules decide the ha
 - The contract decides, not the shape of the assertion. "Does not throw" is the whole promise of some code.
 - A test that is the only one to fail when behaviour someone relies on breaks is a Keep or a Task.
 - The test that stays in place of a removed one is a Keep that passes the first three questions, judged in this run even when it lies outside the area, or a test that waits for the owner's yes. A test is never removed because a worse one covers it.
-- When more than one verdict fits: a test the run proved catches nothing is a Remove, unless it is on the list above, it is skipped or disabled, or another test leans on it. Otherwise the order is Task, then Remove on a yes, then Remove.
+- When more than one verdict fits: a test the run proved catches nothing is a Remove, unless what it asserts, not its name, puts it on the list above, it is skipped or disabled, or another test leans on it. Otherwise the order is Task, then Remove on a yes, then Remove.
 
 ## Steps
 
