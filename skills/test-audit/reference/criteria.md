@@ -16,7 +16,6 @@
 | Class | Example |
 |---|---|
 | Catches nothing | It runs no code and reads no file of this repo: it asserts on data it built, on what a mock was told to return, or on the language or a library |
-| | It sits behind a second guard and passes whatever is broken on its path |
 | Proved by a test of the same kind | Several cases with different values that take one path through the code |
 | | An old test left beside its replacement |
 | | A check that fails only on a crash ("is defined", "does not throw", "it renders", `expect(total(cart)).toBe(total(cart))`) beside a test that asserts the result |
@@ -27,8 +26,8 @@ When a convicted test was the only one that drove a flow, the flow goes on the l
 
 | Class | Example |
 |---|---|
-| Proved at another layer | A unit test whose every assertion a flow test also proves, or the reverse. The run shows it; whether one contract needs two tests is the owner's choice |
-| On the list in `SKILL.md`, and proved by another test | Six rows that refuse an unknown config field on one line of code. The list protects the contract; which tests it needs is the owner's choice |
+| Proved at another layer | A unit test whose every assertion a flow test also proves, or the reverse. |
+| On the list in `SKILL.md`, and proved by another test | Six rows that refuse an unknown config field on one line of code |
 
 ## Task
 
@@ -39,7 +38,7 @@ When a convicted test was the only one that drove a flow, the flow goes on the l
 | The name promises what the test never exercises | Named for a refund; asserts nothing about one | It tests that, or is renamed |
 | May be hiding a bug | Its expected value contradicts the docs, a spec or another test | The owner knows which is right; the code is fixed if it is the bug, the test if not |
 | Does not run | Skipped or disabled; left out by a config or an `only`; it returns before its assertion | It runs and passes, or the owner decided it goes |
-| A test on the list in `SKILL.md` that catches nothing | A regression test that passes with the fix reverted; a default pinned by a tautology | It fails when the fix or the default is gone |
+| A test on the list in `SKILL.md` that does not catch what it is there for | A regression test that passes with the fix reverted, when the revert changes a result; a default pinned by a tautology | It fails when the fix or the default is gone |
 | Passes or fails by chance | A fixed sleep before an assert; the clock; test order, or state another test leaves; a shared port, temp path or env var; the network | It gives one result on every run |
 | Production code only tests use | An export or a flag with no caller in the product. A hook that stands in for something outside the repo is not one | It has a caller in the product, or it goes with its test |
 
@@ -52,7 +51,7 @@ When a convicted test was the only one that drove a flow, the flow goes on the l
 - **A table of cases** is judged case by case when the framework reports each one. Removing a row is a removal. Cases in a loop inside one test are one test.
 - **A test of a private helper** that holds logic the interface cannot reach cheaply is a Keep.
 - **A test that pins text** (a prompt, a doc, a manifest) is a Keep when that text is the product or the repo states it as a requirement. Otherwise it stays unless a run convicts it.
-- **A test nobody seems to rely on** (a getter, a constant restated, an input a guard upstream refuses) stays unless a run convicts it. Say so at the checkpoint, under what you are unsure of.
+- **A test nobody seems to rely on** (a getter, a constant restated, an input a guard upstream refuses) stays unless a run convicts it. When the code it tests has no caller in the product, it is the task above.
 
 ## Flows with no test found
 
