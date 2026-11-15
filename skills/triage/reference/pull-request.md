@@ -60,8 +60,8 @@ Only after the reading, and only where the owner allows outside code to run: the
 ## What the owner's yes allows
 
 - **Take as is.** The owner merges. Give them the pinned command: `gh pr merge <n> --match-head-commit <sha>`. A commit pushed after your verdict is one nobody has read; the pin refuses it.
-- **Take with changes.** The default is a drafted review asking the contributor for the changes. Only when the owner says to carry it through yourself, naming the head commit, and `needs-owner` exits 0 on it: make a branch of the repo from that commit, add your changes as new commits, and follow `deliver` with ending stop. Put `Origin: outside #<n>` on the task and in the body. Pushing that branch runs the repo's CI on the contributor's code with the repo's own rights; say so when you ask.
-- **Rebuild it ourselves.** After the owner's yes it is a task written in your own words, with `Origin: outside #<n>` if any of their code is reused, through `deliver` with ending stop.
+- **Take with changes.** The default is a drafted review asking the contributor for the changes. Only when the owner says to carry it through yourself, naming the head commit, and `needs-owner` exits 0 on it: make a branch of the repo from that commit, add your changes as new commits, and follow `deliver` with ending stop. Put `Origin: outside pull request <n>` on the task and in the body. Pushing that branch runs the repo's CI on the contributor's code with the repo's own rights; say so when you ask.
+- **Rebuild it ourselves.** After the owner's yes it is a task written in your own words, with `Origin: outside pull request <n>` if any of their code is reused, through `deliver` with ending stop.
 - Credit survives a squash only as a `Co-authored-by:` line; say so in the report, and draft a reply for the original pull request that points to the new one.
 
 ## When the head moves
