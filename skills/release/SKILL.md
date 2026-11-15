@@ -1,6 +1,6 @@
 ---
 name: release
-description: Cut a release of a project. Find the repo's own release steps, write the changelog section from a short template with thanks to contributors, bump every file that holds the version, open the release pull request, then tag and publish the way that repo does (a tag, a GitHub release, an npm or other registry publish through its workflow) and check the result. Use for "cut a release", "release this", "release v1.2.0", "make a release", "prepare the release", "write the changelog", "tag a release", "publish to npm". Not for merging a pull request ("send it" is `deliver`), and not for creating a release workflow.
+description: Cut a release the way the repo does it. The changelog section with thanks to contributors, the version bump, the release pull request, then the tag and the publish through the repo's own workflow, checked afterwards. Use for "cut a release", "release this", "release v1.2.0", "make a release", "prepare the release", "write the changelog", "tag a release", "publish to npm". Not for merging a pull request ("send it" is `deliver`), and not for creating a release workflow.
 ---
 
 # release
@@ -40,7 +40,7 @@ You take a project from "the work is merged" to "the version is out and checked"
    - the thanks, each with the pull request or issue it comes from
    - the steps you will take, with each one that cannot be undone marked, and where you will stop
 
-5. **Open the release pull request.** On a branch in a worktree of its own: move the Unreleased entries into the new version's section, headed like the file's other versions, leave an empty Unreleased above it if the file keeps one, and bump every file from step 1, lock files included. Run the repo's verify command and its version check if it has one. The pull request follows the repo's normal path: its review, its checks, and its rule on who merges (the owner, when it names none). Do not add other changes to it.
+5. **Open the release pull request.** On a branch in a worktree of its own: move the Unreleased entries into the new version's section, headed like the file's other versions, leave an empty Unreleased above it if the file keeps one, and bump every file from step 1, lock files included. Run the repo's verify command and its version check if it has one. The pull request follows the repo's normal path: its review, its checks, and its rule on who merges (the owner, when it names none). Do not add other changes to it. Write `HANDOFF.md` with the version, where the owner's yes was said and the next step, so that a later session can read that yes again at its source.
 
 6. **Tag.** Only after the release pull request is merged and the checks are green on `<base>`:
    - `git fetch origin`, then confirm `git log <prev>..<merge sha> --oneline` holds nothing the checkpoint did not show; if it does, go back to step 4

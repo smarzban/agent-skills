@@ -23,7 +23,7 @@ Look for what it does beyond what it says. Each of these is a flag on the verdic
 
 | Look for | Why |
 |---|---|
-| A path on the **Needs the owner** list; CI, hooks, the verify command (`<deliver>/scripts/needs-owner --head <sha> --base origin/<base>` lists these) | The owner decides, whatever else you find |
+| A path on the **Needs the owner** list; CI and the verify command (`<deliver>/scripts/needs-owner --head <sha> --base origin/<base>` lists these), and hooks (it does not list them: read the diff for them) | The owner decides, whatever else you find |
 | Agent instructions and harness settings: `AGENTS.md`, `CLAUDE.md`, skill folders, `.claude`, `.agents`, `.mcp.json` and the like | They steer the next agent |
 | Build or install scripts; anything the verify command runs; the `<verify>` skill or its map | They run with more rights than the code, or decide what gets checked |
 | New or changed dependencies; lockfile changes the manifest does not explain | Code nobody here has read |

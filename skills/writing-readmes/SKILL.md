@@ -9,7 +9,7 @@ A README is the front door. On the first screen a newcomer learns what the proje
 
 Work on the current repo unless you are given a path. In a monorepo, "the README" is the root README; write a package README only when asked for it. Follow `reference/style.md` for the prose.
 
-In Write mode, when you are in the repo's main checkout (`git rev-parse --path-format=absolute --git-dir --git-common-dir` prints the same path twice), do not edit there: another session may be working in it. Do the whole run on a new branch in a worktree of your own (from the repo root, `git worktree add -b readme ../<repo>-readme`; if that branch or folder exists, pick another name, never reuse or delete it) and give its path and branch in the report. Work in place when the repo has no commits or the README has uncommitted changes.
+In Write mode, when you are in the repo's main checkout (`git rev-parse --path-format=absolute --git-dir --git-common-dir` prints the same path twice), do not edit there: another session may be working in it. Do the whole run on a new branch in a worktree of your own (from the repo root, `git worktree add -b readme ../<repo>-readme`; if that branch or folder exists, pick another name, never reuse or delete it) and give its path and branch in the report. Work in place when the repo has no commits, or when the README or a file it links to (such as `AGENTS.md`) has uncommitted changes.
 
 ## Modes
 
@@ -34,7 +34,8 @@ In Write mode, when you are in the repo's main checkout (`git rev-parse --path-f
    - Links and paths: run `<skill>/scripts/check-links README.md`. It must report 0 broken.
    - Badges: each badge points at something that exists. The workflow file named in a CI badge is in `.github/workflows/`, the package named in a version badge is published, and the licence badge matches the `LICENSE` file. Remove a badge that fails this.
    - Images: every image path resolves. Never link an image that is not in the repo; list it as something for the owner to supply.
-5. Report: what the README now covers, what moved to which docs page, what you could not verify, and the owner decisions.
+5. **Land it.** Uncommitted work is not done. Commit it on a branch of its own and open a pull request, by `deliver` when it is installed, with the ending fixed at stop (write "Ending: stop (fixed by `writing-readmes`)" in `HANDOFF.md`) and step 4 as the proof. With no remote, leave the branch; with no commits yet, list the files for the owner's first commit.
+6. Report: what the README now covers, what moved to which docs page, what you could not verify, and the owner decisions.
 
 ## Owner decisions
 

@@ -1,6 +1,6 @@
 ---
 name: writing-docs
-description: Write, audit or update a project's docs from its source code. User docs (quickstart, install, configuration, a page per feature) and maintainer docs (architecture, data model, invariants), as plain Markdown or for a docs framework such as Starlight or MkDocs. Use for "write the docs", "document this repo", "user docs", "user guide", "docs site", "website docs", "architecture docs", "audit the docs", "update the docs", "the docs are out of date". Not for creating or hosting a docs site.
+description: Write, audit or update a project's user docs and maintainer docs from its source code, as plain Markdown or for a docs framework. Use for "write the docs", "document this repo", "user docs", "user guide", "docs site", "website docs", "architecture docs", "audit the docs", "update the docs", "the docs are out of date". Not for the README (`writing-readmes`), or for creating or hosting a docs site.
 ---
 
 # writing-docs
@@ -9,7 +9,7 @@ The code is the source of truth. A page states only what you confirmed in the li
 
 This skill edits docs and the docs map. It never edits product code.
 
-When a write or an update starts while you are in the repo's main checkout (`git rev-parse --path-format=absolute --git-dir --git-common-dir` prints the same path twice), do not edit there: another session may be working in it. Do the whole run on a new branch in a worktree of your own (from the repo root, `git worktree add -b docs-write ../<repo>-docs-write`; if that branch or folder exists, pick another name, never reuse or delete it) and give its path and branch in the report. Work in place when the repo has no commits, or when the docs or the change being documented are not committed yet, because a worktree does not hold them. The unattended update uses a worktree on `docs/update` and reuses that branch and worktree when they exist.
+When a write or an update starts while you are in the repo's main checkout (`git rev-parse --path-format=absolute --git-dir --git-common-dir` prints the same path twice), do not edit there: another session may be working in it. Do the whole run on a new branch in a worktree of your own (from the repo root, `git worktree add -b docs-write ../<repo>-docs-write`; if that branch or folder exists, pick another name, never reuse or delete it) and give its path and branch in the report. Work in place when the repo has no commits, or when the docs, the change being documented, or a file the pages link to or edit (such as `AGENTS.md`) are not committed yet, because a worktree does not hold them. The unattended update uses a worktree on `docs/update` and reuses that branch and worktree when they exist.
 
 ## Choose three things first
 
@@ -62,7 +62,9 @@ Move `verified-at` forward only when every page the map lists was checked agains
 4. Read the source. For more than a few rows, start one read-only subagent per subsystem or feature, in parallel. Each returns a summary and edits nothing: what it does, entry points with paths, settings with defaults and the lines that define them, invariants and what enforces each, any evidence of rationale, open questions.
 5. Write the pages by the rules below and the reference files for your scope and format.
 6. Verify.
-7. Write `docs-map.txt`, update the index, and report.
+7. Write `docs-map.txt` and update the index.
+8. **Land it.** Uncommitted work is not done. Commit it on a branch of its own and open a pull request, by `deliver` when it is installed, with the ending fixed at stop (write "Ending: stop (fixed by `writing-docs`)" in `HANDOFF.md`) and **Verify** as the proof. With no remote, leave the branch; with no commits yet, list the files for the owner's first commit.
+9. Report.
 
 ## Audit
 
@@ -78,22 +80,11 @@ Change nothing; report findings.
 1. Run `<skill>/scripts/docs-scope` (add `--to <rev>` for a specific change). Without a map, list the changed paths with `git diff --name-only <base>..<head>` and find the pages that name them.
 2. Edit only the `STALE` pages, and in them only the claims the changed paths touch.
 3. For each `UNMAPPED` path decide: a new feature gets a page and a map line, other source gets added to a `page` or `exclude` line.
-4. Verify the pages you changed.
+4. Verify the pages you changed, then land them as Write step 8 says.
 
 ## Unattended update
 
-Use this when a scheduled job or a coordinator runs the update with nobody present. Run **Update for a diff** with these changes:
-
-- With no docs map, the outcome is blocked: the docs need a first write with the owner present. Open nothing.
-- If `<skill>/scripts/docs-scope` prints no `STALE` page and no `UNMAPPED` path, the outcome is clean. Stop, and open nothing.
-- Put the page edits on the branch `docs/update` and open one pull request. If a pull request from that branch is still open, update it; do not open a second one.
-- Do not write a new page. List each `UNMAPPED` path in the pull request description with the choice it needs: a new page, an existing `page` line, or an `exclude` line.
-- When the code looks wrong and the page right, leave the page and describe the disagreement in the pull request description, with the evidence.
-- Do not move `verified-at` while an `UNMAPPED` path or a disagreement is unresolved. A later run then reports it again.
-- A blocked run with page edits still opens the pull request and states blocked first. With no edits it opens nothing.
-- Never merge the pull request. Ask no questions; record what you could not decide in the description.
-
-The description starts with the outcome, then lists the pages edited, the items left for the owner, and what was not checked.
+When a scheduled job or a coordinator runs the update with nobody present, read `reference/unattended.md`.
 
 ## Outcomes
 
