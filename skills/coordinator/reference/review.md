@@ -24,14 +24,14 @@ Decide what to send back by how likely a finding is and how much it would cost:
 | A cost or denial-of-service hole, data loss | A path this deployment does not use |
 | Breakage on the main path, and anything cheap to fix | Style that the repo's rules do not back |
 
-- A finding is real when it shows a case that fails, or a "done when" item that does not hold. A remark shows neither; list remarks in the body, and they do not change the ending.
+- A finding is real when it shows a case that fails, or a "done when" item that does not hold. A remark shows neither; list remarks in your report, and they do not change the ending.
 - Setting a finding aside is allowed for a stop: the owner sees it and decides. A real finding you set aside turns a send into a stop.
 - Send the kept findings to the builder by your environment's reference, with the list you set aside, so that it knows what was seen.
 - A fix is a new commit. Proof for the changed code runs again, by the "new commit and old proof" table in the `deliver` skill's proof reference.
 
 ## What the owner sees
 
-- You write the outcome into the pull request body under **Review**: who reviewed, on which commit, the result, and each finding set aside with its reason. Read the body into a file beside your note (`gh pr view <n> --json body --jq .body`), edit it, and write it back with `gh pr edit <n> --body-file <file>`. Change nothing under Verification.
+- The outcome goes in your report to the owner under **Review**: who reviewed, on which commit, the result, and each finding set aside with its reason. It does not go in the pull request body.
 - Keep each reviewer's full report beside your note.
 - Never resolve a review thread that a person opened, and check that the builder did not: `pr-status` prints the count of open threads, and the pull request page shows who resolved one.
 - A close-out comment, or any other words posted where other people read them, is drafted for the owner. Post it only when the owner says so, and never while they are away.

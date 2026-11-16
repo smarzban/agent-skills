@@ -38,14 +38,10 @@ Commit: <full sha the evidence ran on. When items ran on different commits, name
 
 ## For the owner to decide
 <A choice that is the owner's and that this change leaves open.>
-
-## Review
-<Who or what reviewed it, on which commit, and the outcome. Or: skipped at the owner's request.>
-<Each finding that was set aside, with the reason.>
 ```
 
 - Title: what the change does, in the repo's own commit style.
-- Do not write the ending or a merge grant in the body.
+- Do not write the ending, a merge grant or the review in the body.
 - Look for a pull request template in the repo first. If there is one, keep its headings and put these sections under the ones that match.
 - Update **Verification** and its commit whenever the proof is run again.
 - Features you drove because `features-for` printed them, and that no "done when" item covers, go under **Verification** as "also driven", with the result.
@@ -67,6 +63,9 @@ Send it at the end, for either ending. Lead with the result; the owner should be
 
 **For you to decide**
 <The open choices from the pull request body, each with what you would do.>
+
+**Review**
+<Who or what reviewed it, on which commit, and the outcome. Or: skipped at the owner's request. Each finding set aside, with the reason.>
 
 **Decisions**
 <What you decided that the owner did not, and why.>
