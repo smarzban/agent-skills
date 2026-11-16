@@ -35,11 +35,11 @@ They come from the repo's review step, from review bots and from people.
 - Check each finding against the code before you act on it. A finding is real when you can show the failing case.
 - A real finding in this diff: write the test or the recipe step that fails because of it, fix it, and see that it passes.
 - A real finding about code the diff did not touch: note it for the report as a follow-up. Do not widen the diff.
-- A finding you cannot show to be real: say why in one or two lines, and list it in the pull request body under **Review**. Opinions about style that the repo's rules do not back go the same way.
+- A finding you cannot show to be real: say why in one or two lines, and list it in the report under **Review**. Opinions about style that the repo's rules do not back go the same way.
 - Block only on a problem you can show: a bug a user would hit, a failed check, a doc line the change made wrong.
 - Each round uses a fresh reviewer on the whole diff, unless the repo's review step defines its own way to re-check fixes; then use that. A review counts from the first one you run, before or after the pull request exists. An objection that you fixed, followed by a round that passes, is a pass. A fix that changes only wording or the verification map needs no further round.
 - Stop after three rounds. If findings keep coming, report what is still open and let the owner decide.
-- When the last round passes and still shows a small real finding, fix it, run the proof again on the new commit, and say in the body that this one commit was not reviewed. For a send, that commit needs a review of its own.
+- When the last round passes and still shows a small real finding, fix it, run the proof again on the new commit, and say in the report that this one commit was not reviewed. For a send, that commit needs a review of its own.
 
 Threads and replies:
 

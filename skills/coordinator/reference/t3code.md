@@ -6,7 +6,7 @@ Marker: the environment variable `T3CODE_THREAD_ID` is set, and `delegate_task` 
 
 - A builder is a delegate with its own checkout. Call `orchestrator_capabilities` once, then start each builder with `delegate_task` and `isolation: "worktree"`. Use the role `implementation`. Never make a builder's checkout yourself in the shell, and never run a builder in your own checkout.
 - The worktree is a checkout of this thread's project. When the repo you coordinate is another one, pass its project as `target.projectId` (`t3_project_list` shows them). With no project for it, ask the owner to add one; this case was not run when this file was written.
-- The start call answering `running` is your confirmation that the builder started.
+- The start call answering `running` is your confirmation that the builder started. Keep its thread id (`childThreadId`) in your note: work is sent back there.
 - The worktree starts from your current commit. The brief names the base branch; the builder branches from its tip as its first action.
 - The task text is the whole of what the builder knows. Give it where the brief is (the task id, or the path and the heading), and the path of the `deliver` skill to follow. Put no secret in it.
 - A new top-level thread is made only when the owner asks for one. "Builder", "delegate" and "parallel" do not mean one.
@@ -25,7 +25,9 @@ Marker: the environment variable `T3CODE_THREAD_ID` is set, and `delegate_task` 
 
 ## Sending work back
 
-A delegate that has handed back is finished. To have findings fixed, a failing check worked, or a branch brought up to date, start a new builder with `delegate_task` and a worktree. Its first action is to check out the pull request's branch (`gh pr checkout <n>`). Its task holds: the pull request number and branch, the head commit you expect, the list of what to do, the task's "done when" list, the owner's limits, and "Follow the `deliver` skill at <path> for an open pull request. Started by a coordinator: your ending is stop, and you run no review. Hand back the new head commit and the proof you ran again."
+To have findings fixed, a failing check worked, or a branch brought up to date, send the list to the builder's thread with `t3_thread_send`. A send to a finished builder starts a new turn there, with its earlier context and its worktree, and returns a new `taskId`; its completion wakes you as before. Do not set `freshContext`.
+
+Only when that thread cannot be used, start a new builder with `delegate_task` and a worktree. Its first action is to check out the pull request's branch (`gh pr checkout <n>`). Its task holds: the pull request number and branch, the head commit you expect, the list of what to do, the task's "done when" list, the owner's limits, and "Follow the `deliver` skill at <path> for an open pull request. Started by a coordinator: your ending is stop, and you run no review. Hand back the new head commit and the proof you ran again."
 
 T3 Code may tell you to fix a small review finding yourself. A commit you write is yours: prove it again by the `deliver` skill's proof reference, and have the next review round cover it.
 

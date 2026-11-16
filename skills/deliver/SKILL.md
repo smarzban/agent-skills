@@ -77,7 +77,7 @@ Every line must be true of the pull request's head commit, `<sha>`.
 - After `git fetch`, `<skill>/scripts/needs-owner --head <sha> --base origin/<base>` exits 0, where `<base>` is the branch the pull request targets.
 - The diff holds nothing outside the contract's scope.
 - Nothing was loosened to get here: no check disabled, skipped or made non-blocking, no test deleted or weakened, no threshold raised, no allowlist entry added, no feature taken off a verification map, no rule in a verification skill relaxed.
-- You resolved no review thread that a person opened, and every finding you set aside is listed in the pull request body with your reason.
+- You resolved no review thread that a person opened, and every finding you set aside is listed in the report with your reason.
 
 When a line is false, the ending is stop. Name the line in the report.
 
