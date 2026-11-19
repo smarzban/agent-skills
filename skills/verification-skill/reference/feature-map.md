@@ -111,4 +111,5 @@ Preconditions:
 - If the seed data lacks a precondition that a recipe needs, the recipe reports a failure and the reason goes in `Gotchas`. Do not weaken the recipe.
 - `Source` paths are wide enough to catch a change that can break the feature. Where the code allows it, keep them narrow enough not to fire on every commit: shared code that every feature uses (the app shell, the router) goes to the feature that would show the break first. Where several features live in one file, list that file under each of them.
 - Take `Automated coverage` from the test files, not from their names: open the test and confirm that it exercises the sub-feature.
+- A browser step in a recipe goes through the skill's browser helper, the same one in every feature file.
 - Check the map with `<verify>/scripts/features-for --all`. It lists every feature, checks every path in the map, and exits 0 when it prints no `NO-SOURCE` and no `DEAD` line.

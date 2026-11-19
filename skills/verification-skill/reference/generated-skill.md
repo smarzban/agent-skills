@@ -10,7 +10,8 @@
     <feature>.md     one file per user-facing feature
   scripts/
     features-for     copied from this skill; lists the features a diff touches
-    <helper>         whatever drives the app, when the repo has no driver of its own
+    browser          the one browser helper, for a web or Electron app
+    <helper>         whatever else drives the app, when the repo has no driver of its own
 ```
 
 Copy `<skill>/scripts/features-for` into `<verify>/scripts/` and keep it executable. The generated skill must work in a clone that does not have this skill.
@@ -50,7 +51,7 @@ Launch creates the run id and prints it. Every later command takes the run id as
 
 **Evidence.** What to capture for each kind of proof and where it goes. State the proof standards from this skill's rules. Evidence goes under `.verify/<run-id>/` at the repo root, which git ignores. Never write evidence or run state inside the skill folder: it would be committed, or pile up beside the recipes.
 
-**Cleanup.** How to stop what the run started. Where the run started a process, stop it by the id recorded at launch, never by name. Cleanup removes instances and scratch state and leaves the evidence.
+**Cleanup.** How to stop what the run started. Where the run started a process, stop it by the id recorded at launch, never by name. A browser the run opened is closed through the browser helper, its process stopped by its recorded id (by name would also kill the user's own browser), and its profile folder removed. Cleanup removes instances and scratch state and leaves the evidence and the pinned environment under `.verify/env/`.
 
 **Keeping the map current.** Three lines for the next agent:
 
@@ -64,3 +65,13 @@ Launch creates the run id and prints it. Every later command takes the run id as
 - Use a language the repo already depends on, or POSIX shell or Python 3. Do not add a dependency to the product for the sake of a helper; if the helper needs a package, keep it in a virtual environment under `.verify/` and show the one command that creates it.
 - A helper refuses to run against anything it did not create: it checks that the data folder is its own before it writes.
 - Keep run state (ids, ports, process ids) out of the skill folder: under `.verify/<run-id>/`, or in a temporary folder outside the repo with owner-only permissions when it holds a secret (a cookie jar, a token).
+
+## The browser helper
+
+For a web or Electron app whose repo has no Playwright or Cypress of its own, the driver is Playwright, behind one helper, `<verify>/scripts/browser`. Every recipe that touches the browser calls it; no recipe carries its own driver script, raw debugging-protocol call or harness browser tool.
+
+- **Verbs.** At least `open <run-id> <url>`, `click`, `fill`, `screenshot <run-id> --path <file>` and `wait`. Each takes the run id, finds elements by role and accessible name, label, test id or text, and prints what it did. `wait` waits on a condition (an element, a URL, a response), never a fixed time.
+- **Pinned outside the product.** Playwright goes into a virtual environment at `.verify/env/` (a `package.json` there for Node, a Python virtual environment otherwise), never into the product's own dependencies. The exact version is written in the committed skill, as the helper's `setup` command or a constant in it, because `.verify/` is not committed. Use an exact version at least a week old, chosen at create time; never a range or `latest`.
+- **Browser binaries.** Set `PLAYWRIGHT_BROWSERS_PATH=.verify/env/browsers` so the download stays in the repo's ignored folder, or use a browser already installed on the machine (Playwright's `channel` option). Say which in the skill.
+- **One browser per run, reached across shells.** Each command may run in a fresh shell, so `open` starts the browser (or the Electron app) with a remote-debugging port and its own profile folder, records the process id and endpoint under `.verify/<run-id>/`, and each later verb connects to that endpoint. The profile goes under `.verify/<run-id>/`, or, when it will hold a sign-in cookie, in a temporary folder outside the repo by the secret rule above.
+- **Cleanup verb.** `close <run-id>` closes the browser, stops its recorded process and removes its profile. The skill's cleanup calls it.

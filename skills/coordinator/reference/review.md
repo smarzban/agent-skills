@@ -13,7 +13,7 @@ You run the review on each builder's pull request. The builder's brief told it n
 
 ## Findings
 
-Check each finding against the code. For how to act on them, and how many rounds to run, follow `pr-work.md` in the `deliver` skill's `reference` folder. Where the repo's review step defines its own way to re-check fixes (a panel that verifies the kept findings in the same session), use that for the re-check.
+Check each finding against the code. For how to act on them, and how many rounds to run, follow `pr-work.md` in the `deliver` skill's `reference` folder. The two-strikes rule in the skill's **Rules** ends the rounds for a class early: a fix round that brings new findings of the class it fixed is the last for that class. Where the repo's review step defines its own way to re-check fixes (a panel that verifies the kept findings in the same session), use that for the re-check.
 
 Decide what to send back by how likely a finding is and how much it would cost:
 
