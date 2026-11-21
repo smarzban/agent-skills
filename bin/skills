@@ -14,6 +14,9 @@
 #   Claude Code, Cursor one link per skill in ~/.claude/skills and ~/.cursor/skills
 #                       (Claude Code does not scan nested folders; Cursor is not verified to),
 #                       refreshed by the git hooks and the Claude Code SessionStart hook
+#   Antigravity         one entry in ~/.gemini/config/skills.json -> <repo>/skills
+#                       (scanned one level deep, so new skills need no step); written only
+#                       when ~/.gemini/config exists, as an absolute path (agy rejects ~)
 #
 # It never overwrites anything it did not create: an existing file, folder or
 # foreign link with the same name is reported and left alone.
@@ -33,9 +36,10 @@ CLAUDE_DIR="${AGENT_SKILLS_CLAUDE_DIR:-$HOME/.claude/skills}"
 CURSOR_DIR="${AGENT_SKILLS_CURSOR_DIR:-$HOME/.cursor/skills}"
 PER_SKILL_DIRS="$CLAUDE_DIR $CURSOR_DIR"
 CLAUDE_SETTINGS="${AGENT_SKILLS_CLAUDE_SETTINGS:-$HOME/.claude/settings.json}"
+ANTIGRAVITY_SKILLS="${AGENT_SKILLS_ANTIGRAVITY_SKILLS:-$HOME/.gemini/config/skills.json}"
 BUNDLE="$AGENTS_DIR/agent-skills"
 # Harness-private skill folders: a same-named skill here shadows or duplicates ours.
-OTHER_DIRS="$HOME/.codex/skills $HOME/.pi/agent/skills $HOME/.grok/skills $AGENTS_DIR"
+OTHER_DIRS="$HOME/.codex/skills $HOME/.pi/agent/skills $HOME/.grok/skills $HOME/.gemini/config/skills $AGENTS_DIR"
 
 QUIET=0
 say()  { [ "$QUIET" = 1 ] || printf '%s\n' "$*"; }
@@ -69,6 +73,7 @@ ensure_link() {
 cmd_link() {
   local name dir link
   ensure_link "$BUNDLE" "$SRC" || warn "skipped  $BUNDLE exists and is not ours"
+  antigravity_entry add || true
 
   for dir in $PER_SKILL_DIRS; do
     for name in $(skill_names); do
@@ -91,6 +96,9 @@ cmd_status() {
   printf 'repo     %s\n' "$REPO"
   if [ -L "$BUNDLE" ] && [ "$(readlink "$BUNDLE")" = "$SRC" ]; then state="linked"; else state="NOT linked"; fi
   printf 'bundle   %s  (%s)  -> Codex, Pi, Grok\n' "$BUNDLE" "$state"
+  if [ ! -d "$(dirname "$ANTIGRAVITY_SKILLS")" ]; then state="Antigravity not found"
+  elif antigravity_entry check; then state="listed"; else state="NOT listed"; fi
+  printf 'entry    %s  (%s)  -> Antigravity\n' "$ANTIGRAVITY_SKILLS" "$state"
   printf '\n%-28s %-10s %-10s %s\n' "skill" "claude" "cursor" "same name elsewhere"
   for name in $(skill_names); do
     local cols="" dupes=""
@@ -160,6 +168,48 @@ if kept != groups:
 PY
 }
 
+# Add, remove or check our entry in Antigravity's global skills.json.
+# Other entries are kept; a file left empty is removed. A no-op without ~/.gemini/config.
+antigravity_entry() {
+  local action="$1"
+  [ -d "$(dirname "$ANTIGRAVITY_SKILLS")" ] || return 0
+  [ -f "$ANTIGRAVITY_SKILLS" ] || [ "$action" = add ] || return 1
+  ACTION="$action" CONFIG="$ANTIGRAVITY_SKILLS" SRC="$SRC" QUIET="$QUIET" python3 - <<'PY'
+import json, os, shutil, sys
+path, action, src = os.environ["CONFIG"], os.environ["ACTION"], os.environ["SRC"]
+data = {}
+if os.path.exists(path):
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except ValueError:
+        print("skipped  " + path + " is not valid JSON", file=sys.stderr)
+        sys.exit(1)
+entries = data.get("entries", [])
+ours = [e for e in entries if isinstance(e, dict) and e.get("path") == src]
+if action == "check":
+    sys.exit(0 if ours else 1)
+if (action == "add") == bool(ours):
+    sys.exit(0)
+if os.path.exists(path):
+    shutil.copy2(path, path + ".bak-agent-skills")
+if action == "add":
+    data["entries"] = entries + [{"path": src}]
+else:
+    data["entries"] = [e for e in entries if e not in ours]
+    if not data["entries"]:
+        del data["entries"]
+if data:
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
+else:
+    os.remove(path)
+if os.environ["QUIET"] != "1":
+    print(("added" if action == "add" else "removed") + "    Antigravity skills entry in " + path)
+PY
+}
+
 cmd_install() {
   cmd_link
   if git -C "$REPO" rev-parse --git-dir >/dev/null 2>&1; then
@@ -194,6 +244,7 @@ cmd_uninstall() {
     esac
   done
   claude_hook remove
+  antigravity_entry remove || true
   git -C "$REPO" config --unset core.hooksPath 2>/dev/null || true
 }
 
