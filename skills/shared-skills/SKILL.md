@@ -1,6 +1,6 @@
 ---
 name: shared-skills
-description: Add, edit or remove a skill in the user's shared agent-skills repo, the single source of skills for Claude Code, Codex, Cursor, Pi and Grok. Use when asked to "create a skill", "save this as a skill", "add this to my skills", "update the X skill" or "make this available to all my agents".
+description: Add, edit or remove a skill in the user's shared agent-skills repo, the single source of skills for Claude Code, Codex, Cursor, Pi, Grok and Antigravity. Use when asked to "create a skill", "save this as a skill", "add this to my skills", "update the X skill" or "make this available to all my agents".
 ---
 
 # shared-skills
@@ -21,7 +21,7 @@ Resolve the link: `readlink ~/.agents/skills/agent-skills` prints `<repo>/skills
 
 ## Edit or remove a skill
 
-Edit the files in place; every harness reads them through a link, so the change is live. To remove a skill, delete its folder and run `<repo>/bin/skills link` to prune the link.
+Edit the files in place; every harness reads them through a link or a listed folder, so the change is live. To remove a skill, delete its folder and run `<repo>/bin/skills link` to prune the link.
 
 ## Check
 

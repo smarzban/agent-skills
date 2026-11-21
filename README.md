@@ -1,6 +1,6 @@
 # agent-skills
 
-Agent skills for Claude Code, Codex, Cursor, Pi and Grok, in one repo that every harness on your machine reads live.
+Agent skills for Claude Code, Codex, Cursor, Pi, Grok and Antigravity, in one repo that every harness on your machine reads live.
 
 [![CI](https://github.com/smarzban/agent-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/smarzban/agent-skills/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -30,7 +30,7 @@ Agent skills for Claude Code, Codex, Cursor, Pi and Grok, in one repo that every
 
 Needs `git`, `bash` and `python3` on the path, and a system with symlinks. Tested on macOS.
 
-There are two ways to install. A clone reaches all five harnesses and stays live; a plugin needs no clone and is a cached copy. Use one per harness, not both, or each skill loads twice.
+There are two ways to install. A clone reaches all six harnesses and stays live; a plugin needs no clone and is a cached copy. Use one per harness, not both, or each skill loads twice.
 
 **Clone.** Once per machine, in any folder you like. Keep the clone where it is afterwards: the links point into it.
 
@@ -39,7 +39,7 @@ git clone https://github.com/smarzban/agent-skills.git
 agent-skills/bin/skills install
 ```
 
-`install` creates links, turns on the repo's git hooks, and adds a Claude Code `SessionStart` hook (a backup of `~/.claude/settings.json` is written next to it). It prints a line per link and per hook, then the status table. Each skill shows `linked` for Claude Code and Cursor, and the bundle line shows `(linked)  -> Codex, Pi, Grok`.
+`install` creates links, turns on the repo's git hooks, and adds a Claude Code `SessionStart` hook (a backup of `~/.claude/settings.json` is written next to it). It prints a line per link and per hook, then the status table. Each skill shows `linked` for Claude Code and Cursor, the bundle line shows `(linked)  -> Codex, Pi, Grok`, and the entry line shows `(listed)  -> Antigravity`.
 
 **Plugin.** In the harness you use:
 
@@ -59,8 +59,11 @@ To try a skill, start a new agent session in a git repo and ask it to "write a h
 |---|---|---|---|
 | Codex, Pi, Grok | one folder link `~/.agents/skills/agent-skills` → `skills/` | live | live, no step |
 | Claude Code, Cursor | one link per skill in `~/.claude/skills/` and `~/.cursor/skills/` | live | linked by `bin/skills new`, on commit, pull or checkout, and on Claude Code session start |
+| Antigravity | one entry in `~/.gemini/config/skills.json` pointing at `skills/` | live | live, no step |
 
 Claude Code does not scan nested skill folders, so it needs a link per skill. Cursor gets the same per-skill links because nested discovery there is not verified. `bin/skills link` makes them; the git hooks and the `SessionStart` hook run it for you.
+
+Antigravity reads every folder listed in `~/.gemini/config/skills.json`, one level deep. `bin/skills link` adds the clone's `skills/` folder to that list as an absolute path, because `agy` rejects `~`. It keeps any other entries and writes a backup next to the file. It skips this step when `~/.gemini/config` does not exist, so run `bin/skills link` again after you install Antigravity. Antigravity ranks skills listed this way below a project's own `.agents/skills` and below its built-in skills.
 
 ## Daily use
 
@@ -74,7 +77,7 @@ bin/skills update         # pull the newest skills and relink
 bin/skills uninstall      # remove every link and hook it created
 ```
 
-Use only `name` and `description` in frontmatter; both are honoured by all five harnesses. One skill also sets `disable-model-invocation: true`, which Claude Code and Pi honoured (the skill runs only when asked for) and Codex ignored when this repo was set up in November 2026; Cursor and Grok are untested. Its text therefore also tells the agent when not to run it.
+Use only `name` and `description` in frontmatter; both are honoured by all six harnesses. One skill also sets `disable-model-invocation: true`, which Claude Code and Pi honoured (the skill runs only when asked for) and Codex ignored when this repo was set up in November 2026; Antigravity left it out of the skills it lists to the model (November 2026); Cursor and Grok are untested. Its text therefore also tells the agent when not to run it.
 
 The linker never overwrites a file, folder or link it did not create. `status` shows same-named skills that already exist in a harness folder so you can retire the old copy.
 
