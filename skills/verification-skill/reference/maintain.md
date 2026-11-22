@@ -32,7 +32,7 @@ A feature whose stated precondition is not available here (production only, Dock
    - The map describes the feature wrongly or incompletely: fix the feature file.
    - A recipe check that also passes against a broken feature: tighten it, and drive it again.
    - The feature works and the helper cannot drive it: fix the helper, then drive it again before it ships.
-   - A recipe drives a browser some other way (its own script, a raw debugging-protocol call, a harness's browser tool): move it onto the skill's browser helper, adding the helper if the skill has none (`generated-skill.md`), and drive it again.
+   - A recipe drives a browser by a raw debugging-protocol call or a harness's browser tool: move it onto the repo's own driver or the skill's browser helper; where there is neither, add the helper (`generated-skill.md`). Drive it again.
    - `Source` or `Automated coverage` is wrong: correct it. Reading the file it names is the proof; no drive is needed.
    - Drift you suspect from the source and could not prove, because the feature is unreachable here: leave the file, and report it as suspected.
    - The app is broken: record it for the owner with the evidence. Keep it out of the pull request.

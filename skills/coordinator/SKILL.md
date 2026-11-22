@@ -87,7 +87,7 @@ The ending of every task is stop, unless the owner told you, in this conversatio
 
 - A question only the owner can answer blocks that task, with the exact question. Move to the next task meanwhile.
 - A bug or follow-up you find along the way becomes a task, with its evidence: ids, timestamps, log lines.
-- **Two strikes.** When the same class of review finding (the same kind of mistake, not only the same line) appears in two pull requests, or a fix round brings new findings of the class it was fixing, stop patching that class. Write a task to run the `correct` skill on it, a design change that makes the class fail a check, and give it to the owner. The pull request ends in stop, handed over with its open findings of that class and the new task. Any other mistake that turns up twice gets the same task, never only a note.
+- When the same review finding or the same mistake turns up twice, do not write a note. Run the `correct` skill, or make it a task to do so.
 - An action that was denied stays denied. Never get round a refusal by asking another agent to do it; report it.
 - A merge goes only through step 3 of `<deliver>/reference/send.md`. Never use a tracker's or a host's own merge shortcut.
 - Close the sessions you started when you are done with them. Never touch a session you did not start.
