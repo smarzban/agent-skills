@@ -70,7 +70,7 @@ The ending of every task is stop, unless the owner told you, in this conversatio
 9. **Test it yourself.** A builder's proof is a claim until you have seen it. Test in your own clean checkout of the head commit (`git worktree add --detach ../<repo>-test <sha>`), removed afterwards.
    - If the repo has a `verify-<app>` skill, run its `features-for` script on the branch and drive every feature it prints, including one listed only because a shared file changed. A feature you did not drive is named in the report, and the ending is stop.
    - Otherwise run the change the way its user would: click through the app, run the CLI on real input, call the API. A process that starts, or a health check that passes, is not a test.
-   - To drive a browser yourself, here or for a page check after a deploy, follow `reference/browser.md`.
+   - To drive a browser yourself where no `verify-<app>` recipe covers it, here or for a page check after a deploy, follow `reference/browser.md`. A feature the recipes cover is driven by its recipe.
    - Cover the main path, the failure paths that matter, and what the change must not do.
    - Send the full output of each command to a file in the folder you keep, and read only its result lines into the conversation.
    - When a real run is not possible, say exactly what blocks it and what you tested instead. The ending is stop.
