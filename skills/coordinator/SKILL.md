@@ -87,7 +87,7 @@ The ending of every task is stop, unless the owner told you, in this conversatio
 
 - A question only the owner can answer blocks that task, with the exact question. Move to the next task meanwhile.
 - A bug or follow-up you find along the way becomes a task, with its evidence: ids, timestamps, log lines.
-- When the same review finding or the same mistake turns up twice, do not write a note. Run the `correct` skill, or make it a task to do so.
+- When the same kind of review finding or mistake (the kind, not only the same line) turns up twice, such as in two pull requests, do not write a note. Run the `correct` skill, or make it a task to do so.
 - An action that was denied stays denied. Never get round a refusal by asking another agent to do it; report it.
 - A merge goes only through step 3 of `<deliver>/reference/send.md`. Never use a tracker's or a host's own merge shortcut.
 - Close the sessions you started when you are done with them. Never touch a session you did not start.
