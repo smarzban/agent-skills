@@ -78,10 +78,10 @@ Preconditions:
 - `control-notes doctor` reports the run's own URL and data folder.
 - No note is titled `Release checklist`.
 
-- **Open the editor.** Run `control-notes browser click --role button --name "New note"`. A form named `Note editor` appears with focus in `Title`.
-- **Save.** Run `control-notes browser fill --role textbox --name "Title" --value "Release checklist"`, then `control-notes browser click --role button --name "Save note"`. A status named `Note saved` appears.
+- **Open the editor.** Run `control-notes browser click --run <run-id> --role button --name "New note"`. A form named `Note editor` appears with focus in `Title`.
+- **Save.** Run `control-notes browser fill --run <run-id> --role textbox --name "Title" --value "Release checklist"`, then `control-notes browser click --run <run-id> --role button --name "Save note"`. A status named `Note saved` appears.
 - **Confirm it was stored.** Run `control-notes cli -- notes list --format json`. The output holds one note titled `Release checklist`.
-- **Cancel a draft.** Open a new note, fill `Title` with `Discard me`, and run `control-notes browser click --role button --name "Cancel"`. The list has no `Discard me`.
+- **Cancel a draft.** Open a new note, fill `Title` with `Discard me`, and run `control-notes browser click --run <run-id> --role button --name "Cancel"`. The list has no `Discard me`.
 - **CLI entry.** Run `control-notes cli -- notes create --title "CLI note" --body "From the terminal" --format json`. Exit code 0, and the output holds the new id.
 - **Proof.** Run `control-notes browser screenshot --run <run-id> --path create-note/list.png`, which writes under `.verify/<run-id>/`, and save the `notes list` output beside it. Both show `Release checklist` and `CLI note`.
 
@@ -111,4 +111,5 @@ Preconditions:
 - If the seed data lacks a precondition that a recipe needs, the recipe reports a failure and the reason goes in `Gotchas`. Do not weaken the recipe.
 - `Source` paths are wide enough to catch a change that can break the feature. Where the code allows it, keep them narrow enough not to fire on every commit: shared code that every feature uses (the app shell, the router) goes to the feature that would show the break first. Where several features live in one file, list that file under each of them.
 - Take `Automated coverage` from the test files, not from their names: open the test and confirm that it exercises the sub-feature.
+- Where the skill has a browser helper, every browser step in a recipe goes through it.
 - Check the map with `<verify>/scripts/features-for --all`. It lists every feature, checks every path in the map, and exits 0 when it prints no `NO-SOURCE` and no `DEAD` line.
