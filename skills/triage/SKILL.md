@@ -79,7 +79,7 @@ A list of numbers from the owner is a sweep that skips step 1.
 1. List them with a limit above the count, and report the totals: `gh issue list --state open --limit 200 --json number,title,author,updatedAt`, and the same with `gh pr list`.
 2. Skip one only when its note (`TRIAGE/<n>.md`) has a verdict for it and neither its `updatedAt` nor, for a pull request, its head commit has changed since.
 3. Order: security reports, pull requests, bug reports, feature requests; oldest first within each.
-4. Do steps 1 to 4 for each. Do step 5 and the before and after only for the ones the owner picks, unless they said beforehand to fix every reproduced bug.
+4. Do steps 1 to 4 for each. Do step 5 and the before and after only for the ones the owner picks, unless they said beforehand to fix every reproduced bug. "Fix every reproduced bug and send them", said in this conversation, is the owner's send for each of those fixes.
 5. Report as one table: number, kind, verdict, flags, what you recommend.
 
 ## Your note
