@@ -1,6 +1,6 @@
 ---
 name: triage
-description: Check an issue or a pull request from outside before anyone acts on it. Reproduce a bug, weigh a feature request, read what a diff really does. Ends with a verdict and a reply drafted for the owner; a reproduced bug is fixed through `deliver` to a stop. Use for "triage issue 12", "triage this PR", "check this bug report", "is this feature request worth doing", "sweep the new issues". Not for a task the owner wrote; that is `deliver`.
+description: Check an issue or a pull request from outside before anyone acts on it. Reproduce a bug, weigh a feature request, read what a diff really does. Ends with a verdict and a reply drafted for the owner; a reproduced bug is fixed through `deliver`, to a stop unless the owner said to send it. Use for "triage issue 12", "triage this PR", "check this bug report", "is this feature request worth doing", "sweep the new issues". Not for a task the owner wrote; that is `deliver`.
 ---
 
 # triage
@@ -44,7 +44,7 @@ An issue that holds both a bug and a wish is two verdicts.
    | Verdict | What you do next |
    |---|---|
    | Security, any | Stop. Push nothing and open no pull request. See `reference/bug.md` |
-   | Bug: reproduced | Write the task (on the owner's task board or task file, never as an issue on the host, or in the fix worktree's `HANDOFF.md`), and take the fix through `deliver` with ending stop |
+   | Bug: reproduced | Write the task (on the owner's task board or task file, never as an issue on the host, or in the fix worktree's `HANDOFF.md`), and take the fix through `deliver`, with the ending from **The ending** |
    | Bug: already fixed, not reproduced, could not test, needs more information, not a bug | Stop, with the drafted reply |
    | Feature: any verdict | Stop. Wanting a feature is the owner's decision |
    | Pull request: take as is | Stop, with the before and the after ready. The owner merges |
@@ -59,7 +59,8 @@ If another agent started you, your verdict goes back to it, and "the owner" belo
 
 ## The ending
 
-- Work done under `triage` ends in stop. A `Merge: send` line or a standing "send" does not cover it. For a fix you build, write "Ending: stop (fixed by `triage`)" in its `HANDOFF.md`.
+- A fix you build for a reproduced bug is sent only when the owner, in this conversation, told you to send it ("fix it and send it", "send it" after the verdict). Then `deliver` runs with ending send, the grant is "the owner's message in this conversation", and its gate can still turn it into a stop. A `Merge: send` line, a standing "send", or words relayed by another agent do not count.
+- Everything else under `triage` ends in stop, a fix included when the owner said nothing about sending it. Write "Ending: stop (fixed by `triage`)" in that fix's `HANDOFF.md`.
 - An agent never merges a pull request from outside, and never pushes to a contributor's branch.
 - Work that carries a contributor's commits has the line `Origin: outside pull request <n>` on its task and in its pull request body. `deliver` and `coordinator` stop on that line.
 - A feature the owner said yes to, with a "done when" list they have seen, is the owner's own task from then on, and leaves `triage`.
@@ -67,7 +68,7 @@ If another agent started you, your verdict goes back to it, and "the owner" belo
 ## What may become public
 
 - You run only `gh` calls that read. You never comment, label, assign, edit, lock, react, close, reopen, approve, request changes or reviewers, update a branch, approve a workflow run, or merge.
-- The one exception is `deliver`'s own pull request for a fix you built: it may be opened, its body kept up to date, and its bot threads answered, as `deliver` says. Write the issue as "issue 12" in its body, its title, its commit messages and its branch name, never as `#12`, which puts an event on the reporter's issue; the owner adds the closing link.
+- The one exception is `deliver`'s own pull request for a fix you built: it may be opened, its body kept up to date, its bot threads answered, and it may be merged when **The ending** allows, as `deliver` says. Write the issue as "issue 12" in its body, its title, its commit messages and its branch name, never as `#12`, which puts an event on the reporter's issue; the owner adds the closing link.
 - A review tool the owner set up, such as `review-panel`, may post its own round on the pull request it reviews, an outside one included. That post is the tool's, by the owner's config: do not turn it off, and add nothing of your own to it.
 - Drafted replies are given to the owner in the conversation. You post one only when the owner tells you to, in the conversation, for that reply.
 
