@@ -52,15 +52,15 @@ An issue that holds both a bug and a wish is two verdicts.
    | Pull request: owner's call, decline, needs more information | Stop, with the drafted reply |
    | Duplicate | Stop, with the link |
 
-6. **Set up the before and the after**, by `reference/before-after.md`, for a fix you built, and for a pull request whose verdict is "take as is" or "take with changes". Not for one you recommend declining.
+6. **Set up the before and the after**, by `reference/before-after.md`, for a fix you built that stopped, and for a pull request whose verdict is "take as is" or "take with changes". Not for one you recommend declining.
 7. **Report.** Just before it, for a pull request, run `<deliver>/scripts/pr-status <n> --head <sha>`; `HEAD-MOVED` means your verdict is old, and you say so. That is all this run is for: `READY` is not a verdict on a pull request from outside. Give the verdict first; a `deliver` report for a fix follows it and repeats nothing. Remove a contributor's head checkout that is not part of a before and after; leave the rest in place, listed with how to stop and remove each.
 
 If another agent started you, your verdict goes back to it, and "the owner" below reaches you only through it.
 
 ## The ending
 
-- A fix you build for a reproduced bug is sent only when the owner, in this conversation, told you to send it ("fix it and send it", "send it" after the verdict). Then `deliver` runs with ending send, the grant is "the owner's message in this conversation", and its gate can still turn it into a stop. A `Merge: send` line, a standing "send", or words relayed by another agent do not count.
-- Everything else under `triage` ends in stop, a fix included when the owner said nothing about sending it. Write "Ending: stop (fixed by `triage`)" in that fix's `HANDOFF.md`.
+- A fix for an issue's `Bug: reproduced` verdict is sent only when the owner, in this conversation, told you to send it ("fix it and send it", "send it" after the verdict): `deliver` takes that message as its grant. A `Merge: send` line, a standing "send", or words relayed by another agent do not count.
+- Everything else under `triage` ends in stop.
 - An agent never merges a pull request from outside, and never pushes to a contributor's branch.
 - Work that carries a contributor's commits has the line `Origin: outside pull request <n>` on its task and in its pull request body. `deliver` and `coordinator` stop on that line.
 - A feature the owner said yes to, with a "done when" list they have seen, is the owner's own task from then on, and leaves `triage`.
