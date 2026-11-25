@@ -41,4 +41,4 @@ These worktrees hold ignored evidence folders, so removing one takes `git worktr
 
 - Write the steps in your own words, following what the reporter did, so that the owner sees what they saw.
 - Start both and check them yourself before you hand over: the before shows the problem, the after does not.
-- List both under **Left running** in `TRIAGE.md`. They stay until the owner says they are finished; then stop them and remove the worktrees.
+- List both under **Left running** in the item's note, `TRIAGE/<n>.md`. They stay until the owner says they are finished; then stop them and remove the worktrees.
