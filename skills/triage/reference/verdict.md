@@ -1,6 +1,6 @@
 # The verdict
 
-Written for an owner who has one minute. Give it in the conversation, and keep a copy in `TRIAGE.md`.
+Written for an owner who has one minute. Give it in the conversation, and keep a copy in the item's note, `TRIAGE/<n>.md` (see "Your note" in `SKILL.md`).
 
 ```markdown
 ## #<n> <title>
