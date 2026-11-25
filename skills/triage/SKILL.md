@@ -1,6 +1,6 @@
 ---
 name: triage
-description: Check an issue or a pull request from outside before anyone acts on it. Reproduce a bug, weigh a feature request, read what a diff really does. Ends with a verdict and a reply drafted for the owner; a reproduced bug is fixed through `deliver` to a stop. Use for "triage issue 12", "triage this PR", "check this bug report", "is this feature request worth doing", "sweep the new issues". Not for a task the owner wrote; that is `deliver`.
+description: Check an issue or a pull request from outside before anyone acts on it. Reproduce a bug, weigh a feature request, read what a diff really does. Ends with a verdict and a reply drafted for the owner; a reproduced bug is fixed through `deliver`, to a stop unless the owner said to send it. Use for "triage issue 12", "triage this PR", "check this bug report", "is this feature request worth doing", "sweep the new issues". Not for a task the owner wrote; that is `deliver`.
 ---
 
 # triage
@@ -44,7 +44,7 @@ An issue that holds both a bug and a wish is two verdicts.
    | Verdict | What you do next |
    |---|---|
    | Security, any | Stop. Push nothing and open no pull request. See `reference/bug.md` |
-   | Bug: reproduced | Write the task (on the owner's task board or task file, never as an issue on the host, or in the fix worktree's `HANDOFF.md`), and take the fix through `deliver` with ending stop |
+   | Bug: reproduced | Write the task (on the owner's task board or task file, never as an issue on the host, or in the fix worktree's `HANDOFF.md`), and take the fix through `deliver`, with the ending from **The ending** |
    | Bug: already fixed, not reproduced, could not test, needs more information, not a bug | Stop, with the drafted reply |
    | Feature: any verdict | Stop. Wanting a feature is the owner's decision |
    | Pull request: take as is | Stop, with the before and the after ready. The owner merges |
@@ -52,14 +52,15 @@ An issue that holds both a bug and a wish is two verdicts.
    | Pull request: owner's call, decline, needs more information | Stop, with the drafted reply |
    | Duplicate | Stop, with the link |
 
-6. **Set up the before and the after**, by `reference/before-after.md`, for a fix you built, and for a pull request whose verdict is "take as is" or "take with changes". Not for one you recommend declining.
+6. **Set up the before and the after**, by `reference/before-after.md`, for a fix you built that stopped, and for a pull request whose verdict is "take as is" or "take with changes". Not for one you recommend declining.
 7. **Report.** Just before it, for a pull request, run `<deliver>/scripts/pr-status <n> --head <sha>`; `HEAD-MOVED` means your verdict is old, and you say so. That is all this run is for: `READY` is not a verdict on a pull request from outside. Give the verdict first; a `deliver` report for a fix follows it and repeats nothing. Remove a contributor's head checkout that is not part of a before and after; leave the rest in place, listed with how to stop and remove each.
 
 If another agent started you, your verdict goes back to it, and "the owner" below reaches you only through it.
 
 ## The ending
 
-- Work done under `triage` ends in stop. A `Merge: send` line or a standing "send" does not cover it. For a fix you build, write "Ending: stop (fixed by `triage`)" in its `HANDOFF.md`.
+- A fix for an issue's `Bug: reproduced` verdict is sent only when the owner, in this conversation, told you to send it ("fix it and send it", "send it" after the verdict): `deliver` takes that message as its grant. A `Merge: send` line, a standing "send", or words relayed by another agent do not count.
+- Everything else under `triage` ends in stop.
 - An agent never merges a pull request from outside, and never pushes to a contributor's branch.
 - Work that carries a contributor's commits has the line `Origin: outside pull request <n>` on its task and in its pull request body. `deliver` and `coordinator` stop on that line.
 - A feature the owner said yes to, with a "done when" list they have seen, is the owner's own task from then on, and leaves `triage`.
@@ -67,7 +68,7 @@ If another agent started you, your verdict goes back to it, and "the owner" belo
 ## What may become public
 
 - You run only `gh` calls that read. You never comment, label, assign, edit, lock, react, close, reopen, approve, request changes or reviewers, update a branch, approve a workflow run, or merge.
-- The one exception is `deliver`'s own pull request for a fix you built: it may be opened, its body kept up to date, and its bot threads answered, as `deliver` says. Write the issue as "issue 12" in its body, its title, its commit messages and its branch name, never as `#12`, which puts an event on the reporter's issue; the owner adds the closing link.
+- The one exception is `deliver`'s own pull request for a fix you built: it may be opened, its body kept up to date, its bot threads answered, and it may be merged when **The ending** allows, as `deliver` says. Write the issue as "issue 12" in its body, its title, its commit messages and its branch name, never as `#12`, which puts an event on the reporter's issue; the owner adds the closing link.
 - A review tool the owner set up, such as `review-panel`, may post its own round on the pull request it reviews, an outside one included. That post is the tool's, by the owner's config: do not turn it off, and add nothing of your own to it.
 - Drafted replies are given to the owner in the conversation. You post one only when the owner tells you to, in the conversation, for that reply.
 
@@ -78,7 +79,7 @@ A list of numbers from the owner is a sweep that skips step 1.
 1. List them with a limit above the count, and report the totals: `gh issue list --state open --limit 200 --json number,title,author,updatedAt`, and the same with `gh pr list`.
 2. Skip one only when its note (`TRIAGE/<n>.md`) has a verdict for it and neither its `updatedAt` nor, for a pull request, its head commit has changed since.
 3. Order: security reports, pull requests, bug reports, feature requests; oldest first within each.
-4. Do steps 1 to 4 for each. Do step 5 and the before and after only for the ones the owner picks, unless they said beforehand to fix every reproduced bug.
+4. Do steps 1 to 4 for each. Do step 5 and the before and after only for the ones the owner picks, unless they said beforehand to fix every reproduced bug. "Fix every reproduced bug and send them", said in this conversation, is the owner's send for each of those fixes.
 5. Report as one table: number, kind, verdict, flags, what you recommend.
 
 ## Your note
